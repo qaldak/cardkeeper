@@ -12,6 +12,11 @@ export interface YgoAdapterOptions {
 const LANGUAGES = ['en', 'de', 'fr', 'it', 'pt'] as const
 const MAX_SEARCH_RESULTS = 25
 
+// The API reports every error as HTTP 400 with a JSON body `{ "error": "<message>" }`: an empty
+// result as well as an invalid parameter. Only the message tells them apart.
+const NO_RESULT = /no cards? (matching|found)/i
+const MAX_ERROR_TEXT = 200
+
 export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
   const fetchFn = options.fetchFn ?? fetch
   const baseUrl = options.baseUrl.replace(/\/+$/, '')
@@ -42,22 +47,26 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
         signal: AbortSignal.timeout(options.timeoutMs ?? 10_000),
       })
     }
-    catch {
-      throw new HttpError(502, 'upstream_unreachable', 'YGOPRODeck is not reachable')
+    catch (error) {
+      // Keep the cause (DNS error, refused connection, timeout, ...) so it shows up in the logs.
+      throw new HttpError(502, 'upstream_unreachable', 'YGOPRODeck is not reachable', { cause: error })
     }
 
     if (response.status === 429) {
       throw new HttpError(429, 'upstream_rate_limited', 'YGOPRODeck rate limit reached, try again later')
     }
 
-    const body = await response.json().catch(() => null) as { error?: string } | null
+    const body = await response.json().catch(() => null) as { error?: unknown } | null
+    const apiError = typeof body?.error === 'string' ? body.error : undefined
 
-    // The API answers an empty result with HTTP 400 and an explanatory message.
-    if (response.status === 400 && typeof body?.error === 'string' && /no card matching/i.test(body.error)) {
+    if (response.status === 400 && apiError !== undefined && NO_RESULT.test(apiError)) {
       return []
     }
     if (!response.ok) {
-      throw new HttpError(502, 'upstream_error', `YGOPRODeck answered with status ${response.status}`)
+      // Any other error means our request was not accepted (e.g. an invalid parameter value):
+      // pass the API's own message on so the cause is visible in the logs.
+      const detail = apiError ? `: ${apiError.slice(0, MAX_ERROR_TEXT)}` : ''
+      throw new HttpError(502, 'upstream_error', `YGOPRODeck answered with status ${response.status}${detail}`)
     }
 
     const parsed = ygoResponseSchema.safeParse(body)

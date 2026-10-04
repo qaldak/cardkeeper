@@ -226,6 +226,8 @@ No schema change and no change in the services is required.
   lookup or refresh and downloads each image once. Images are only downloaded from the hosts an adapter declares.
 - The adapter follows the documented API v7 response shape. Its tests use a hand-written fixture of that shape, not
   recorded live data, so check a real lookup after the first deployment.
+- The API reports every error as HTTP 400 with `{ "error": "<message>" }`. Only "No card matching …" means an empty
+  result; any other error text is passed on in the 502 message and the cause of network failures is kept in the logs.
 - Every card is requested twice (`language=de` and English). If the API answers a German request for an untranslated card
   with the English card instead of "not found", that copy is detected (same name and text as the English one) and not
   stored as a German translation.
