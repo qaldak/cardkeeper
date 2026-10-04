@@ -1,0 +1,47 @@
+{
+  "name": "cardkeeper",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "nuxt dev --host 0.0.0.0",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "prisma generate && nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@iconify-json/lucide": "^1.2.139",
+    "@nuxt/ui": "^4.11.3",
+    "@nuxtjs/i18n": "^10.6.0",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "nuxt": "^4.5.2",
+    "pg": "^8.23.1",
+    "tailwindcss": "^4.3.3",
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.17.0",
+    "@types/node": "^26.6.4",
+    "@types/pg": "^8.23.1",
+    "eslint": "^10.12.0",
+    "prisma": "7.10.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.3",
+    "vue-tsc": "^3.3.12"
+  }
+}

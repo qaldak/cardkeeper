@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-400.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-500.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-600.css";
+
+@theme static {
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+
+  /* Brand blue of the UI mockups (#2F6FED at 500). */
+  --color-brand-50: #eaf1fd;
+  --color-brand-100: #d5e3fb;
+  --color-brand-200: #adc8f8;
+  --color-brand-300: #84acf5;
+  --color-brand-400: #5a8cf1;
+  --color-brand-500: #2f6fed;
+  --color-brand-600: #1d4fbd;
+  --color-brand-700: #183f98;
+  --color-brand-800: #132f72;
+  --color-brand-900: #0e2150;
+  --color-brand-950: #08142e;
+}
+
+body {
+  background-color: #f6f8fb;
+}

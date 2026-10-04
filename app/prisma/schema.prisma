@@ -1,0 +1,158 @@
+// Core schema of the card collection. Game specific data lives in JSONB columns so that
+// adding a new trading card game does not require a schema change.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../server/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CardStatus {
+  ACTIVE
+  SOLD
+  TRADED
+  GIFTED
+  LOST
+}
+
+enum ImageSource {
+  API
+  MANUAL
+}
+
+model Game {
+  id          Int    @id @default(autoincrement())
+  slug        String @unique
+  displayName String @map("display_name")
+  cards       Card[]
+
+  @@map("games")
+}
+
+model Player {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  contact   String?
+  createdAt DateTime @default(now()) @map("created_at")
+  cards     Card[]
+
+  @@map("players")
+}
+
+// One row represents one physical card (copy) of the collection.
+model Card {
+  id                     Int        @id @default(autoincrement())
+  gameId                 Int        @map("game_id")
+  externalId             String?    @map("external_id")
+  name                   String
+  description            String?
+  language               String     @default("en")
+  gameSpecificAttributes Json       @default("{}") @map("game_specific_attributes")
+  // Maps a manually edited field to the value it had before the first manual edit.
+  manualOverrides        Json       @default("{}") @map("manual_overrides")
+  assignedPlayerId       Int?       @map("assigned_player_id")
+  status                 CardStatus @default(ACTIVE)
+  purchaseDate           DateTime?  @map("purchase_date") @db.Date
+  createdAt              DateTime   @default(now()) @map("created_at")
+  lastFetchedAt          DateTime?  @map("last_fetched_at")
+  lastModifiedAt         DateTime   @default(now()) @updatedAt @map("last_modified_at")
+  lastModifiedBy         String?    @map("last_modified_by")
+
+  game           Game            @relation(fields: [gameId], references: [id])
+  assignedPlayer Player?         @relation(fields: [assignedPlayerId], references: [id], onDelete: SetNull)
+  sets           CardSet[]
+  priceHistory   PriceHistory[]
+  statusHistory  StatusHistory[]
+  snapshots      ApiSnapshot[]
+  images         CardImage[]
+
+  @@index([gameId, status])
+  @@index([assignedPlayerId])
+  @@index([externalId])
+  @@map("cards")
+}
+
+model CardSet {
+  id      Int     @id @default(autoincrement())
+  cardId  Int     @map("card_id")
+  setCode String  @map("set_code")
+  setName String  @map("set_name")
+  rarity  String?
+  edition String?
+  card    Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("card_sets")
+}
+
+model PriceHistory {
+  id        Int      @id @default(autoincrement())
+  cardId    Int      @map("card_id")
+  source    String
+  price     Decimal  @db.Decimal(10, 2)
+  currency  String   @db.VarChar(3)
+  fetchedAt DateTime @default(now()) @map("fetched_at")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId, source, fetchedAt])
+  @@map("price_history")
+}
+
+model StatusHistory {
+  id         Int        @id @default(autoincrement())
+  cardId     Int        @map("card_id")
+  status     CardStatus
+  date       DateTime   @db.Date
+  personText String?    @map("person_text")
+  changedBy  String?    @map("changed_by")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  card       Card       @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId, createdAt])
+  @@map("status_history")
+}
+
+// Immutable raw API responses, kept for traceability.
+model ApiSnapshot {
+  id        Int      @id @default(autoincrement())
+  cardId    Int      @map("card_id")
+  fetchedAt DateTime @default(now()) @map("fetched_at")
+  rawJson   Json     @map("raw_json")
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("api_snapshots")
+}
+
+model CardImage {
+  id         Int         @id @default(autoincrement())
+  cardId     Int         @map("card_id")
+  // Path relative to the image directory (IMAGE_DIR), never an absolute path.
+  filePath   String      @map("file_path")
+  source     ImageSource
+  isPrimary  Boolean     @default(false) @map("is_primary")
+  uploadedAt DateTime    @default(now()) @map("uploaded_at")
+  uploadedBy String?     @map("uploaded_by")
+  card       Card        @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("card_images")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  entity    String
+  entityId  Int      @map("entity_id")
+  field     String
+  oldValue  String?  @map("old_value")
+  newValue  String?  @map("new_value")
+  changedBy String?  @map("changed_by")
+  changedAt DateTime @default(now()) @map("changed_at")
+
+  @@index([entity, entityId])
+  @@map("audit_log")
+}
