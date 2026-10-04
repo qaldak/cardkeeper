@@ -15,7 +15,18 @@ ENV CHECKPOINT_DISABLE=1 \
     NUXT_TELEMETRY_DISABLED=1
 
 # ---------------------------------------------------------------------------------------------
-FROM base AS deps
+# The dependency and build stages always run on the builder's native platform. The Nitro bundle is
+# plain JavaScript (no native binaries), so a multi-arch build does not have to run npm and nuxt
+# under QEMU emulation, which would take very long for the arm64 image.
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-alpine AS build-base
+WORKDIR /app
+RUN apk add --no-cache openssl
+ENV CHECKPOINT_DISABLE=1 \
+    PRISMA_HIDE_UPDATE_MESSAGE=1 \
+    NUXT_TELEMETRY_DISABLED=1
+
+# ---------------------------------------------------------------------------------------------
+FROM build-base AS deps
 COPY package.json package-lock.json ./
 # Install scripts (prisma generate, nuxt prepare) need the sources and run in the build stage.
 RUN npm ci --ignore-scripts --no-audit --no-fund
@@ -32,7 +43,7 @@ EXPOSE 3000
 CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && npm run dev"]
 
 # ---------------------------------------------------------------------------------------------
-FROM base AS build
+FROM build-base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate && npm run build
