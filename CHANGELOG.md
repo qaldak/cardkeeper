@@ -1,3 +1,13 @@
+## [0.2.0](https://github.com/qaldak/cardkeeper/compare/v0.1.1...v0.2.0) (2026-10-04)
+
+### Features
+
+* store German and English card texts, add filters and refresh from API ([4ded1b6](https://github.com/qaldak/cardkeeper/commit/4ded1b6e6d431d649cdfdc1daa5ba03a31ca115a))
+
+### Bug Fixes
+
+* keep the API error text and the cause of network failures ([26fef58](https://github.com/qaldak/cardkeeper/commit/26fef5848785e47284e19cb388d74171b601901d))
+
 ## [0.1.1](https://github.com/qaldak/cardkeeper/compare/v0.1.0...v0.1.1) (2026-10-04)
 
 ### Bug Fixes
