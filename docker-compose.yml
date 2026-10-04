@@ -1,0 +1,60 @@
+# Production stack: web app + PostgreSQL. Copy .env.example to .env and set the passwords first.
+#
+#   docker compose up -d --build     build the image from source and start
+#   docker compose pull && docker compose up -d     use the published image instead of building
+name: cardkeeper
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      # Superuser, only used by the init script and never by the application.
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      APP_DB_NAME: ${APP_DB_NAME:-cardkeeper}
+      APP_DB_USER: ${APP_DB_USER:-cardkeeper}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Set APP_DB_PASSWORD in .env}
+    # Keep the memory footprint small for a Raspberry Pi.
+    command: ["postgres", "-c", "shared_buffers=128MB", "-c", "max_connections=30"]
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Check over TCP: the temporary server that runs the init scripts only listens on a socket,
+      # so the app does not start before the application role exists.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    # No published ports: the database is only reachable from the app container.
+
+  app:
+    image: ${APP_IMAGE:-ghcr.io/qaldak/cardkeeper:latest}
+    build:
+      context: ./app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${APP_DB_USER:-cardkeeper}:${APP_DB_PASSWORD}@db:5432/${APP_DB_NAME:-cardkeeper}
+      PRICE_SOURCE: ${PRICE_SOURCE:-cardmarket}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-5}
+      AUTH_USER_HEADER: ${AUTH_USER_HEADER:-x-remote-user}
+      NODE_OPTIONS: --max-old-space-size=256
+    volumes:
+      - card-images:/data/card-images
+    # The only port that reaches the host. Bound to localhost by default, the reverse proxy
+    # (nginx) forwards to it. Set APP_BIND_ADDRESS=0.0.0.0 only inside a trusted network.
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-3000}:3000"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  db-data:
+  card-images:
