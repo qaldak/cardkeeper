@@ -58,6 +58,8 @@ describe.skipIf(!TEST_DATABASE_URL)('image service', () => {
     const second = await h.services.images.addManual(card.id, JPEG_BYTES, 'anna')
     expect(first).toMatchObject({ source: 'MANUAL', isPrimary: true })
     expect(second).toMatchObject({ source: 'MANUAL', isPrimary: false })
+    // Image changes count as a change by the user.
+    expect((await h.services.cards.get(card.id)).userModifiedAt).toBe('2026-10-04T12:00:00.000Z')
     expect((await h.services.cards.get(card.id)).images.map(image => image.id)).toEqual([first.id, second.id])
   })
 

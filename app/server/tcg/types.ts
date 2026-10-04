@@ -1,6 +1,6 @@
 export interface CommonCardSet {
   setCode: string
-  setName: string
+  setName: string | null
   rarity: string | null
 }
 
@@ -38,6 +38,8 @@ export interface CardAdapter {
   readonly displayName: string
   readonly languages: readonly string[]
   readonly defaultLanguage: string
+  /** Languages whose texts are downloaded and stored for every card, in order of preference. */
+  readonly storedLanguages: readonly string[]
   /** Hosts card images may be downloaded from. */
   readonly imageHosts: readonly string[]
   fetchCardById(externalId: string, language?: string): Promise<CommonCard | null>

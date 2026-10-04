@@ -1,5 +1,6 @@
 import type { Prisma } from '../generated/prisma/client'
 import type { CardDetailDto, CardListItemDto, PricePointDto } from '../../shared/types/api'
+import { sortByLanguagePreference } from '../../shared/utils/languages'
 import { formatDateOnly } from '../lib/dates'
 
 const toNumber = (value: { toString: () => string }): number => Number(value.toString())
@@ -21,6 +22,7 @@ export function listInclude(priceSource: string) {
 export function detailInclude() {
   return {
     game: { select: { slug: true, displayName: true } },
+    translations: true,
     sets: { orderBy: { id: 'asc' } },
     images: { orderBy: [{ isPrimary: 'desc' }, { id: 'asc' }] },
     priceHistory: { orderBy: [{ fetchedAt: 'desc' }, { id: 'desc' }], take: 200 },
@@ -54,10 +56,12 @@ export function toDetail(card: DetailCard, priceSource: string): CardDetailDto {
     game: card.game,
     externalId: card.externalId,
     name: card.name,
-    description: card.description,
-    language: card.language,
+    translations: sortByLanguagePreference(card.translations).map(entry => ({
+      language: entry.language,
+      name: entry.name,
+      description: entry.description,
+    })),
     attributes: card.gameSpecificAttributes as CardDetailDto['attributes'],
-    manualOverrides: card.manualOverrides as Record<string, unknown>,
     status: card.status,
     statusDate: showStatusInfo ? formatDateOnly(latestStatus.date) : null,
     statusPerson: showStatusInfo ? latestStatus.personText : null,
@@ -80,6 +84,7 @@ export function toDetail(card: DetailCard, priceSource: string): CardDetailDto {
     })),
     primarySource: priceSource,
     lastFetchedAt: card.lastFetchedAt?.toISOString() ?? null,
+    userModifiedAt: card.userModifiedAt?.toISOString() ?? null,
     lastModifiedAt: card.lastModifiedAt.toISOString(),
     lastModifiedBy: card.lastModifiedBy,
   }

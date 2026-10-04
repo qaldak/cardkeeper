@@ -142,13 +142,47 @@ describe('YGO adapter: requests', () => {
     expect(fetchFn).not.toHaveBeenCalled()
   })
 
-  it('treats the "no card matching" 400 as an empty result', async () => {
+  // The API reports every error as HTTP 400 with {"error": "..."}; the text tells them apart.
+  it.each([
+    'No card matching your query was found in the database.',
+    'No card matching your query was found in the database. Please see https://ygoprodeck.com/api-guide/ for syntax usage.',
+    'No cards found.',
+  ])('treats the 400 "%s" as an empty result', async (message) => {
     // A fresh Response per call: a body can only be read once.
-    const fetchFn = vi.fn().mockImplementation(() =>
-      Promise.resolve(json({ error: 'No card matching your query was found in the database.' }, 400)))
+    const fetchFn = vi.fn().mockImplementation(() => Promise.resolve(json({ error: message }, 400)))
     const adapter = adapterWith(fetchFn)
     expect(await adapter.fetchCardById('1234567')).toBeNull()
     expect(await adapter.searchCards('zzzz')).toEqual([])
+  })
+
+  it('does not treat other 400 errors as an empty result and passes the API message on', async () => {
+    const message = 'No valid parameter set. Accepted parameters: name, fname, id, ...'
+    const fetchFn = vi.fn().mockImplementation(() => Promise.resolve(json({ error: message }, 400)))
+    const error = await adapterWith(fetchFn).searchCards('dark').catch((e: HttpError) => e)
+    expect(error).toMatchObject({ status: 502, code: 'upstream_error' })
+    expect((error as HttpError).message).toContain('status 400')
+    expect((error as HttpError).message).toContain(message)
+  })
+
+  it('shortens a very long API error message', async () => {
+    const fetchFn = vi.fn().mockImplementation(() => Promise.resolve(json({ error: 'x'.repeat(5000) }, 400)))
+    const error = await adapterWith(fetchFn).searchCards('dark').catch((e: HttpError) => e)
+    expect((error as HttpError).message.length).toBeLessThan(300)
+  })
+
+  it('handles a 400 without a JSON body or without an error text', async () => {
+    for (const response of [() => new Response('<html>blocked</html>', { status: 400 }), () => json({ unexpected: true }, 400), () => json({ error: { nested: true } }, 400)]) {
+      const fetchFn = vi.fn().mockImplementation(() => Promise.resolve(response()))
+      expect(await adapterWith(fetchFn).fetchCardById('46986414').catch((e: HttpError) => e)).toMatchObject({ status: 502, code: 'upstream_error' })
+    }
+  })
+
+  it('keeps the cause of a network failure for the logs', async () => {
+    const cause = Object.assign(new Error('connect EHOSTUNREACH 104.20.45.245:443'), { code: 'EHOSTUNREACH' })
+    const fetchFn = vi.fn().mockRejectedValue(new TypeError('fetch failed', { cause }))
+    const error = await adapterWith(fetchFn).fetchCardById('46986414').catch((e: HttpError) => e)
+    expect(error).toMatchObject({ status: 502, code: 'upstream_unreachable' })
+    expect(((error as HttpError).cause as Error).cause).toBe(cause)
   })
 
   it('maps upstream failures to stable error codes', async () => {

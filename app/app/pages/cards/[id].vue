@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CardDetailDto, CardImageDto, PlayerDto } from '#shared/types/api'
-import { formatAttributeValue, getAttributeFields, parseAttributeInput } from '#shared/utils/game-fields'
+import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
+import { CARD_LANGUAGES, preferredLanguage } from '#shared/utils/languages'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
 
 const { t } = useI18n()
@@ -16,19 +17,33 @@ if (error.value || !card.value) {
 }
 const { data: players } = await useFetch<PlayerDto[]>('/api/players')
 
-useHead({ title: () => card.value?.name })
-
 const NONE = 'none'
 const today = () => new Date().toISOString().slice(0, 10)
 
+// --- Language of the shown texts --------------------------------------------------------------
+
+const availableLanguages = computed(() => card.value!.translations.map(entry => entry.language))
+// German is selected whenever the card has a German text.
+const language = ref(preferredLanguage(availableLanguages.value) ?? 'en')
+const translation = computed(() =>
+  card.value!.translations.find(entry => entry.language === language.value) ?? card.value!.translations[0],
+)
+const shownName = computed(() => translation.value?.name ?? card.value!.name)
+
+// A refresh can add a language; keep the selection valid if one disappears.
+watch(availableLanguages, (languages) => {
+  if (!languages.includes(language.value)) {
+    language.value = preferredLanguage(languages) ?? 'en'
+  }
+})
+
+useHead({ title: () => shownName.value })
+
+// --- Editable part of the form ----------------------------------------------------------------
+
 interface FormState {
-  name: string
-  description: string
-  setName: string
   setCode: string
-  rarity: string
   edition: string
-  attributes: Record<string, string>
   status: CardStatusValue
   statusDate: string
   statusPerson: string
@@ -39,15 +54,8 @@ interface FormState {
 function toForm(source: CardDetailDto): FormState {
   const set = source.sets[0]
   return {
-    name: source.name,
-    description: source.description ?? '',
-    setName: set?.setName ?? '',
     setCode: set?.setCode ?? '',
-    rarity: set?.rarity ?? '',
     edition: set?.edition ?? '',
-    attributes: Object.fromEntries(
-      getAttributeFields(source.game.slug).map(field => [field.key, formatAttributeValue(field.kind, source.attributes[field.key])]),
-    ),
     status: source.status,
     statusDate: source.statusDate ?? '',
     statusPerson: source.statusPerson ?? '',
@@ -57,7 +65,6 @@ function toForm(source: CardDetailDto): FormState {
 }
 
 const form = reactive<FormState>(toForm(card.value))
-const attributeErrors = ref<Record<string, boolean>>({})
 const saving = ref(false)
 
 const attributeFields = computed(() => getAttributeFields(card.value!.game.slug))
@@ -80,47 +87,19 @@ const playerItems = computed(() => [
 const nullIfBlank = (value: string) => (value.trim() === '' ? null : value.trim())
 
 /** Builds the PATCH body with only the fields that differ from the stored card. */
-function buildPatch(current: CardDetailDto): Record<string, unknown> | null {
+function buildPatch(current: CardDetailDto): Record<string, unknown> {
   const patch: Record<string, unknown> = {}
   const original = toForm(current)
 
-  if (form.name !== original.name) {
-    patch.name = form.name
-  }
-  if (form.description !== original.description) {
-    patch.description = form.description
-  }
-
-  const attributes: Record<string, string | number | null> = {}
-  const errors: Record<string, boolean> = {}
-  for (const field of attributeFields.value) {
-    if (form.attributes[field.key] === original.attributes[field.key]) {
-      continue
+  if (form.setCode !== original.setCode || form.edition !== original.edition) {
+    const set: Record<string, string | null> = {}
+    if (form.setCode !== original.setCode) {
+      set.setCode = form.setCode.trim()
     }
-    const parsed = parseAttributeInput(field.kind, form.attributes[field.key] ?? '')
-    if (parsed === undefined) {
-      errors[field.key] = true
+    if (form.edition !== original.edition) {
+      set.edition = nullIfBlank(form.edition)
     }
-    else {
-      attributes[field.key] = parsed
-    }
-  }
-  attributeErrors.value = errors
-  if (Object.keys(errors).length > 0) {
-    return null
-  }
-  if (Object.keys(attributes).length > 0) {
-    patch.attributes = attributes
-  }
-
-  const setFields = ['setName', 'setCode', 'rarity', 'edition'] as const
-  if (setFields.some(key => form[key] !== original[key])) {
-    patch.set = {
-      setName: nullIfBlank(form.setName) ?? undefined,
-      setCode: nullIfBlank(form.setCode) ?? undefined,
-      rarity: nullIfBlank(form.rarity),
-      edition: nullIfBlank(form.edition),
-    }
+    patch.set = set
   }
 
   if (form.status !== original.status) {
@@ -144,10 +123,6 @@ function buildPatch(current: CardDetailDto): Record<string, unknown> | null {
 
 async function save() {
   const patch = buildPatch(card.value!)
-  if (patch === null) {
-    toast.add({ title: t('errors.invalid_attribute'), color: 'error' })
-    return
-  }
   if (Object.keys(patch).length === 0) {
     return
   }
@@ -166,7 +141,26 @@ async function save() {
   }
 }
 
-// --- Images -----------------------------------------------------------------------------
+// --- Refresh from the card API ----------------------------------------------------------------
+
+const refreshing = ref(false)
+
+async function refreshFromApi() {
+  refreshing.value = true
+  try {
+    // Set code, edition, status and assignment are not touched, so the form stays as it is.
+    card.value = await $fetch<CardDetailDto>(`/api/cards/${id}/refresh`, { method: 'POST' })
+    toast.add({ title: t('card.refresh.done'), color: 'success' })
+  }
+  catch (e) {
+    toast.add({ title: apiError(e), color: 'error' })
+  }
+  finally {
+    refreshing.value = false
+  }
+}
+
+// --- Images -----------------------------------------------------------------------------------
 
 const selectedImageId = ref<number | null>(null)
 const images = computed(() => card.value!.images)
@@ -229,7 +223,7 @@ async function deleteImage() {
   }
 }
 
-// --- Prices -----------------------------------------------------------------------------
+// --- Prices -----------------------------------------------------------------------------------
 
 const priceSources = computed(() => [...new Set(card.value!.priceHistory.map(point => point.source))])
 const selectedSource = ref(card.value.primarySource)
@@ -238,25 +232,8 @@ const pricePoints = computed(() => {
   const source = priceSources.value.includes(selectedSource.value) ? selectedSource.value : priceSources.value[0]
   return card.value!.priceHistory.filter(point => point.source === source)
 })
-const refreshing = ref(false)
 
-async function refreshPrices() {
-  refreshing.value = true
-  const before = card.value!.priceHistory.length
-  try {
-    card.value = await $fetch<CardDetailDto>(`/api/cards/${id}/refresh-prices`, { method: 'POST' })
-    const added = card.value.priceHistory.length > before
-    toast.add({ title: added ? t('card.prices.refreshed') : t('card.prices.noNewPrices'), color: added ? 'success' : 'warning' })
-  }
-  catch (e) {
-    toast.add({ title: apiError(e), color: 'error' })
-  }
-  finally {
-    refreshing.value = false
-  }
-}
-
-// --- Deleting the card ----------------------------------------------------------------
+// --- Deleting the card ------------------------------------------------------------------------
 
 const deleteOpen = ref(false)
 
@@ -272,14 +249,14 @@ async function deleteCard() {
   }
 }
 
-const originOf = (key: string) => card.value!.manualOverrides[key]
-const isEdited = (key: string) => key in card.value!.manualOverrides
 const subtitle = computed(() => [
   card.value!.sets[0]?.setCode,
   card.value!.game.displayName,
   card.value!.externalId ? t('card.origin.api') : t('card.origin.manual'),
+  card.value!.userModifiedAt ? t('card.modifiedOn', { date: dateTime(card.value!.userModifiedAt) }) : null,
 ].filter(Boolean).join(' · '))
 const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.sets[0]?.rarity].filter(Boolean).join(' · '))
+const readonlyUi = { base: 'bg-elevated text-muted' }
 </script>
 
 <template>
@@ -288,11 +265,46 @@ const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.s
       {{ t('common.back') }}
     </NuxtLink>
 
-    <div class="mb-6">
-      <h1 class="mb-1 text-2xl font-semibold">
-        {{ card.name }}
-      </h1>
-      <span class="text-[13px] text-muted">{{ subtitle }}</span>
+    <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="mb-1 text-2xl font-semibold">
+          {{ shownName }}
+        </h1>
+        <span class="text-[13px] text-muted">{{ subtitle }}</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex gap-1.5" role="group" :aria-label="t('card.language.label')">
+          <button
+            v-for="code in CARD_LANGUAGES"
+            :key="code"
+            type="button"
+            class="rounded-full border px-3.5 py-1.5 text-sm uppercase disabled:cursor-not-allowed disabled:opacity-40"
+            :class="language === code
+              ? 'border-primary bg-primary font-medium text-white'
+              : 'border-default bg-default text-muted hover:text-default'"
+            :aria-pressed="language === code"
+            :disabled="!availableLanguages.includes(code)"
+            :title="availableLanguages.includes(code) ? undefined : t('card.language.unavailable')"
+            @click="language = code"
+          >
+            {{ code }}
+          </button>
+        </div>
+        <UButton
+          v-if="card.externalId"
+          type="button"
+          color="primary"
+          variant="outline"
+          size="sm"
+          icon="i-lucide-refresh-cw"
+          :loading="refreshing"
+          :title="t('card.refresh.hint')"
+          @click="refreshFromApi"
+        >
+          {{ t('card.refresh.button') }}
+        </UButton>
+      </div>
     </div>
 
     <form class="flex flex-wrap gap-8" @submit.prevent="save">
@@ -302,7 +314,7 @@ const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.s
           <img
             v-if="selectedImage"
             :src="`/api/images/${selectedImage.id}`"
-            :alt="card.name"
+            :alt="shownName"
             class="size-full object-contain"
           >
           <span v-else>{{ t('card.noImage') }}</span>
@@ -360,32 +372,32 @@ const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.s
       <!-- Data -->
       <div class="flex min-w-0 flex-[999_1_420px] flex-col gap-7">
         <section>
-          <h2 class="mb-3 text-[15px] font-semibold">
+          <h2 class="mb-1 text-[15px] font-semibold">
             {{ t('card.sections.basics') }}
           </h2>
+          <p class="mb-3 text-xs text-dimmed">
+            {{ t('card.basicsHint') }}
+          </p>
           <div class="flex flex-col gap-3.5">
             <UFormField :label="t('card.fields.name')">
-              <template v-if="isEdited('name')" #hint>
-                <span class="text-primary" :title="t('card.editedHint', { value: String(originOf('name')) })">{{ t('card.edited') }}</span>
-              </template>
-              <UInput v-model="form.name" required maxlength="200" class="w-full" />
+              <UInput :model-value="shownName" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
             <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-              <UFormField :label="t('card.fields.setName')">
-                <UInput v-model="form.setName" maxlength="200" class="w-full" />
-              </UFormField>
-              <UFormField :label="t('card.fields.setCode')">
+              <UFormField :label="t('card.fields.setCode')" :hint="t('card.fields.editable')">
                 <UInput v-model="form.setCode" maxlength="40" class="w-full" />
               </UFormField>
-              <UFormField :label="t('card.fields.rarity')">
-                <UInput v-model="form.rarity" maxlength="80" class="w-full" />
-              </UFormField>
-              <UFormField :label="t('card.fields.edition')">
+              <UFormField :label="t('card.fields.edition')" :hint="t('card.fields.editable')">
                 <UInput v-model="form.edition" maxlength="80" class="w-full" />
+              </UFormField>
+              <UFormField :label="t('card.fields.setName')">
+                <UInput :model-value="card.sets[0]?.setName ?? ''" readonly class="w-full" :ui="readonlyUi" />
+              </UFormField>
+              <UFormField :label="t('card.fields.rarity')">
+                <UInput :model-value="card.sets[0]?.rarity ?? ''" readonly class="w-full" :ui="readonlyUi" />
               </UFormField>
             </div>
             <UFormField v-if="card.externalId" :label="t('card.fields.externalId')">
-              <UInput :model-value="card.externalId" readonly class="w-full" :ui="{ base: 'bg-elevated text-muted' }" />
+              <UInput :model-value="card.externalId" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
           </div>
         </section>
@@ -399,21 +411,19 @@ const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.s
               v-for="field in attributeFields"
               :key="field.key"
               :label="t(`card.attributes.${field.key}`)"
-              :error="attributeErrors[field.key] ? t('errors.invalid_attribute') : undefined"
             >
-              <template v-if="isEdited(`attributes.${field.key}`)" #hint>
-                <span class="text-primary" :title="t('card.editedHint', { value: String(originOf(`attributes.${field.key}`) ?? '') })">{{ t('card.edited') }}</span>
-              </template>
-              <UInput v-model="form.attributes[field.key]" maxlength="200" class="w-full" />
+              <UInput
+                :model-value="formatAttributeValue(field.kind, card.attributes[field.key])"
+                readonly
+                class="w-full"
+                :ui="readonlyUi"
+              />
             </UFormField>
           </div>
         </section>
 
         <UFormField :label="t('card.fields.description')">
-          <template v-if="isEdited('description')" #hint>
-            <span class="text-primary">{{ t('card.edited') }}</span>
-          </template>
-          <UTextarea v-model="form.description" :rows="3" maxlength="5000" class="w-full" />
+          <UTextarea :model-value="translation?.description ?? ''" readonly :rows="3" class="w-full" :ui="readonlyUi" />
         </UFormField>
 
         <section>
@@ -443,12 +453,13 @@ const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.s
           <UButton type="submit" :loading="saving">
             {{ t('common.save') }}
           </UButton>
-          <UButton color="error" variant="outline" @click="deleteOpen = true">
+          <UButton type="button" color="error" variant="outline" @click="deleteOpen = true">
             {{ t('card.delete.button') }}
           </UButton>
-          <span class="text-xs text-dimmed">
-            {{ t('card.lastModified', { date: dateTime(card.lastModifiedAt), user: card.lastModifiedBy ?? t('common.none') }) }}
-          </span>
+        </div>
+        <div class="flex flex-col gap-0.5 text-xs text-dimmed">
+          <span>{{ t('card.lastModified', { date: dateTime(card.lastModifiedAt), user: card.lastModifiedBy ?? t('common.none') }) }}</span>
+          <span v-if="card.lastFetchedAt">{{ t('card.lastFetched', { date: dateTime(card.lastFetchedAt) }) }}</span>
         </div>
 
         <section>
@@ -471,18 +482,6 @@ const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.s
           <p v-else class="text-sm text-muted">
             {{ t('card.prices.empty') }}
           </p>
-          <UButton
-            v-if="card.externalId"
-            type="button"
-            class="mt-2.5"
-            color="primary"
-            variant="outline"
-            size="sm"
-            :loading="refreshing"
-            @click="refreshPrices"
-          >
-            {{ t('card.prices.refresh') }}
-          </UButton>
         </section>
       </div>
     </form>
@@ -490,7 +489,7 @@ const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.s
     <UModal v-model:open="deleteOpen" :title="t('card.delete.title')">
       <template #body>
         <p class="text-sm">
-          {{ t('card.delete.text', { name: card.name }) }}
+          {{ t('card.delete.text', { name: shownName }) }}
         </p>
       </template>
       <template #footer>
