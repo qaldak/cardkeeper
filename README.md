@@ -9,15 +9,24 @@ Everything runs in containers: there is nothing to install on the host except Do
 
 ## Features
 
-- Collection overview with game, status, player and free text filters, total value of the active cards
-- Card detail page: editable master data and game specific attributes, manual image upload, status handling
-  (active, sold, traded, gifted, lost) with date and counterpart, assignment to players, price history
-- "Add card" lookup by name or passcode against the card database, including the exact printing (set and rarity)
+- Collection overview with filters for status, player, card type, monster type, attribute, rarity and a level range
+  (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
+  total value of the active cards
+- Card detail page: texts in German and English with a language switch (German first, a language the card does not
+  have is disabled), the set code and edition can be corrected (e.g. German or Japanese prints, applies to all
+  languages), manual image upload, status handling (active, sold, traded, gifted, lost) with date and counterpart,
+  assignment to players, price history
+- "Update from API" refreshes texts, attributes and prices of a card; set code, edition, status, assignment,
+  purchase date and images are never touched
+- "Add card" lookup by name or passcode against the card database, including the exact printing (set and rarity). There
+  is no language to choose: the search looks for German first and falls back to English, and both languages are
+  stored where available
 - Card images are downloaded once and stored on a volume, never hotlinked
 - Prices are stored per marketplace in the currency of that marketplace and are **not converted**
   (Cardmarket in EUR, TCGplayer/eBay/Amazon/CoolStuffInc in USD); the list uses the marketplace set in `PRICE_SOURCE`
-- Every manual edit of API data is remembered (`manual_overrides`) and written to an audit log
-- User interface in German and English, card data language selectable per card
+- Changes made by users are written to an audit log, and the card page shows "modified on" next to the origin as soon
+  as a user has changed anything (printing, status, assignment, purchase date, images; a refresh does not count)
+- User interface in German and English
 - Semantic releases, multi-arch (amd64 + arm64) Docker images, automated dependency updates
 
 Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): scheduled price refresh,
@@ -191,7 +200,13 @@ docker-compose.dev.yml    Development and test overlay
 Differences from the original concept:
 
 - Card status is stored as a language neutral enum (`ACTIVE`, `SOLD`, `TRADED`, `GIFTED`, `LOST`) and translated in the UI.
-- Cards have a `language` column (the language of the stored name and description).
+- Language dependent texts live in `card_translations` (one row per card and language: German and English).
+  `cards.name` is the display name in the preferred language (German, else English). Language independent attributes
+  (type, monster type, attribute, ATK, DEF, level) come from the English response. `api_snapshots` has one raw
+  response per language.
+- Names, texts and attributes are read-only in the UI, so there are no manual overrides of API data (`manual_overrides`
+  was dropped). `card_sets` holds the printing of the physical card; its set code and edition are the only editable
+  card data and apply to all languages. `cards.user_modified_at` records the last change made by a user.
 - `card_sets.edition` holds the manually entered edition (e.g. "1st Edition"), which the API does not provide.
 - Prices keep their source currency instead of being shown in CHF.
 - The Nuxt app is the Nuxt 4 default layout, so its pages are in `app/app/`.
@@ -211,6 +226,9 @@ No schema change and no change in the services is required.
   lookup or refresh and downloads each image once. Images are only downloaded from the hosts an adapter declares.
 - The adapter follows the documented API v7 response shape. Its tests use a hand-written fixture of that shape, not
   recorded live data, so check a real lookup after the first deployment.
+- Every card is requested twice (`language=de` and English). If the API answers a German request for an untranslated card
+  with the English card instead of "not found", that copy is detected (same name and text as the English one) and not
+  stored as a German translation.
 
 ## Roadmap
 

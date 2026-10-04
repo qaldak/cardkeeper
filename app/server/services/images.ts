@@ -6,9 +6,14 @@ import { detectImageType, mimeFromExtension, removeImageFile, resolveImagePath, 
 export interface ImageServiceDeps {
   db: PrismaClient
   config: AppConfig
+  now?: () => Date
 }
 
-export function createImageService({ db, config }: ImageServiceDeps) {
+export function createImageService({ db, config, now = () => new Date() }: ImageServiceDeps) {
+  /** Image changes count as a change made by the user. */
+  const touchCard = (cardId: number, actor: string) =>
+    db.card.update({ where: { id: cardId }, data: { userModifiedAt: now(), lastModifiedBy: actor } })
+
   return {
     /** Stores a manually uploaded image. It becomes the primary image if the card has none yet. */
     async addManual(cardId: number, bytes: Uint8Array, actor: string) {
@@ -44,6 +49,7 @@ export function createImageService({ db, config }: ImageServiceDeps) {
         await db.auditLog.create({
           data: { entity: 'card', entityId: cardId, field: 'image', newValue: `uploaded #${image.id}`, changedBy: actor },
         })
+        await touchCard(cardId, actor)
         return { id: image.id, source: image.source, isPrimary: image.isPrimary }
       }
       catch (error) {
@@ -64,6 +70,7 @@ export function createImageService({ db, config }: ImageServiceDeps) {
           data: { entity: 'card', entityId: image.cardId, field: 'primaryImage', newValue: String(imageId), changedBy: actor },
         }),
       ])
+      await touchCard(image.cardId, actor)
     },
 
     async remove(imageId: number, actor: string) {
@@ -84,6 +91,7 @@ export function createImageService({ db, config }: ImageServiceDeps) {
       await db.auditLog.create({
         data: { entity: 'card', entityId: image.cardId, field: 'image', oldValue: `deleted #${imageId}`, changedBy: actor },
       })
+      await touchCard(image.cardId, actor)
     },
 
     /** Absolute path and content type of a stored image, for serving it. */

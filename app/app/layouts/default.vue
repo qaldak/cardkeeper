@@ -65,7 +65,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
           icon="i-lucide-search"
           :placeholder="t('overview.searchPlaceholder')"
           :aria-label="t('overview.searchLabel')"
-          class="w-[220px]"
+          class="w-[280px]"
         />
         <UButton to="/cards/new" icon="i-lucide-plus">
           {{ t('nav.addCard') }}

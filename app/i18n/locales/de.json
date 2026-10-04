@@ -29,8 +29,8 @@
     "LOST": "Verloren"
   },
   "overview": {
-    "searchLabel": "Karte suchen",
-    "searchPlaceholder": "Karte suchen…",
+    "searchLabel": "Karten suchen",
+    "searchPlaceholder": "Name, Set-Code oder Set …",
     "count": "keine Karten | {n} Karte | {n} Karten",
     "totalValue": "{value} Gesamtwert",
     "statusFilter": "Status filtern",
@@ -40,7 +40,23 @@
     "unassigned": "Nicht zugewiesen",
     "emptyTitle": "Noch keine Karten",
     "emptyText": "Füge deine erste Karte hinzu – sie wird automatisch aus der Kartendatenbank übernommen.",
-    "noResults": "Keine Karten für diese Filter gefunden."
+    "noResults": "Keine Karten für diese Filter gefunden.",
+    "filters": {
+      "cardType": "Kartentyp",
+      "race": "Typ",
+      "attribute": "Attribut",
+      "rarity": "Seltenheit",
+      "level": "Level",
+      "from": "von",
+      "to": "bis",
+      "levelFrom": "Level von",
+      "levelTo": "Level bis",
+      "allCardTypes": "Alle Kartentypen",
+      "allRaces": "Alle Typen",
+      "allAttributes": "Alle Attribute",
+      "allRarities": "Alle Seltenheiten",
+      "reset": "Filter zurücksetzen"
+    }
   },
   "card": {
     "noImage": "Bild",
@@ -68,7 +84,7 @@
       "statusPersonPlaceholder": "Name der Person",
       "player": "Zugewiesen an",
       "purchaseDate": "Kaufdatum",
-      "language": "Kartensprache"
+      "editable": "änderbar"
     },
     "attributes": {
       "atk": "ATK",
@@ -78,8 +94,6 @@
       "race": "Typ",
       "attribute": "Attribut"
     },
-    "edited": "angepasst",
-    "editedHint": "Manuell geändert (Original: {value})",
     "image": {
       "upload": "Bild manuell hochladen",
       "uploaded": "Bild hochgeladen",
@@ -89,9 +103,6 @@
       "primaryChanged": "Hauptbild geändert"
     },
     "prices": {
-      "refresh": "Preis erneut abrufen",
-      "refreshed": "Preise aktualisiert",
-      "noNewPrices": "Die Kartendatenbank liefert aktuell keinen Preis.",
       "empty": "Noch keine Preise vorhanden.",
       "source": "Quelle"
     },
@@ -101,12 +112,23 @@
       "text": "„{name}“ wird mit Preis- und Statusverlauf sowie allen Bildern endgültig gelöscht.",
       "done": "Karte gelöscht"
     },
-    "lastModified": "Zuletzt geändert am {date} von {user}"
+    "lastModified": "Zuletzt geändert am {date} von {user}",
+    "modifiedOn": "geändert am {date}",
+    "basicsHint": "Namen, Texte und Attribute stammen aus der Kartendatenbank. Set-Code und Edition lassen sich anpassen (z. B. bei deutschen oder japanischen Ausgaben) und gelten für alle Sprachen.",
+    "language": {
+      "label": "Kartensprache",
+      "unavailable": "Für diese Karte nicht verfügbar"
+    },
+    "refresh": {
+      "button": "Von API aktualisieren",
+      "hint": "Texte, Attribute und Preise neu abrufen. Set-Code, Edition, Status und Zuweisung bleiben unverändert.",
+      "done": "Daten aktualisiert"
+    },
+    "lastFetched": "Daten zuletzt von der API abgerufen am {date}"
   },
   "add": {
     "title": "Karte hinzufügen",
     "game": "Spiel",
-    "language": "Kartensprache",
     "query": "Name oder Passcode",
     "queryPlaceholder": "z. B. Dunkler Magier oder 46986414",
     "search": "Suchen",
@@ -121,7 +143,8 @@
     "player": "Zugewiesen an",
     "purchaseDate": "Kaufdatum (optional)",
     "submit": "Zur Sammlung hinzufügen",
-    "added": "Karte hinzugefügt"
+    "added": "Karte hinzugefügt",
+    "languageHint": "Die Suche läuft zuerst auf Deutsch, danach auf Englisch. Gespeichert werden beide Sprachen, soweit vorhanden."
   },
   "players": {
     "title": "Spieler",
@@ -149,7 +172,6 @@
     "upstream_error": "Die Kartendatenbank hat einen Fehler gemeldet.",
     "upstream_invalid_response": "Die Kartendatenbank hat unerwartete Daten geliefert.",
     "invalid_set": "Die gewählte Ausgabe ist ungültig.",
-    "invalid_attribute": "Ungültiger Attributwert.",
     "invalid_date": "Ungültiges Datum.",
     "unsupported_image": "Nur PNG-, JPEG- und WebP-Bilder werden unterstützt.",
     "file_too_large": "Die Datei ist zu groß.",

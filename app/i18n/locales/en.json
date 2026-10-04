@@ -30,7 +30,7 @@
   },
   "overview": {
     "searchLabel": "Search cards",
-    "searchPlaceholder": "Search cards…",
+    "searchPlaceholder": "Name, set code or set …",
     "count": "no cards | {n} card | {n} cards",
     "totalValue": "{value} total value",
     "statusFilter": "Filter by status",
@@ -40,7 +40,23 @@
     "unassigned": "Not assigned",
     "emptyTitle": "No cards yet",
     "emptyText": "Add your first card – it is imported from the card database automatically.",
-    "noResults": "No cards match these filters."
+    "noResults": "No cards match these filters.",
+    "filters": {
+      "cardType": "Card type",
+      "race": "Type",
+      "attribute": "Attribute",
+      "rarity": "Rarity",
+      "level": "Level",
+      "from": "from",
+      "to": "to",
+      "levelFrom": "Level from",
+      "levelTo": "Level to",
+      "allCardTypes": "All card types",
+      "allRaces": "All types",
+      "allAttributes": "All attributes",
+      "allRarities": "All rarities",
+      "reset": "Reset filters"
+    }
   },
   "card": {
     "noImage": "Image",
@@ -68,7 +84,7 @@
       "statusPersonPlaceholder": "Name of the person",
       "player": "Assigned to",
       "purchaseDate": "Purchase date",
-      "language": "Card language"
+      "editable": "editable"
     },
     "attributes": {
       "atk": "ATK",
@@ -78,8 +94,6 @@
       "race": "Type",
       "attribute": "Attribute"
     },
-    "edited": "edited",
-    "editedHint": "Changed manually (original: {value})",
     "image": {
       "upload": "Upload image manually",
       "uploaded": "Image uploaded",
@@ -89,9 +103,6 @@
       "primaryChanged": "Primary image changed"
     },
     "prices": {
-      "refresh": "Fetch price again",
-      "refreshed": "Prices updated",
-      "noNewPrices": "The card database currently provides no price.",
       "empty": "No prices yet.",
       "source": "Source"
     },
@@ -101,12 +112,23 @@
       "text": "“{name}” is deleted permanently, including price and status history and all images.",
       "done": "Card deleted"
     },
-    "lastModified": "Last modified on {date} by {user}"
+    "lastModified": "Last modified on {date} by {user}",
+    "modifiedOn": "modified on {date}",
+    "basicsHint": "Names, texts and attributes come from the card database. Set code and edition can be adjusted (e.g. for German or Japanese prints) and apply to every language.",
+    "language": {
+      "label": "Card language",
+      "unavailable": "Not available for this card"
+    },
+    "refresh": {
+      "button": "Update from API",
+      "hint": "Fetch texts, attributes and prices again. Set code, edition, status and assignment stay unchanged.",
+      "done": "Data updated"
+    },
+    "lastFetched": "Data last fetched from the API on {date}"
   },
   "add": {
     "title": "Add card",
     "game": "Game",
-    "language": "Card language",
     "query": "Name or passcode",
     "queryPlaceholder": "e.g. Dark Magician or 46986414",
     "search": "Search",
@@ -121,7 +143,8 @@
     "player": "Assigned to",
     "purchaseDate": "Purchase date (optional)",
     "submit": "Add to collection",
-    "added": "Card added"
+    "added": "Card added",
+    "languageHint": "The search looks for German first, then English. Both languages are stored where available."
   },
   "players": {
     "title": "Players",
@@ -149,7 +172,6 @@
     "upstream_error": "The card database reported an error.",
     "upstream_invalid_response": "The card database returned unexpected data.",
     "invalid_set": "The selected printing is invalid.",
-    "invalid_attribute": "Invalid attribute value.",
     "invalid_date": "Invalid date.",
     "unsupported_image": "Only PNG, JPEG and WebP images are supported.",
     "file_too_large": "The file is too large.",

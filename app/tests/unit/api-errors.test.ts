@@ -83,9 +83,20 @@ describe('request schemas', () => {
     expect(() => createCardSchema.parse({ game: 'ygo', externalId: '1', purchaseDate: '04.10.2026' })).toThrow()
   })
 
-  it('rejects unknown fields on card updates', () => {
-    expect(() => updateCardSchema.parse({ gameId: 2 })).toThrow()
-    expect(updateCardSchema.parse({ name: ' Dunkler Magier ' }).name).toBe('Dunkler Magier')
+  it('only allows the printing and the user\'s own data on card updates', () => {
+    expect(updateCardSchema.parse({ set: { setCode: ' LOB-DE005 ', edition: '1st Edition' } }).set).toEqual({ setCode: 'LOB-DE005', edition: '1st Edition' })
+    expect(updateCardSchema.parse({ status: 'SOLD', assignedPlayerId: 3 })).toEqual({ status: 'SOLD', assignedPlayerId: 3 })
+    // Texts, attributes, rarity and set name come from the API and cannot be edited.
+    for (const field of [{ name: 'x' }, { description: 'x' }, { attributes: { atk: 1 } }, { gameId: 2 }, { set: { rarity: 'Common' } }, { set: { setName: 'x' } }]) {
+      expect(() => updateCardSchema.parse(field)).toThrow()
+    }
+  })
+
+  it('accepts the new list filters and validates their ranges', () => {
+    expect(listQuerySchema.parse({ cardType: 'Normal Monster', race: 'Dragon', attribute: 'LIGHT', rarity: 'Rare', levelMin: '4', levelMax: '8' }))
+      .toMatchObject({ cardType: 'Normal Monster', race: 'Dragon', attribute: 'LIGHT', rarity: 'Rare', levelMin: 4, levelMax: 8 })
+    expect(() => listQuerySchema.parse({ levelMin: '-1' })).toThrow()
+    expect(() => listQuerySchema.parse({ levelMax: 'high' })).toThrow()
   })
 
   it('validates players', () => {

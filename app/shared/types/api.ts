@@ -55,9 +55,15 @@ export interface CardListResponseDto {
 export interface CardSetDto {
   id: number
   setCode: string
-  setName: string
+  setName: string | null
   rarity: string | null
   edition: string | null
+}
+
+export interface CardTranslationDto {
+  language: string
+  name: string
+  description: string | null
 }
 
 export interface CardImageDto {
@@ -78,12 +84,12 @@ export interface CardDetailDto {
   id: number
   game: { slug: string, displayName: string }
   externalId: string | null
+  /** Display name in the preferred language. */
   name: string
-  description: string | null
-  language: string
+  /** Texts per language, German first. A language that is not listed is not available for this card. */
+  translations: CardTranslationDto[]
+  /** Language independent attributes from the card API (read-only). */
   attributes: Record<string, string | number | null>
-  /** Manually edited fields mapped to the value they had before the first edit. */
-  manualOverrides: Record<string, unknown>
   status: CardStatusValue
   statusDate: string | null
   statusPerson: string | null
@@ -93,7 +99,10 @@ export interface CardDetailDto {
   images: CardImageDto[]
   priceHistory: PricePointDto[]
   primarySource: string
+  /** Last time the data was fetched from the card API. */
   lastFetchedAt: string | null
+  /** Last change made by a user; null while the card is exactly as imported. */
+  userModifiedAt: string | null
   lastModifiedAt: string
   lastModifiedBy: string | null
 }
@@ -102,9 +111,18 @@ export interface LookupCandidateDto {
   externalId: string
   name: string
   description: string | null
+  /** Language of the shown name and description (German, or English if the card has no German text). */
   language: string
   attributes: Record<string, unknown>
-  sets: { setCode: string, setName: string, rarity: string | null }[]
+  sets: { setCode: string, setName: string | null, rarity: string | null }[]
+}
+
+/** Distinct values for the overview's filter dropdowns. */
+export interface FacetsDto {
+  types: string[]
+  races: string[]
+  attributes: string[]
+  rarities: string[]
 }
 
 export interface ApiErrorData {

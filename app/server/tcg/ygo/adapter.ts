@@ -72,6 +72,7 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
     displayName: 'Yu-Gi-Oh!',
     languages: LANGUAGES,
     defaultLanguage: 'en',
+    storedLanguages: ['de', 'en'],
     imageHosts: ['images.ygoprodeck.com'],
 
     async fetchCardById(externalId, language) {
