@@ -1,0 +1,160 @@
+{
+  "app": {
+    "title": "Card collection"
+  },
+  "nav": {
+    "overview": "Overview",
+    "players": "Players",
+    "addCard": "Add card",
+    "language": "Language"
+  },
+  "common": {
+    "save": "Save",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "none": "–",
+    "loading": "Loading …",
+    "back": "← Back to overview",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {pages}"
+  },
+  "status": {
+    "ACTIVE": "Active",
+    "SOLD": "Sold",
+    "TRADED": "Traded",
+    "GIFTED": "Gifted",
+    "LOST": "Lost"
+  },
+  "overview": {
+    "searchLabel": "Search cards",
+    "searchPlaceholder": "Search cards…",
+    "count": "no cards | {n} card | {n} cards",
+    "totalValue": "{value} total value",
+    "statusFilter": "Filter by status",
+    "allStatus": "All statuses",
+    "playerFilter": "Filter by player",
+    "allPlayers": "All players",
+    "unassigned": "Not assigned",
+    "emptyTitle": "No cards yet",
+    "emptyText": "Add your first card – it is imported from the card database automatically.",
+    "noResults": "No cards match these filters."
+  },
+  "card": {
+    "noImage": "Image",
+    "origin": {
+      "api": "imported from API",
+      "manual": "added manually"
+    },
+    "sections": {
+      "basics": "Basics",
+      "attributes": "Attributes ({game})",
+      "status": "Status & assignment",
+      "prices": "Price history"
+    },
+    "fields": {
+      "name": "Name",
+      "setName": "Set",
+      "setCode": "Set code",
+      "rarity": "Rarity",
+      "edition": "Edition",
+      "externalId": "External ID (passcode, from API)",
+      "description": "Description",
+      "status": "Status",
+      "statusDate": "Date",
+      "statusPerson": "Person",
+      "statusPersonPlaceholder": "Name of the person",
+      "player": "Assigned to",
+      "purchaseDate": "Purchase date",
+      "language": "Card language"
+    },
+    "attributes": {
+      "atk": "ATK",
+      "def": "DEF",
+      "level": "Level",
+      "type": "Card type",
+      "race": "Type",
+      "attribute": "Attribute"
+    },
+    "edited": "edited",
+    "editedHint": "Changed manually (original: {value})",
+    "image": {
+      "upload": "Upload image manually",
+      "uploaded": "Image uploaded",
+      "makePrimary": "Make primary",
+      "delete": "Delete image",
+      "deleted": "Image deleted",
+      "primaryChanged": "Primary image changed"
+    },
+    "prices": {
+      "refresh": "Fetch price again",
+      "refreshed": "Prices updated",
+      "noNewPrices": "The card database currently provides no price.",
+      "empty": "No prices yet.",
+      "source": "Source"
+    },
+    "delete": {
+      "button": "Delete card",
+      "title": "Delete card?",
+      "text": "“{name}” is deleted permanently, including price and status history and all images.",
+      "done": "Card deleted"
+    },
+    "lastModified": "Last modified on {date} by {user}"
+  },
+  "add": {
+    "title": "Add card",
+    "game": "Game",
+    "language": "Card language",
+    "query": "Name or passcode",
+    "queryPlaceholder": "e.g. Dark Magician or 46986414",
+    "search": "Search",
+    "results": "Results",
+    "noResults": "No card found.",
+    "minChars": "Enter at least 2 characters.",
+    "choose": "Select",
+    "chosen": "Selected card",
+    "changeChoice": "Choose another card",
+    "printing": "Printing (set / rarity)",
+    "noPrinting": "No specific printing",
+    "player": "Assigned to",
+    "purchaseDate": "Purchase date (optional)",
+    "submit": "Add to collection",
+    "added": "Card added"
+  },
+  "players": {
+    "title": "Players",
+    "intro": "People cards can be assigned to.",
+    "name": "Name",
+    "contact": "Contact (optional)",
+    "add": "Add player",
+    "cards": "no cards | {n} card | {n} cards",
+    "empty": "No players yet.",
+    "deleteTitle": "Delete player?",
+    "deleteText": "“{name}” is deleted. Assigned cards are kept and become unassigned.",
+    "created": "Player added",
+    "deleted": "Player deleted"
+  },
+  "errors": {
+    "unknown": "Something went wrong. Please try again.",
+    "validation_error": "The input is invalid.",
+    "card_not_found": "The card was not found.",
+    "player_not_found": "The player was not found.",
+    "image_not_found": "The image was not found.",
+    "player_exists": "A player with this name already exists.",
+    "upstream_card_not_found": "The card was not found in the card database.",
+    "upstream_rate_limited": "The card database is busy. Please try again later.",
+    "upstream_unreachable": "The card database is not reachable.",
+    "upstream_error": "The card database reported an error.",
+    "upstream_invalid_response": "The card database returned unexpected data.",
+    "invalid_set": "The selected printing is invalid.",
+    "invalid_attribute": "Invalid attribute value.",
+    "invalid_date": "Invalid date.",
+    "unsupported_image": "Only PNG, JPEG and WebP images are supported.",
+    "file_too_large": "The file is too large.",
+    "empty_file": "The file is empty.",
+    "missing_file": "No file was selected.",
+    "no_external_id": "This card is not linked to the card database."
+  }
+}

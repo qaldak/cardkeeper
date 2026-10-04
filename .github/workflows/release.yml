@@ -1,0 +1,116 @@
+name: Test and release new version
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Run project test set
+    permissions:
+      contents: read
+    uses: ./.github/workflows/tests.yml
+
+  release:
+    name: Create semantic release
+    # The release commit itself ("release: x.y.z") must not trigger another release.
+    if: ${{ ! startsWith(github.event.head_commit.message, 'release') }}
+    needs: quality
+    runs-on: ubuntu-latest
+    concurrency: release
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      released: ${{ steps.semantic.outputs.released }}
+      version: ${{ steps.semantic.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          # A personal access token is needed to push the release commit to a protected main branch.
+          # Without the RELEASE_TOKEN secret the workflow token is used.
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install release tooling
+        run: npm ci
+
+      # semantic-release always starts at 1.0.0 when the repository has no version tag yet. Anchoring
+      # v0.0.0 at the first commit makes the first feature release 0.1.0, so that only a breaking
+      # change (feat!, fix!, BREAKING CHANGE) ever produces a new major version.
+      - name: Bootstrap version tag
+        run: |
+          if [ -z "$(git tag --list 'v[0-9]*')" ]; then
+            git tag v0.0.0 "$(git rev-list --max-parents=0 HEAD | tail -n 1)"
+            git push origin v0.0.0
+          fi
+
+      - name: Semantic release
+        id: semantic
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+  docker:
+    name: Publish Docker image
+    needs: release
+    if: ${{ needs.release.outputs.released == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout released version
+        uses: actions/checkout@v7
+        with:
+          ref: v${{ needs.release.outputs.version }}
+
+      - name: Set up QEMU (arm64 emulation)
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}},value=v${{ needs.release.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=v${{ needs.release.outputs.version }}
+            type=semver,pattern={{major}},value=v${{ needs.release.outputs.version }}
+            type=raw,value=latest
+
+      - name: Build and push (amd64 + arm64)
+        uses: docker/build-push-action@v7
+        with:
+          context: ./app
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

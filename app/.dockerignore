@@ -1,0 +1,12 @@
+node_modules
+.nuxt
+.output
+.data
+.env
+.env.*
+server/generated
+tests
+coverage
+*.log
+Dockerfile
+.dockerignore

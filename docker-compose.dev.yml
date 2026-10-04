@@ -1,0 +1,51 @@
+# Development and test overlay, used together with docker-compose.yml:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build     dev server with hot reload
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml run --rm test  lint, typecheck and tests
+#
+# Nothing is installed on the host: node_modules lives in a named volume, the source is bind mounted.
+services:
+  db:
+    environment:
+      APP_DB_DEV: "1"
+
+  app:
+    image: cardkeeper-dev
+    build:
+      context: ./app
+      target: dev
+    environment:
+      NODE_ENV: development
+      NODE_OPTIONS: ""
+      YGOPRODECK_API_URL: ${YGOPRODECK_API_URL:-https://db.ygoprodeck.com/api/v7}
+    volumes:
+      - ./app:/app
+      - app-node-modules:/app/node_modules
+      - card-images:/data/card-images
+    ports: !override
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-3000}:3000"
+    security_opt: !reset []
+    cap_drop: !reset []
+    healthcheck:
+      disable: true
+
+  test:
+    image: cardkeeper-dev
+    build:
+      context: ./app
+      target: dev
+    profiles: ["test"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: test
+      # Separate database: the integration tests truncate all tables.
+      TEST_DATABASE_URL: postgresql://${APP_DB_USER:-cardkeeper}:${APP_DB_PASSWORD}@db:5432/${APP_DB_NAME:-cardkeeper}_test
+    volumes:
+      - ./app:/app
+      - app-node-modules:/app/node_modules
+    command: sh -c "npx prisma generate && npm run lint && npm run typecheck && npm test"
+
+volumes:
+  app-node-modules:

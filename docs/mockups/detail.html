@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Karten-Detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; }
+  a { color: #2F6FED; }
+  a:hover { color: #1D4FBD; }
+  .field label { display: block; font-size: 12px; font-weight: 500; color: #64748B; margin-bottom: 6px; }
+  .field input, .field select, .field textarea {
+    width: 100%; box-sizing: border-box; border: 1px solid #E2E8F0; border-radius: 8px;
+    padding: 9px 12px; font-size: 14px; font-family: inherit; color: #1E293B; background: #FFFFFF;
+  }
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans', system-ui, sans-serif; background: #F6F8FB; color: #1E293B;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; padding: 18px 32px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0;">
+    <span style="font-size: 19px; font-weight: 600;">Kartensammlung</span>
+    <nav style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+      <a href="Main.dc.html" style="text-decoration: none; color: #64748B;">Übersicht</a>
+      <a href="#" style="text-decoration: none; color: #64748B;">Spieler</a>
+      <a href="#" style="text-decoration: none; color: #64748B;">Export</a>
+    </nav>
+    <div style="width: 220px;"></div>
+  </div>
+
+  <div style="max-width: 1040px; margin: 0 auto; padding: 24px 32px 48px;">
+
+    <a href="Main.dc.html" style="display: inline-block; font-size: 13px; color: #64748B; text-decoration: none; margin-bottom: 16px;">← Zur Übersicht</a>
+
+    <div style="margin-bottom: 24px;">
+      <h1 style="margin: 0 0 4px; font-size: 24px; font-weight: 600;">Dunkler Magier</h1>
+      <span style="font-size: 13px; color: #64748B;">LOB-005 · Yu-Gi-Oh! · aus API übernommen</span>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 32px;">
+
+      <div style="flex: 1 1 280px; max-width: 300px; display: flex; flex-direction: column; gap: 16px;">
+        <div style="background: #EAF1FD; border-radius: 12px; height: 380px; display: flex; align-items: center; justify-content: center; color: #2F6FED; font-size: 14px;">Kartenbild</div>
+        <div style="display: flex; gap: 8px;">
+          <div style="width: 56px; height: 56px; border-radius: 8px; background: #EAF1FD; border: 1px solid #E2E8F0;"></div>
+          <div style="width: 56px; height: 56px; border-radius: 8px; background: #EAF1FD; border: 1px solid #E2E8F0;"></div>
+          <div style="width: 56px; height: 56px; border-radius: 8px; background: #FFFFFF; border: 1px dashed #CBD5E1;"></div>
+        </div>
+        <div>
+          <label for="imgUpload" style="display: inline-block; font-size: 13px; font-weight: 500; color: #2F6FED; border: 1px solid #2F6FED; border-radius: 8px; padding: 8px 14px; cursor: pointer;">Bild manuell hochladen</label>
+          <input id="imgUpload" type="file" style="position: absolute; width: 1px; height: 1px; overflow: hidden;">
+        </div>
+        <span style="font-size: 12px; color: #94A3B8;">1st Edition · Ultra Rare</span>
+      </div>
+
+      <div style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 28px;">
+
+        <div>
+          <h2 style="font-size: 15px; font-weight: 600; margin: 0 0 12px;">Grunddaten</h2>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" type="text" value="Dunkler Magier">
+            </div>
+            <div class="field">
+              <label for="set">Set</label>
+              <input id="set" type="text" value="Legend of Blue Eyes White Dragon (LOB-005)">
+            </div>
+            <div class="field">
+              <label for="passcode">Externe ID (Passcode, aus API)</label>
+              <input id="passcode" type="text" value="46986414" readonly style="background: #F6F8FB; color: #64748B;">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="font-size: 15px; font-weight: 600; margin: 0 0 12px;">Attribute (Yu-Gi-Oh!)</h2>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;">
+            <div class="field"><label for="atk">ATK</label><input id="atk" type="text" value="2500"></div>
+            <div class="field"><label for="def">DEF</label><input id="def" type="text" value="2100"></div>
+            <div class="field"><label for="level">Level</label><input id="level" type="text" value="7"></div>
+            <div class="field"><label for="type">Typ</label><input id="type" type="text" value="Magier / Normal"></div>
+            <div class="field"><label for="attr">Attribut</label><input id="attr" type="text" value="DUNKEL"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="desc">Beschreibung</label>
+          <textarea id="desc" rows="3">Der ultimative Magier in Angriff und Verteidigung.</textarea>
+        </div>
+
+        <div>
+          <h2 style="font-size: 15px; font-weight: 600; margin: 0 0 12px;">Status &amp; Zuweisung</h2>
+          <div style="display: flex; flex-direction: column; gap: 14px; max-width: 320px;">
+            <div class="field">
+              <label for="status">Status</label>
+              <select id="status" value="{{status}}" onChange="{{onStatusChange}}">
+                <option value="aktiv">Aktiv</option>
+                <option value="verkauft">Verkauft</option>
+                <option value="getauscht">Getauscht</option>
+                <option value="verschenkt">Verschenkt</option>
+                <option value="verloren">Verloren</option>
+              </select>
+            </div>
+            <sc-if value="{{showDate}}" hint-placeholder-val="{{true}}">
+              <div class="field">
+                <label for="statusDate">Datum</label>
+                <input id="statusDate" type="date">
+              </div>
+            </sc-if>
+            <sc-if value="{{showPerson}}" hint-placeholder-val="{{true}}">
+              <div class="field">
+                <label for="statusPerson">Person</label>
+                <input id="statusPerson" type="text" placeholder="Name der Person">
+              </div>
+            </sc-if>
+            <div class="field">
+              <label for="player">Zugewiesen an</label>
+              <select id="player">
+                <option>Anna</option>
+                <option>Sven</option>
+                <option>–</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="font-size: 15px; font-weight: 600; margin: 0 0 12px;">Preisverlauf</h2>
+          <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px; overflow: hidden; max-width: 420px;">
+            <div style="display: flex; justify-content: space-between; padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #E2E8F0;">
+              <span style="color: #64748B;">04.10.2026</span><span>CHF 18.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #E2E8F0;">
+              <span style="color: #64748B;">01.09.2026</span><span>CHF 16.50</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 10px 14px; font-size: 13px;">
+              <span style="color: #64748B;">15.07.2026</span><span>CHF 15.00</span>
+            </div>
+          </div>
+          <button style="margin-top: 10px; background: #FFFFFF; color: #2F6FED; border: 1px solid #2F6FED; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 500; font-family: inherit;">Preis erneut abrufen</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { status: 'verkauft' };
+  }
+  renderVals() {
+    const status = this.state.status;
+    const showDate = status !== 'aktiv';
+    const showPerson = status === 'verkauft' || status === 'getauscht' || status === 'verschenkt';
+    return {
+      status: status,
+      showDate: showDate,
+      showPerson: showPerson,
+      onStatusChange: (e) => this.setState({ status: e.target.value }),
+    };
+  }
+}
+</script>
+</body>
+</html>
