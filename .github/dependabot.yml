@@ -1,0 +1,63 @@
+version: 2
+updates:
+  # Application dependencies. Production dependency updates ship in the image, so they are
+  # released as a patch ("chore" = patch); development-only updates do not trigger a release.
+  - package-ecosystem: "npm"
+    directory: "/app"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore: npm"
+      prefix-development: "build: npm-dev"
+    groups:
+      # The Prisma CLI and client must always have the same version.
+      prisma:
+        patterns:
+          - "prisma"
+          - "@prisma/*"
+    ignore:
+      # vue-tsc needs to support a new TypeScript major first.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+
+  # Release tooling (semantic-release) in the repository root.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build: release-tooling"
+    ignore:
+      # v10 needs conventional-changelog-writer 9+, which @semantic-release/release-notes-generator 14
+      # does not bundle. Revisit when release-notes-generator 15 is stable.
+      - dependency-name: "conventional-changelog-conventionalcommits"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "docker"
+    directory: "/app"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build: docker"
+    ignore:
+      # Stay on LTS releases of Node.js.
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build: compose"
+    ignore:
+      # A PostgreSQL major upgrade needs a dump/restore, never an automatic image bump.
+      - dependency-name: "postgres"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build"
