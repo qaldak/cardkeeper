@@ -3,6 +3,7 @@ import type { CardDetailDto, GameDto, LookupCandidateDto, PlayerDto } from '#sha
 import type { PokemonAttributes } from '#shared/types/pokemon'
 import { formatAttributeValue } from '#shared/utils/game-fields'
 import { getGameConfig } from '#shared/utils/game-config'
+import { formatPrintedNumber } from '#shared/utils/pokemon-number'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -20,6 +21,8 @@ const gameSlug = ref(games.value?.[0]?.slug ?? '')
 const config = computed(() => getGameConfig(gameSlug.value))
 const isPokemon = computed(() => gameSlug.value === 'pokemon')
 
+// Pokémon: by set and number (what is printed on the card) or by name / card id.
+const mode = ref<'set' | 'name'>('set')
 const query = ref('')
 const results = ref<LookupCandidateDto[] | null>(null)
 const searching = ref(false)
@@ -77,10 +80,10 @@ async function search() {
 
 // The search result only carries the printings of one language (or none); loading the card again
 // gives the printings of both languages to choose from.
-async function choose(candidate: LookupCandidateDto) {
-  choosing.value = candidate.externalId
+async function choose(externalId: string) {
+  choosing.value = externalId
   try {
-    chosen.value = await $fetch<LookupCandidateDto>(`/api/lookup/${encodeURIComponent(candidate.externalId)}`, {
+    chosen.value = await $fetch<LookupCandidateDto>(`/api/lookup/${encodeURIComponent(externalId)}`, {
       query: { game: gameSlug.value },
     })
     printing.value = config.value.printingRequired && chosen.value.sets.length > 0 ? '0' : NONE
@@ -128,6 +131,8 @@ function subline(candidate: LookupCandidateDto): string {
       attributes.category ? labels.pokemonCategory(attributes.category) : null,
       attributes.hp ? `${t('pokemon.fields.hp')} ${attributes.hp}` : null,
       attributes.types?.map(labels.pokemonType).join(', '),
+      attributes.localId ? formatPrintedNumber(attributes.localId, attributes.setCardCount?.official) : null,
+      candidate.sets[0]?.setName,
       `#${candidate.externalId}`,
     ].filter(Boolean).join(' · ')
   }
@@ -155,10 +160,28 @@ const MAX_RESULTS = 50
     </p>
 
     <template v-if="!chosen">
-      <form class="mb-6 flex flex-wrap items-end gap-3" @submit.prevent="search">
-        <UFormField v-if="gameItems.length > 1" :label="t('add.game')" class="w-44">
-          <USelect v-model="gameSlug" :items="gameItems" class="w-full" />
-        </UFormField>
+      <UFormField v-if="gameItems.length > 1" :label="t('add.game')" class="mb-4 w-44">
+        <USelect v-model="gameSlug" :items="gameItems" class="w-full" />
+      </UFormField>
+
+      <div v-if="isPokemon" class="mb-5 flex gap-1.5" role="group" :aria-label="t('add.bySet.modeLabel')">
+        <button
+          v-for="entry in (['set', 'name'] as const)"
+          :key="entry"
+          type="button"
+          class="rounded-full border px-3.5 py-1.5 text-sm"
+          :class="mode === entry ? 'border-primary bg-primary font-medium text-white' : 'border-default bg-default text-muted hover:text-default'"
+          :aria-pressed="mode === entry"
+          :data-test="`mode-${entry}`"
+          @click="mode = entry"
+        >
+          {{ t(`add.bySet.mode.${entry}`) }}
+        </button>
+      </div>
+
+      <PokemonSetPicker v-if="isPokemon && mode === 'set'" @select="choose" />
+
+      <form v-else class="mb-6 flex flex-wrap items-end gap-3" @submit.prevent="search">
         <UFormField :label="t('add.query')" class="min-w-64 flex-1">
           <UInput
             v-model="query"
@@ -172,7 +195,7 @@ const MAX_RESULTS = 50
         </UButton>
       </form>
 
-      <p v-if="isPokemon" class="-mt-3 mb-5 text-xs text-dimmed">
+      <p v-if="isPokemon && mode === 'name'" class="-mt-3 mb-5 text-xs text-dimmed">
         {{ t('add.idHint') }}
       </p>
 
@@ -180,7 +203,7 @@ const MAX_RESULTS = 50
         {{ searchError }}
       </p>
 
-      <template v-if="results">
+      <template v-if="results && !(isPokemon && mode === 'set')">
         <p v-if="results.length === 0" class="text-sm text-muted">
           {{ t('add.noResults') }}
         </p>
@@ -209,7 +232,7 @@ const MAX_RESULTS = 50
                   {{ subline(candidate) }}
                 </p>
               </div>
-              <UButton size="sm" variant="outline" :loading="choosing === candidate.externalId" @click="choose(candidate)">
+              <UButton size="sm" variant="outline" :loading="choosing === candidate.externalId" @click="choose(candidate.externalId)">
                 {{ t('add.choose') }}
               </UButton>
             </li>

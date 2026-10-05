@@ -1,7 +1,7 @@
 import { badRequest, HttpError } from '../../lib/errors'
-import type { CardAdapter, CommonCard } from '../types'
+import type { CardAdapter, CommonCard, GameSet, SetCard } from '../types'
 import { cardImages, mapTcgdexCard } from './mapper'
-import { tcgdexBriefListSchema } from './schema'
+import { tcgdexBriefListSchema, tcgdexSetListSchema, tcgdexSetSchema } from './schema'
 
 export interface TcgdexAdapterOptions {
   /** E.g. https://api.tcgdex.net/v2 (the language and resource are appended). */
@@ -16,6 +16,11 @@ const MAX_ERROR_TEXT = 200
 
 // Card ids are "<set id>-<number in set>", e.g. "swsh3-136", "sv04.5-001" or "P-A-001".
 const CARD_ID = /^[A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)+$/
+// Set ids are a card id without the number; Japanese sets use the printed code in mixed case ("SV9", "S12a").
+const SET_ID = /^[A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*$/
+
+/** Logos and symbols are delivered without a file extension, like the card images. */
+const asset = (base: string | undefined) => (base ? `${base}.webp` : null)
 
 export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter {
   const fetchFn = options.fetchFn ?? fetch
@@ -110,7 +115,9 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
     displayName: 'Pokémon',
     languages: LANGUAGES,
     defaultLanguage: 'en',
-    storedLanguages: ['de', 'en'],
+    // Japanese cards live in their own database with their own ids; a card that does not exist in a language
+    // is left out, so asking for all three languages is harmless for German and English cards.
+    storedLanguages: ['de', 'en', 'ja'],
     imageHosts: ['assets.tcgdex.net'],
     // TCGdex is an open project that serves its images for apps; thumbnails make the many printings
     // of a Pokémon distinguishable.
@@ -130,7 +137,9 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
       if (trimmed === '') {
         return []
       }
-      const byName = await searchBrief(trimmed, lang, false)
+      // Japanese names are written in kana and kanji: a Latin name cannot match there, so only the id is tried.
+      const searchableByName = lang !== 'ja' || /[^\x20-\x7E]/.test(trimmed)
+      const byName = searchableByName ? await searchBrief(trimmed, lang, false) : []
       if (byName.length > 0) {
         return byName
       }
@@ -144,6 +153,48 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
 
     mapToCommonSchema(raw, language) {
       return mapTcgdexCard(raw, resolveLanguage(language))
+    },
+
+    async listSets(language) {
+      const lang = resolveLanguage(language)
+      const body = await request(lang, 'sets')
+      if (body === null) {
+        return []
+      }
+      const parsed = tcgdexSetListSchema.safeParse(body)
+      if (!parsed.success) {
+        throw new HttpError(502, 'upstream_invalid_response', 'Unexpected response from TCGdex')
+      }
+      return parsed.data.map((set): GameSet => ({
+        id: set.id,
+        name: set.name,
+        logoUrl: asset(set.logo),
+        symbolUrl: asset(set.symbol),
+        official: set.cardCount?.official ?? null,
+        total: set.cardCount?.total ?? null,
+      }))
+    },
+
+    async listSetCards(setId, language) {
+      const lang = resolveLanguage(language)
+      if (!SET_ID.test(setId)) {
+        return null
+      }
+      const body = await request(lang, `sets/${encodeURIComponent(setId)}`)
+      if (body === null) {
+        return null
+      }
+      const parsed = tcgdexSetSchema.safeParse(body)
+      if (!parsed.success) {
+        throw new HttpError(502, 'upstream_invalid_response', 'Unexpected response from TCGdex')
+      }
+      return parsed.data.cards.map((card): SetCard => ({
+        id: card.id,
+        number: String(card.localId ?? card.id.split('-').pop() ?? ''),
+        name: card.name,
+        imageUrl: card.image ? `${card.image}/high.webp` : null,
+        thumbnailUrl: card.image ? `${card.image}/low.webp` : null,
+      }))
     },
   }
 }

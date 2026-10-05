@@ -1,0 +1,16 @@
+{
+  "id": "fx1",
+  "name": "Fixture Set Two",
+  "cardCount": {
+    "official": 88,
+    "total": 100
+  },
+  "cards": [
+    {
+      "id": "fx1-40",
+      "localId": "40",
+      "name": "Other Card",
+      "image": "https://assets.tcgdex.net/en/fx/fx1/40"
+    }
+  ]
+}

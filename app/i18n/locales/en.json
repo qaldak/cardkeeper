@@ -169,12 +169,41 @@
     "purchaseDate": "Purchase date (optional)",
     "submit": "Add to collection",
     "added": "Card added",
-    "languageHint": "The search looks for German first, then English. Both languages are stored where available.",
+    "languageHint": "The search looks for German first, then English. German, English and (for Pokémon) Japanese texts are stored where available.",
     "variant": "Variant",
     "queryPlaceholderPokemon": "e.g. Pikachu or swsh3-136",
     "manyResults": "Only the first results are shown. Narrow the search, e.g. with the card id (swsh3-136).",
     "idHint": "Pokémon: name or card id (set id and number, e.g. swsh3-136).",
-    "variantRequired": "Choose the variant of your card."
+    "variantRequired": "Choose the variant of your card.",
+    "bySet": {
+      "modeLabel": "How to find the card",
+      "mode": {
+        "set": "By set and number",
+        "name": "By name or id"
+      },
+      "language": {
+        "label": "Language of the card",
+        "de": "German",
+        "en": "English",
+        "ja": "Japanese"
+      },
+      "number": "Number on the card",
+      "numberPlaceholder": "040/088",
+      "filter": "Filter sets",
+      "filterPlaceholder": "Name or set id",
+      "invalidNumber": "Enter the number as printed on the card, e.g. 040/088 or 40.",
+      "sets": "Sets",
+      "setHint": "Pick the set by its symbol or name. Typing the number as 040/088 narrows the sets down by their printed size.",
+      "filteredBySize": "Only sets with {total} printed cards. Several sets can share the same size, so check the symbol.",
+      "loading": "Loading …",
+      "noSets": "No set matches.",
+      "cards": "{official} cards",
+      "changeSet": "Choose another set",
+      "sizeMismatch": "The card number says {typed} cards, but this set has {official}. Check that this is the right set.",
+      "numberMissing": "This set has no card with the number {number}.",
+      "found": "Card found by set and number",
+      "use": "Use this card"
+    }
   },
   "players": {
     "title": "Players",

@@ -3,6 +3,7 @@ import type { AppConfig } from '../lib/config'
 import type { PrismaClient } from '../generated/prisma/client'
 import type { AdapterRegistry } from '../tcg/registry'
 import { createCardService } from './cards'
+import { createCatalogService } from './catalog'
 import { createImageService } from './images'
 import { createPlayerService } from './players'
 
@@ -19,6 +20,7 @@ export function createServices(deps: ServiceDeps) {
     config: deps.config,
     db: deps.db,
     cards: createCardService(deps),
+    catalog: createCatalogService(deps),
     images: createImageService(deps),
     players: createPlayerService(deps.db),
     games: (): GameDto[] => deps.registry.list().map(adapter => ({

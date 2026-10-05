@@ -249,7 +249,7 @@ describe('TCGdex adapter: configuration', () => {
       slug: 'pokemon',
       displayName: 'Pokémon',
       defaultLanguage: 'en',
-      storedLanguages: ['de', 'en'],
+      storedLanguages: ['de', 'en', 'ja'],
       imageHosts: ['assets.tcgdex.net'],
       searchThumbnails: true,
     })
@@ -259,5 +259,91 @@ describe('TCGdex adapter: configuration', () => {
   it('is registered next to Yu-Gi-Oh!', () => {
     const registry = createRegistry([adapter])
     expect(registry.require('pokemon')).toBe(adapter)
+  })
+})
+
+describe('TCGdex adapter: sets', () => {
+  const setRoutes = (routes: Record<string, unknown>) =>
+    vi.fn(async (input: URL | RequestInfo) => {
+      const path = new URL(String(input)).pathname
+      return path in routes ? json(routes[path]) : json({ error: 'not found' }, 404)
+    })
+
+  it('lists the sets with logo, symbol and the printed and total card counts', async () => {
+    const fetchFn = setRoutes({ '/v2/en/sets': load('sets-en') })
+    const sets = await adapterWith(fetchFn as unknown as typeof fetch).listSets!('en')
+    expect(sets.find(set => set.id === 'me03')).toEqual({
+      id: 'me03',
+      name: 'Fixture Set ME03',
+      logoUrl: 'https://assets.tcgdex.net/en/me/me03/logo.webp',
+      symbolUrl: 'https://assets.tcgdex.net/univ/me/me03/symbol.webp',
+      official: 88,
+      total: 120,
+    })
+    // the printed size 88 belongs to more than one set: the number alone does not identify the set
+    expect(sets.filter(set => set.official === 88).map(set => set.id)).toEqual(['me03', 'fx1'])
+  })
+
+  it('keeps sets without a card count and without images', async () => {
+    const sets = await adapterWith(setRoutes({ '/v2/en/sets': load('sets-en') }) as unknown as typeof fetch).listSets!('en')
+    expect(sets.find(set => set.id === 'nocount')).toMatchObject({ official: null, total: null })
+  })
+
+  it('lists the cards of a set with their number and thumbnail', async () => {
+    const fetchFn = setRoutes({ '/v2/de/sets/me03': load('set-me03-de') })
+    const cards = await adapterWith(fetchFn as unknown as typeof fetch).listSetCards!('me03', 'de')
+    expect(cards!.find(card => card.id === 'me03-040')).toEqual({
+      id: 'me03-040',
+      number: '040',
+      name: 'Hippoterus',
+      imageUrl: 'https://assets.tcgdex.net/de/me/me03/040/high.webp',
+      thumbnailUrl: 'https://assets.tcgdex.net/de/me/me03/040/low.webp',
+    })
+  })
+
+  it('returns null for an unknown set', async () => {
+    const fetchFn = setRoutes({})
+    expect(await adapterWith(fetchFn as unknown as typeof fetch).listSetCards!('nope', 'en')).toBeNull()
+  })
+
+  it('does not ask the API for a set id with unexpected characters', async () => {
+    const fetchFn = setRoutes({})
+    expect(await adapterWith(fetchFn as unknown as typeof fetch).listSetCards!('../cards', 'en')).toBeNull()
+    expect(fetchFn).not.toHaveBeenCalled()
+  })
+
+  it('rejects an unexpected set list with a 502', async () => {
+    const fetchFn = setRoutes({ '/v2/en/sets': { not: 'a list' } })
+    await expect(adapterWith(fetchFn as unknown as typeof fetch).listSets!('en')).rejects.toMatchObject({ status: 502, code: 'upstream_invalid_response' })
+  })
+})
+
+describe('TCGdex adapter: Japanese cards', () => {
+  const adapter = adapterWith(vi.fn() as unknown as typeof fetch)
+
+  it('maps Japanese categories, types and stages to the English spelling', () => {
+    const card = adapter.mapToCommonSchema(load('pikachu-ja'), 'ja')
+    expect(card).toMatchObject({ externalId: 'SV9-040', name: 'ピカチュウ', language: 'ja' })
+    expect(card.attributes).toMatchObject({ category: 'Pokemon', types: ['Lightning'], stage: 'Basic', localId: '040', setId: 'SV9' })
+  })
+
+  it('leaves unknown Japanese values as delivered', () => {
+    const card = adapter.mapToCommonSchema({ ...load('pikachu-ja'), stage: 'ふしぎ' }, 'ja')
+    expect(card.attributes).toMatchObject({ stage: 'ふしぎ' })
+  })
+
+  it('does not touch the values of other languages', () => {
+    const card = adapter.mapToCommonSchema(load('furret-de'), 'de')
+    expect(card.attributes).toMatchObject({ types: ['Farblos'] })
+  })
+
+  it('searches Japanese names only with Japanese text; a Latin text is tried as an id', async () => {
+    const fetchFn = vi.fn(async () => json({ error: 'not found' }, 404))
+    const ja = adapterWith(fetchFn as unknown as typeof fetch)
+    await ja.searchCards('SV9-040', 'ja')
+    expect(fetchFn.mock.calls.map(call => String((call as unknown as [URL])[0]))).toEqual(['https://tcgdex.test/v2/ja/cards/SV9-040'])
+    fetchFn.mockClear()
+    await ja.searchCards('ピカ', 'ja')
+    expect(String((fetchFn.mock.calls[0] as unknown as [URL])[0])).toContain('/v2/ja/cards?name=')
   })
 })

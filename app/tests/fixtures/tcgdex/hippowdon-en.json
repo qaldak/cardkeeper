@@ -1,0 +1,60 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 shapes (https://tcgdex.dev/reference). Not a recorded live response; only the id, the number and the printed set size come from the user's example (me03-040, 040/088), everything else is invented.",
+  "category": "Pokemon",
+  "id": "me03-040",
+  "illustrator": "fixture artist",
+  "image": "https://assets.tcgdex.net/en/me/me03/040",
+  "localId": "040",
+  "name": "Hippowdon",
+  "rarity": "Rare",
+  "set": {
+    "cardCount": {
+      "official": 88,
+      "total": 120
+    },
+    "id": "me03",
+    "name": "Fixture Set ME03"
+  },
+  "variants": {
+    "firstEdition": false,
+    "holo": false,
+    "normal": true,
+    "reverse": true,
+    "wPromo": false
+  },
+  "dexId": [
+    450
+  ],
+  "hp": 150,
+  "types": [
+    "Fighting"
+  ],
+  "evolveFrom": "Hippopotas",
+  "stage": "Stage2",
+  "description": "Invented text.",
+  "attacks": [
+    {
+      "cost": [
+        "Fighting",
+        "Colorless"
+      ],
+      "name": "Sand Storm",
+      "damage": 90,
+      "effect": "Invented."
+    }
+  ],
+  "weaknesses": [
+    {
+      "type": "Water",
+      "value": "×2"
+    }
+  ],
+  "retreat": 3,
+  "pricing": {
+    "cardmarket": {
+      "unit": "EUR",
+      "avg": 0.3,
+      "trend": 0.25
+    }
+  }
+}

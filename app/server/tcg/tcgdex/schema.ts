@@ -80,3 +80,25 @@ export const tcgdexBriefListSchema = z.array(z.object({
   name: z.string().min(1),
   image: z.string().optional(),
 }))
+
+const setCardCountSchema = z.object({ official: z.number().optional(), total: z.number().optional() })
+
+/** The set list holds brief sets: id, name, logo, symbol and the card count. */
+export const tcgdexSetListSchema = z.array(z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  logo: z.string().optional(),
+  symbol: z.string().optional(),
+  cardCount: setCardCountSchema.optional(),
+}))
+
+/** A set holds its cards as brief cards. */
+export const tcgdexSetSchema = z.object({
+  id: z.string().min(1),
+  cards: z.array(z.object({
+    id: z.string().min(1),
+    localId: numeric.optional(),
+    name: z.string().min(1),
+    image: z.string().optional(),
+  })).default([]),
+})

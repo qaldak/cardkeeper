@@ -1,9 +1,10 @@
-// Card texts are downloaded in these languages, in order of preference.
-export const CARD_LANGUAGES = ['de', 'en'] as const
+// Card texts are downloaded in these languages, in order of preference. Not every game has all of them
+// (see `GameConfig.languages`).
+export const CARD_LANGUAGES = ['de', 'en', 'ja'] as const
 
 export type CardLanguage = (typeof CARD_LANGUAGES)[number]
 
-/** German if available, otherwise English, otherwise the first available language. */
+/** German if available, otherwise English, then Japanese, otherwise the first available language. */
 export function preferredLanguage(available: readonly string[]): string | null {
   for (const language of CARD_LANGUAGES) {
     if (available.includes(language)) {
@@ -13,7 +14,7 @@ export function preferredLanguage(available: readonly string[]): string | null {
   return available[0] ?? null
 }
 
-/** Sorts languages by preference (German, English, then the rest alphabetically). */
+/** Sorts languages by preference (German, English, Japanese, then the rest alphabetically). */
 export function sortByLanguagePreference<T extends { language: string }>(items: readonly T[]): T[] {
   const rank = (language: string) => {
     const index = (CARD_LANGUAGES as readonly string[]).indexOf(language)

@@ -1,0 +1,22 @@
+{
+  "id": "SV9",
+  "name": "バトルパートナーズ",
+  "cardCount": {
+    "official": 100,
+    "total": 120
+  },
+  "cards": [
+    {
+      "id": "SV9-039",
+      "localId": "039",
+      "name": "ヒポポタス",
+      "image": "https://assets.tcgdex.net/ja/SV/SV9/039"
+    },
+    {
+      "id": "SV9-040",
+      "localId": "040",
+      "name": "ピカチュウ",
+      "image": "https://assets.tcgdex.net/ja/SV/SV9/040"
+    }
+  ]
+}

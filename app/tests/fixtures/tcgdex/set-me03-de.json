@@ -1,0 +1,35 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 shapes (https://tcgdex.dev/reference). Not a recorded live response; only the id, the number and the printed set size come from the user's example (me03-040, 040/088), everything else is invented.",
+  "id": "me03",
+  "name": "Fixture-Set ME03",
+  "cardCount": {
+    "official": 88,
+    "total": 120
+  },
+  "cards": [
+    {
+      "id": "me03-039",
+      "localId": "039",
+      "name": "Hippopotas",
+      "image": "https://assets.tcgdex.net/de/me/me03/039"
+    },
+    {
+      "id": "me03-040",
+      "localId": "040",
+      "name": "Hippoterus",
+      "image": "https://assets.tcgdex.net/de/me/me03/040"
+    },
+    {
+      "id": "me03-041",
+      "localId": "041",
+      "name": "Skorgla",
+      "image": "https://assets.tcgdex.net/de/me/me03/041"
+    },
+    {
+      "id": "me03-TG01",
+      "localId": "TG01",
+      "name": "Promo Karte",
+      "image": "https://assets.tcgdex.net/de/me/me03/TG01"
+    }
+  ]
+}

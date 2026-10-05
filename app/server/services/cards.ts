@@ -9,6 +9,7 @@ import { formatDateOnly, parseDateOnly, utcToday } from '../lib/dates'
 import { badRequest, notFound } from '../lib/errors'
 import { detectImageType, removeCardImageDir, saveImage } from '../lib/image-files'
 import { downloadImage } from '../lib/image-download'
+import { allowedImageUrl } from '../lib/image-url'
 import { fromCents, toCents } from '../lib/money'
 import type { CreateCardInput, UpdateCardInput } from '../lib/schemas'
 import { normalizeStatusChange } from '../lib/status'
@@ -105,19 +106,8 @@ export function createCardService(deps: CardServiceDeps) {
   }
 
   /** The image host of the game must allow it, and only URLs on that host are passed on. */
-  const thumbnailOf = (adapter: CardAdapter, card: { images: CommonCardImage[] }): string | null => {
-    const url = card.images[0]?.smallUrl ?? null
-    if (!adapter.searchThumbnails || !url) {
-      return null
-    }
-    try {
-      const parsed = new URL(url)
-      return parsed.protocol === 'https:' && adapter.imageHosts.includes(parsed.hostname) ? url : null
-    }
-    catch {
-      return null
-    }
-  }
+  const thumbnailOf = (adapter: CardAdapter, card: { images: CommonCardImage[] }): string | null =>
+    adapter.searchThumbnails ? allowedImageUrl(card.images[0]?.smallUrl, adapter.imageHosts) : null
 
   const candidateOf = (adapter: CardAdapter, merged: MergedCard): LookupCandidateDto => {
     const text = merged.translations.find(entry => entry.name === merged.name) ?? merged.translations[0]!

@@ -53,4 +53,29 @@ export interface CardAdapter {
   /** Fuzzy search used by the "add card" lookup. */
   searchCards(query: string, language?: string): Promise<CommonCard[]>
   mapToCommonSchema(raw: unknown, language?: string): CommonCard
+  /** Sets of the game, for games whose cards are easier to find by set and number than by name. */
+  listSets?(language?: string): Promise<GameSet[]>
+  /** Cards of one set; null if the set does not exist. */
+  listSetCards?(setId: string, language?: string): Promise<SetCard[] | null>
+}
+
+/** A set (expansion) as listed by a game's database. */
+export interface GameSet {
+  id: string
+  name: string
+  logoUrl: string | null
+  symbolUrl: string | null
+  /** Size of the set as printed on the cards. */
+  official: number | null
+  total: number | null
+}
+
+/** A card in a set. */
+export interface SetCard {
+  id: string
+  /** Number in the set as stored by the database, e.g. "040". */
+  number: string
+  name: string
+  imageUrl: string | null
+  thumbnailUrl: string | null
 }

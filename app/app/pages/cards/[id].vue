@@ -3,7 +3,7 @@ import type { CardDetailDto, CardImageDto, PlayerDto } from '#shared/types/api'
 import { POKEMON_VARIANTS, type PokemonDetails } from '#shared/types/pokemon'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
-import { CARD_LANGUAGES, preferredLanguage } from '#shared/utils/languages'
+import { preferredLanguage } from '#shared/utils/languages'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
 
 const { t } = useI18n()
@@ -25,6 +25,8 @@ const today = () => new Date().toISOString().slice(0, 10)
 
 // --- Language of the shown texts --------------------------------------------------------------
 
+// Only the languages the game stores are offered (Yu-Gi-Oh!: DE/EN, Pokémon: DE/EN/JA).
+const shownLanguages = computed(() => getGameConfig(card.value!.game.slug).languages)
 const availableLanguages = computed(() => card.value!.translations.map(entry => entry.language))
 // German is selected whenever the card has a German text.
 const language = ref(preferredLanguage(availableLanguages.value) ?? 'en')
@@ -296,7 +298,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
       <div class="flex flex-wrap items-center gap-3">
         <div class="flex gap-1.5" role="group" :aria-label="t('card.language.label')">
           <button
-            v-for="code in CARD_LANGUAGES"
+            v-for="code in shownLanguages"
             :key="code"
             type="button"
             class="rounded-full border px-3.5 py-1.5 text-sm uppercase disabled:cursor-not-allowed disabled:opacity-40"

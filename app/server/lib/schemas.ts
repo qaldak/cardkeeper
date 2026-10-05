@@ -30,6 +30,11 @@ export const listQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(200).default(48),
 })
 
+export const setsQuerySchema = z.object({
+  game: z.string().trim().min(1).max(40),
+  language: z.string().trim().min(2).max(5).optional(),
+})
+
 export const facetsQuerySchema = z.object({
   game: z.string().trim().min(1).max(40).optional(),
 })

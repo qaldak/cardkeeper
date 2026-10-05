@@ -1,6 +1,7 @@
 import { POKEMON_VARIANTS, type PokemonAttributes, type PokemonDetails } from '../../../shared/types/pokemon'
 import { HttpError } from '../../lib/errors'
 import type { CommonCard, CommonCardImage, CommonCardSet } from '../types'
+import { normalizeCategorical } from './normalize'
 import { mapTcgdexPricing } from './pricing'
 import { tcgdexCardSchema } from './schema'
 
@@ -39,14 +40,22 @@ export function mapTcgdexCard(raw: unknown, language: string): CommonCard {
     POKEMON_VARIANTS.map(key => [key, card.variants?.[key] === true]),
   ) as PokemonAttributes['variants']
 
+  const categorical = normalizeCategorical(language, {
+    category: card.category,
+    types: card.types,
+    stage: card.stage,
+    trainerType: card.trainerType,
+    energyType: card.energyType,
+  })
+
   const attributes: PokemonAttributes = compact({
-    category: card.category ?? 'Pokemon',
+    category: categorical.category ?? 'Pokemon',
     localId: String(card.localId ?? card.id.split('-').pop() ?? ''),
     setId: card.set?.id ?? card.id.split('-')[0] ?? '',
     setCardCount: card.set?.cardCount,
     hp: toNumber(card.hp),
-    types: card.types,
-    stage: card.stage,
+    types: categorical.types,
+    stage: categorical.stage,
     evolveFrom: card.evolveFrom,
     dexId: card.dexId,
     level: toNumber(card.level),
@@ -54,8 +63,8 @@ export function mapTcgdexCard(raw: unknown, language: string): CommonCard {
     retreat: toNumber(card.retreat),
     regulationMark: card.regulationMark,
     illustrator: card.illustrator,
-    trainerType: card.trainerType,
-    energyType: card.energyType,
+    trainerType: categorical.trainerType,
+    energyType: categorical.energyType,
     legal: card.legal,
     variants,
   })

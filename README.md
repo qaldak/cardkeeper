@@ -270,6 +270,19 @@ The data model is explicit and typed in [`shared/types/pokemon.ts`](app/shared/t
 - Searching: by name (German first, then English) or by card id such as `swsh3-136`; the results show small images
   loaded from `assets.tcgdex.net` (only in the result list, the card image itself is downloaded and stored locally).
 
+- **Finding a card by set and number**: a Pokémon card has no set code, only a symbol and a number such as `040/088`.
+  When adding a card, "By set and number" lets you pick the card database language (German, English or Japanese), type the
+  number as printed and pick the set by its symbol, logo or name. The part after the slash is the *printed* size of the set
+  (TCGdex `cardCount.official`, which can be smaller than the real number of cards because of secret rares), and it narrows
+  the set list down. Several sets can have the same size, so the symbol still has to be checked. The number is matched
+  without leading zeros (`040` = `40`, `TG01` = `tg01`). The chosen card is shown with its number, set and image before it
+  is added; the set and its card list come from `GET /api/sets` and `GET /api/sets/<id>` and are cached for six hours.
+- **Japanese cards** live in their own TCGdex database with their own ids (`SV9-040`), they are not translations of the
+  English cards. Japanese is therefore a third stored language, and a card that exists only in Japanese keeps only its
+  Japanese text. TCGdex cannot search Japanese cards by Latin text, so they are found by set and number or by card id; a
+  Japanese name search needs Japanese characters. Japanese category, type, stage and trainer/energy type values are mapped to the
+  English spellings so the filters work across languages; a value that is not in the mapping stays as delivered.
+
 How the printing behaves per game is configured in [`shared/utils/game-config.ts`](app/shared/utils/game-config.ts).
 
 ### Adding a game
@@ -296,9 +309,13 @@ No schema change and no change in the core services is required.
   A card that does not exist in a language answers 404 and that language is left out. The search returns brief cards (id,
   number, name, image) and at most 50 hits; narrow a broad name down with the card id. Which prices exist depends on the
   card, so a card may have none.
-- Every card is requested twice (`language=de` and English). If the API answers a German request for an untranslated card
+- Every card is requested once per stored language (`de`, `en`, `ja` for Pokémon). If the API answers a German request for an untranslated card
   with the English card instead of "not found", that copy is detected (same name and text as the English one) and not
   stored as a German translation.
+- The set browser and the Japanese data are not yet checked against the live TCGdex API (it is not reachable from the
+  development environment). Assumptions to verify after deploying: set logo and symbol are served as `<url>.webp`, the brief
+  set list contains `cardCount`, `localId` is padded as printed (`040`), and the Japanese categorical values match the
+  mapping in `server/tcg/tcgdex/normalize.ts`.
 
 ## Roadmap
 
@@ -307,7 +324,7 @@ No schema change and no change in the core services is required.
 - `/admin` area (games, players) behind HTTP basic auth and audit log view
 - Decision on a login (currently none; access control is the network and the reverse proxy)
 - Pokémon: a list price that depends on the variant (holo and reverse holo have their own prices), paging through the search
-  results, more filters (set, illustrator, regulation mark), the Japanese card database
+  results, more filters (set, illustrator, regulation mark)
 
 ## License
 
