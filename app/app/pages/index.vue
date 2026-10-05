@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CardListResponseDto, FacetsDto, GameDto, PlayerDto } from '#shared/types/api'
+import { CARD_SORTS, defaultDirection, isCardSort, isSortDirection } from '#shared/utils/sorting'
 import { CARD_STATUSES, isCardStatus } from '#shared/utils/status'
 
 const { t } = useI18n()
@@ -34,6 +35,14 @@ const rarity = computed(() => one(route.query.rarity))
 const levelMin = computed(() => levelOf(route.query.levelMin))
 const levelMax = computed(() => levelOf(route.query.levelMax))
 const page = computed(() => Math.max(1, Number(one(route.query.page)) || 1))
+const sort = computed(() => {
+  const value = one(route.query.sort)
+  return isCardSort(value) ? value : 'created'
+})
+const direction = computed(() => {
+  const value = one(route.query.dir)
+  return isSortDirection(value) ? value : defaultDirection(sort.value)
+})
 
 const apiQuery = computed(() => ({
   game: game.value,
@@ -46,6 +55,8 @@ const apiQuery = computed(() => ({
   rarity: rarity.value,
   levelMin: levelMin.value,
   levelMax: levelMax.value,
+  sort: sort.value,
+  dir: direction.value,
   page: page.value,
 }))
 
@@ -59,6 +70,10 @@ function setQuery(patch: Record<string, string | number | undefined>) {
 }
 
 const ALL = 'all'
+const sortItems = computed(() => CARD_SORTS.map(value => ({ label: t(`overview.sort.${value}`), value })))
+// Choosing an order starts with its default direction; the arrow button flips it.
+const setSort = (value: string) => setQuery({ sort: value === 'created' ? undefined : value, dir: undefined })
+const flipDirection = () => setQuery({ dir: direction.value === 'asc' ? 'desc' : 'asc' })
 const statusItems = computed(() => [
   { label: t('overview.allStatus'), value: ALL },
   ...CARD_STATUSES.map(value => ({ label: t(`status.${value}`), value })),
@@ -113,16 +128,41 @@ const hasFilters = computed(() => Boolean(
   || rarity.value || levelMin.value !== undefined || levelMax.value !== undefined,
 ))
 
+// The sort order is not a filter and stays when the filters are reset.
 function resetFilters() {
-  router.push({ query: game.value && games.value && games.value.length > 1 ? { game: game.value } : {} })
+  const keep = { sort: one(route.query.sort), dir: one(route.query.dir) }
+  const query: Record<string, string> = Object.fromEntries(Object.entries(keep).filter(([, value]) => value !== undefined)) as Record<string, string>
+  if (game.value && games.value && games.value.length > 1) {
+    query.game = game.value
+  }
+  router.push({ query })
 }
 </script>
 
 <template>
   <div class="px-8 pb-10 pt-6">
-    <p class="mb-4 text-sm text-muted">
-      {{ summaryText }}
-    </p>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <p class="text-sm text-muted">
+        {{ summaryText }}
+      </p>
+      <div class="flex items-center gap-1.5">
+        <USelect
+          :model-value="sort"
+          :items="sortItems"
+          :aria-label="t('overview.sort.label')"
+          class="w-48"
+          @update:model-value="setSort"
+        />
+        <UButton
+          color="neutral"
+          variant="outline"
+          :icon="direction === 'asc' ? 'i-lucide-arrow-up-narrow-wide' : 'i-lucide-arrow-down-wide-narrow'"
+          :aria-label="direction === 'asc' ? t('overview.sort.ascending') : t('overview.sort.descending')"
+          :title="direction === 'asc' ? t('overview.sort.ascending') : t('overview.sort.descending')"
+          @click="flipDirection"
+        />
+      </div>
+    </div>
 
     <div v-if="games && games.length > 1" class="mb-3 flex flex-wrap gap-2">
       <button

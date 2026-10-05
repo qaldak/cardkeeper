@@ -66,9 +66,17 @@ describe('resolveActor', () => {
 
 describe('request schemas', () => {
   it('applies list defaults and coerces query strings', () => {
-    expect(listQuerySchema.parse({})).toEqual({ page: 1, pageSize: 48 })
+    expect(listQuerySchema.parse({})).toEqual({ page: 1, pageSize: 48, sort: 'created' })
     expect(listQuerySchema.parse({ player: '4', page: '2', status: 'SOLD' })).toMatchObject({ player: 4, page: 2, status: 'SOLD' })
     expect(listQuerySchema.parse({ player: 'none' }).player).toBe('none')
+  })
+
+  it('validates the sort order', () => {
+    expect(listQuerySchema.parse({})).toMatchObject({ sort: 'created' })
+    expect(listQuerySchema.parse({ sort: 'price', dir: 'desc' })).toMatchObject({ sort: 'price', dir: 'desc' })
+    expect(listQuerySchema.parse({ sort: 'purchaseDate' }).dir).toBeUndefined()
+    expect(() => listQuerySchema.parse({ sort: 'rarity' })).toThrow()
+    expect(() => listQuerySchema.parse({ dir: 'up' })).toThrow()
   })
 
   it('rejects out-of-range paging and unknown statuses', () => {
