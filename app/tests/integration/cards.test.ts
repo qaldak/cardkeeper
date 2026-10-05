@@ -221,6 +221,64 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect(await ids({ race: 'Dragon', status: 'SOLD' })).toEqual([])
     })
 
+    describe('sorting', () => {
+      async function seedSortable() {
+        const magician = await addDarkMagician({ purchaseDate: '2026-07-15' })
+        const dragon = await h.services.cards.create({ game: 'ygo', externalId: String(BLUE_EYES.id), purchaseDate: '2026-05-01' }, ACTOR)
+        const spell = await h.services.cards.create({ game: 'ygo', externalId: String(ENGLISH_ONLY.id) }, ACTOR)
+        return { magician, dragon, spell }
+      }
+      const names = async (sort: 'created' | 'name' | 'level' | 'purchaseDate' | 'price', dir?: 'asc' | 'desc') =>
+        (await h.services.cards.list({}, all, { sort, dir })).items.map(item => item.name)
+
+      it('sorts by name', async () => {
+        await seedSortable()
+        expect(await names('name', 'asc')).toEqual(['Blauäugiger weißer Drache', 'Dunkler Magier', 'Obscure Spell'])
+        expect(await names('name', 'desc')).toEqual(['Obscure Spell', 'Dunkler Magier', 'Blauäugiger weißer Drache'])
+      })
+
+      it('sorts by level and puts cards without a level last', async () => {
+        await seedSortable()
+        expect(await names('level', 'asc')).toEqual(['Dunkler Magier', 'Blauäugiger weißer Drache', 'Obscure Spell'])
+        expect(await names('level', 'desc')).toEqual(['Blauäugiger weißer Drache', 'Dunkler Magier', 'Obscure Spell'])
+      })
+
+      it('sorts by purchase date and puts cards without one last', async () => {
+        await seedSortable()
+        expect(await names('purchaseDate', 'asc')).toEqual(['Blauäugiger weißer Drache', 'Dunkler Magier', 'Obscure Spell'])
+        expect(await names('purchaseDate', 'desc')).toEqual(['Dunkler Magier', 'Blauäugiger weißer Drache', 'Obscure Spell'])
+      })
+
+      it('sorts by the latest price of the configured source', async () => {
+        const { magician } = await seedSortable()
+        expect(await names('price', 'asc')).toEqual(['Obscure Spell', 'Dunkler Magier', 'Blauäugiger weißer Drache'])
+        expect(await names('price', 'desc')).toEqual(['Blauäugiger weißer Drache', 'Dunkler Magier', 'Obscure Spell'])
+
+        // Dark Magician becomes the most expensive card after a refresh.
+        h.ygo.cards.set(DARK_MAGICIAN.id, { ...DARK_MAGICIAN, prices: { ...DARK_MAGICIAN.prices, cardmarket_price: '99.00' } })
+        await h.services.cards.refresh(magician.id, ACTOR)
+        expect(await names('price', 'desc')).toEqual(['Dunkler Magier', 'Blauäugiger weißer Drache', 'Obscure Spell'])
+      })
+
+      it('shows the newest card first by default and the oldest first when ascending', async () => {
+        await seedSortable()
+        expect(await names('created')).toEqual(['Obscure Spell', 'Blauäugiger weißer Drache', 'Dunkler Magier'])
+        expect(await names('created', 'asc')).toEqual(['Dunkler Magier', 'Blauäugiger weißer Drache', 'Obscure Spell'])
+      })
+
+      it('sorts across pages and keeps filters and the summary', async () => {
+        await seedSortable()
+        const first = await h.services.cards.list({}, { page: 1, pageSize: 2 }, { sort: 'name', dir: 'asc' })
+        const second = await h.services.cards.list({}, { page: 2, pageSize: 2 }, { sort: 'name', dir: 'asc' })
+        expect(first.items.map(item => item.name)).toEqual(['Blauäugiger weißer Drache', 'Dunkler Magier'])
+        expect(second.items.map(item => item.name)).toEqual(['Obscure Spell'])
+        expect(second.summary.count).toBe(3)
+
+        const filtered = await h.services.cards.list({ cardType: 'Normal Monster' }, all, { sort: 'price', dir: 'desc' })
+        expect(filtered.items.map(item => item.name)).toEqual(['Blauäugiger weißer Drache', 'Dunkler Magier'])
+      })
+    })
+
     it('paginates while the summary still covers every match', async () => {
       await seed()
       const first = await h.services.cards.list({}, { page: 1, pageSize: 3 })

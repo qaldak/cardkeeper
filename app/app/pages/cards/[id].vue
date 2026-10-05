@@ -383,10 +383,10 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
               <UInput :model-value="shownName" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
             <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-              <UFormField :label="t('card.fields.setCode')" :hint="t('card.fields.editable')">
+              <UFormField :label="t('card.fields.setCode')">
                 <UInput v-model="form.setCode" maxlength="40" class="w-full" />
               </UFormField>
-              <UFormField :label="t('card.fields.edition')" :hint="t('card.fields.editable')">
+              <UFormField :label="t('card.fields.edition')">
                 <UInput v-model="form.edition" maxlength="80" class="w-full" />
               </UFormField>
               <UFormField :label="t('card.fields.setName')">

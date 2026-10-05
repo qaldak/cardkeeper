@@ -56,6 +56,16 @@
       "allAttributes": "All attributes",
       "allRarities": "All rarities",
       "reset": "Reset filters"
+    },
+    "sort": {
+      "label": "Sort by",
+      "created": "Recently added",
+      "name": "Name",
+      "level": "Level",
+      "purchaseDate": "Purchase date",
+      "price": "Price",
+      "ascending": "Sorted ascending",
+      "descending": "Sorted descending"
     }
   },
   "card": {
@@ -83,8 +93,7 @@
       "statusPerson": "Person",
       "statusPersonPlaceholder": "Name of the person",
       "player": "Assigned to",
-      "purchaseDate": "Purchase date",
-      "editable": "editable"
+      "purchaseDate": "Purchase date"
     },
     "attributes": {
       "atk": "ATK",

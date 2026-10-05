@@ -1,7 +1,9 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client'
 import type { CardDetailDto, CardListResponseDto, FacetsDto, LookupCandidateDto } from '../../shared/types/api'
+import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import type { AppConfig } from '../lib/config'
 import { buildCardWhere, type CardFilters } from '../lib/card-filters'
+import { sortRows, type SortRow } from '../lib/card-sort'
 import { formatDateOnly, parseDateOnly, utcToday } from '../lib/dates'
 import { badRequest, notFound } from '../lib/errors'
 import { detectImageType, removeCardImageDir, saveImage } from '../lib/image-files'
@@ -114,53 +116,75 @@ export function createCardService(deps: CardServiceDeps) {
   return {
     get,
 
-    async list(filters: CardFilters, paging: { page: number, pageSize: number }): Promise<CardListResponseDto> {
+    async list(
+      filters: CardFilters,
+      paging: { page: number, pageSize: number },
+      order: { sort: CardSort, dir?: SortDirection } = { sort: 'created' },
+    ): Promise<CardListResponseDto> {
       const where = buildCardWhere(filters)
-      const orderBy: Prisma.CardOrderByWithRelationInput[] = [{ createdAt: 'desc' }, { id: 'desc' }]
 
-      const [cards, valueRows] = await Promise.all([
-        db.card.findMany({
-          where,
-          orderBy,
-          skip: (paging.page - 1) * paging.pageSize,
-          take: paging.pageSize,
-          include: listInclude(config.priceSource),
-        }),
-        // The summary covers all matching cards, not just the current page. A personal collection
-        // is small enough that loading status and latest price of every match is cheap.
-        db.card.findMany({
-          where,
-          select: {
-            status: true,
-            priceHistory: {
-              where: { source: config.priceSource },
-              orderBy: [{ fetchedAt: 'desc' }, { id: 'desc' }],
-              take: 1,
-              select: { price: true, currency: true },
-            },
+      // Loads what is needed to sort and to summarize every matching card, not just the current
+      // page. Level and latest price cannot be sorted by the database (JSON attribute, related
+      // table), and a personal collection is small enough that this is cheap.
+      const rows = await db.card.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+          purchaseDate: true,
+          status: true,
+          gameSpecificAttributes: true,
+          priceHistory: {
+            where: { source: config.priceSource },
+            orderBy: [{ fetchedAt: 'desc' }, { id: 'desc' }],
+            take: 1,
+            select: { price: true, currency: true },
           },
-        }),
-      ])
+        },
+      })
 
       const centsByCurrency = new Map<string, number>()
       let activeCount = 0
-      for (const row of valueRows) {
-        if (row.status !== 'ACTIVE') {
-          continue
-        }
-        activeCount += 1
+      const sortRowsInput: SortRow[] = []
+      for (const row of rows) {
         const latest = row.priceHistory[0]
-        if (latest) {
-          centsByCurrency.set(latest.currency, (centsByCurrency.get(latest.currency) ?? 0) + toCents(Number(latest.price)))
+        const level = (row.gameSpecificAttributes as Record<string, unknown>).level
+        sortRowsInput.push({
+          id: row.id,
+          name: row.name,
+          createdAt: row.createdAt,
+          purchaseDate: row.purchaseDate,
+          level: typeof level === 'number' ? level : null,
+          priceCents: latest ? toCents(Number(latest.price)) : null,
+        })
+        if (row.status === 'ACTIVE') {
+          activeCount += 1
+          if (latest) {
+            centsByCurrency.set(latest.currency, (centsByCurrency.get(latest.currency) ?? 0) + toCents(Number(latest.price)))
+          }
         }
       }
 
+      const pageIds = sortRows(sortRowsInput, order.sort, order.dir)
+        .slice((paging.page - 1) * paging.pageSize, paging.page * paging.pageSize)
+        .map(row => row.id)
+      const cards = await db.card.findMany({
+        where: { id: { in: pageIds } },
+        include: listInclude(config.priceSource),
+      })
+      const byId = new Map(cards.map(card => [card.id, card]))
+      const items = pageIds.flatMap((id) => {
+        const card = byId.get(id)
+        return card ? [toListItem(card)] : []
+      })
+
       return {
-        items: cards.map(toListItem),
+        items,
         page: paging.page,
         pageSize: paging.pageSize,
         summary: {
-          count: valueRows.length,
+          count: rows.length,
           activeCount,
           totals: [...centsByCurrency.entries()]
             .sort(([a], [b]) => a.localeCompare(b))

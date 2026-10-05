@@ -11,7 +11,8 @@ Everything runs in containers: there is nothing to install on the host except Do
 
 - Collection overview with filters for status, player, card type, monster type, attribute, rarity and a level range
   (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
-  total value of the active cards
+  sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come
+  last); total value of the active cards
 - Card detail page: texts in German and English with a language switch (German first, a language the card does not
   have is disabled), the set code and edition can be corrected (e.g. German or Japanese prints, applies to all
   languages), manual image upload, status handling (active, sold, traded, gifted, lost) with date and counterpart,

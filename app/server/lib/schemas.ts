@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CARD_SORTS } from '../../shared/utils/sorting'
 import { CARD_STATUSES } from '../../shared/utils/status'
 
 const dateOnly = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD')
@@ -15,6 +16,9 @@ export const listQuerySchema = z.object({
   rarity: z.string().trim().min(1).max(80).optional(),
   levelMin: z.coerce.number().int().min(0).max(99).optional(),
   levelMax: z.coerce.number().int().min(0).max(99).optional(),
+  sort: z.enum(CARD_SORTS).default('created'),
+  // Without a direction every order uses its default (see `defaultDirection`).
+  dir: z.enum(['asc', 'desc']).optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(200).default(48),
 })
