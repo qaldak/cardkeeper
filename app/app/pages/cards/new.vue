@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { CardDetailDto, GameDto, LookupCandidateDto, PlayerDto } from '#shared/types/api'
+import type { PokemonAttributes } from '#shared/types/pokemon'
 import { formatAttributeValue } from '#shared/utils/game-fields'
+import { getGameConfig } from '#shared/utils/game-config'
 
 const { t } = useI18n()
 const toast = useToast()
 const apiError = useApiError()
+const labels = useGameLabels()
 
 useHead({ title: () => t('add.title') })
 
@@ -14,6 +17,9 @@ const { data: players } = await useFetch<PlayerDto[]>('/api/players')
 const NONE = 'none'
 
 const gameSlug = ref(games.value?.[0]?.slug ?? '')
+const config = computed(() => getGameConfig(gameSlug.value))
+const isPokemon = computed(() => gameSlug.value === 'pokemon')
+
 const query = ref('')
 const results = ref<LookupCandidateDto[] | null>(null)
 const searching = ref(false)
@@ -26,17 +32,26 @@ const playerId = ref(NONE)
 const purchaseDate = ref('')
 const submitting = ref(false)
 
+// A search belongs to one game: switching the game starts over.
+watch(gameSlug, () => {
+  results.value = null
+  chosen.value = null
+  searchError.value = ''
+})
+
 const gameItems = computed(() => (games.value ?? []).map(entry => ({ label: entry.displayName, value: entry.slug })))
 const playerItems = computed(() => [
   { label: t('common.none'), value: NONE },
   ...(players.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })),
 ])
+
+// Yu-Gi-Oh!: set, code and rarity. Pokémon: the card is fixed, the choice is the variant of the physical card.
+const printingLabel = (set: LookupCandidateDto['sets'][number]) => isPokemon.value
+  ? [labels.variant(set.edition), set.rarity, set.setName].filter(Boolean).join(' · ')
+  : [set.setCode, set.setName, set.rarity].filter(Boolean).join(' · ')
 const printingItems = computed(() => [
-  { label: t('add.noPrinting'), value: NONE },
-  ...(chosen.value?.sets ?? []).map((set, index) => ({
-    label: [set.setCode, set.setName, set.rarity].filter(Boolean).join(' · '),
-    value: String(index),
-  })),
+  ...(config.value.printingRequired ? [] : [{ label: t('add.noPrinting'), value: NONE }]),
+  ...(chosen.value?.sets ?? []).map((set, index) => ({ label: printingLabel(set), value: String(index) })),
 ])
 
 async function search() {
@@ -60,15 +75,15 @@ async function search() {
   }
 }
 
-// The search result only carries the printings of one language; loading the card again
+// The search result only carries the printings of one language (or none); loading the card again
 // gives the printings of both languages to choose from.
 async function choose(candidate: LookupCandidateDto) {
   choosing.value = candidate.externalId
   try {
-    chosen.value = await $fetch<LookupCandidateDto>(`/api/lookup/${candidate.externalId}`, {
+    chosen.value = await $fetch<LookupCandidateDto>(`/api/lookup/${encodeURIComponent(candidate.externalId)}`, {
       query: { game: gameSlug.value },
     })
-    printing.value = NONE
+    printing.value = config.value.printingRequired && chosen.value.sets.length > 0 ? '0' : NONE
   }
   catch (error) {
     toast.add({ title: apiError(error), color: 'error' })
@@ -90,7 +105,7 @@ async function submit() {
       body: {
         game: gameSlug.value,
         externalId: chosen.value.externalId,
-        set: set ? { setCode: set.setCode, rarity: set.rarity } : undefined,
+        set: set ? { setCode: set.setCode, rarity: set.rarity, edition: set.edition } : undefined,
         playerId: playerId.value === NONE ? null : Number(playerId.value),
         purchaseDate: purchaseDate.value || null,
       },
@@ -106,14 +121,25 @@ async function submit() {
   }
 }
 
-const summaryAttributes = (candidate: LookupCandidateDto) =>
-  ['atk', 'def', 'level']
+function subline(candidate: LookupCandidateDto): string {
+  if (isPokemon.value) {
+    const attributes = candidate.attributes as Partial<PokemonAttributes>
+    return [
+      attributes.category ? labels.pokemonCategory(attributes.category) : null,
+      attributes.hp ? `${t('pokemon.fields.hp')} ${attributes.hp}` : null,
+      attributes.types?.map(labels.pokemonType).join(', '),
+      `#${candidate.externalId}`,
+    ].filter(Boolean).join(' · ')
+  }
+  const stats = ['atk', 'def', 'level']
     .filter(key => candidate.attributes[key] !== undefined)
     .map(key => `${t(`card.attributes.${key}`)} ${formatAttributeValue('number', candidate.attributes[key])}`)
     .join(' · ')
+  return [candidate.attributes.type, stats, `#${candidate.externalId}`].filter(Boolean).join(' · ')
+}
 
-const subline = (candidate: LookupCandidateDto) =>
-  [candidate.attributes.type, summaryAttributes(candidate), `#${candidate.externalId}`].filter(Boolean).join(' · ')
+// The search returns this many cards at most; more means the search should be narrowed down.
+const MAX_RESULTS = 50
 </script>
 
 <template>
@@ -134,12 +160,21 @@ const subline = (candidate: LookupCandidateDto) =>
           <USelect v-model="gameSlug" :items="gameItems" class="w-full" />
         </UFormField>
         <UFormField :label="t('add.query')" class="min-w-64 flex-1">
-          <UInput v-model="query" :placeholder="t('add.queryPlaceholder')" class="w-full" autofocus />
+          <UInput
+            v-model="query"
+            :placeholder="isPokemon ? t('add.queryPlaceholderPokemon') : t('add.queryPlaceholder')"
+            class="w-full"
+            autofocus
+          />
         </UFormField>
         <UButton type="submit" icon="i-lucide-search" :loading="searching">
           {{ t('add.search') }}
         </UButton>
       </form>
+
+      <p v-if="isPokemon" class="-mt-3 mb-5 text-xs text-dimmed">
+        {{ t('add.idHint') }}
+      </p>
 
       <p v-if="searchError" class="mb-4 text-sm text-error">
         {{ searchError }}
@@ -155,6 +190,14 @@ const subline = (candidate: LookupCandidateDto) =>
           </h2>
           <ul class="divide-y divide-default overflow-hidden rounded-xl border border-default bg-default">
             <li v-for="candidate in results" :key="candidate.externalId" class="flex flex-wrap items-center gap-3 px-4 py-3">
+              <img
+                v-if="candidate.thumbnailUrl"
+                :src="candidate.thumbnailUrl"
+                :alt="candidate.name"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+                class="h-16 w-12 shrink-0 rounded bg-primary-50 object-cover"
+              >
               <div class="min-w-0 flex-1">
                 <p class="font-medium">
                   {{ candidate.name }}
@@ -171,27 +214,39 @@ const subline = (candidate: LookupCandidateDto) =>
               </UButton>
             </li>
           </ul>
+          <p v-if="results.length >= MAX_RESULTS" class="mt-3 text-xs text-dimmed">
+            {{ t('add.manyResults') }}
+          </p>
         </template>
       </template>
     </template>
 
     <form v-else class="flex max-w-xl flex-col gap-5" @submit.prevent="submit">
-      <div class="rounded-xl border border-default bg-default p-4">
-        <p class="text-xs text-muted">
-          {{ t('add.chosen') }}
-        </p>
-        <p class="text-lg font-semibold">
-          {{ chosen.name }}
-        </p>
-        <p class="text-xs text-muted">
-          {{ subline(chosen) }}
-        </p>
-        <UButton size="xs" variant="link" class="mt-2 px-0" @click="chosen = null">
-          {{ t('add.changeChoice') }}
-        </UButton>
+      <div class="flex gap-4 rounded-xl border border-default bg-default p-4">
+        <img
+          v-if="chosen.thumbnailUrl"
+          :src="chosen.thumbnailUrl"
+          :alt="chosen.name"
+          referrerpolicy="no-referrer"
+          class="h-24 w-[70px] shrink-0 rounded bg-primary-50 object-cover"
+        >
+        <div>
+          <p class="text-xs text-muted">
+            {{ t('add.chosen') }}
+          </p>
+          <p class="text-lg font-semibold">
+            {{ chosen.name }}
+          </p>
+          <p class="text-xs text-muted">
+            {{ subline(chosen) }}
+          </p>
+          <UButton size="xs" variant="link" class="mt-2 px-0" @click="chosen = null">
+            {{ t('add.changeChoice') }}
+          </UButton>
+        </div>
       </div>
 
-      <UFormField :label="t('add.printing')">
+      <UFormField :label="isPokemon ? t('add.variant') : t('add.printing')" :hint="config.printingRequired ? t('add.variantRequired') : undefined">
         <USelectMenu v-model="printing" :items="printingItems" value-key="value" class="w-full" />
       </UFormField>
       <UFormField :label="t('add.player')">

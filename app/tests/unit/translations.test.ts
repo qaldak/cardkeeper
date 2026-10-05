@@ -22,8 +22,8 @@ describe('mergeLanguageCards', () => {
     const merged = mergeLanguageCards([card('en'), card('de')])
     expect(merged.name).toBe('Dunkler Magier')
     expect(merged.translations).toEqual([
-      { language: 'de', name: 'Dunkler Magier', description: 'Der ultimative Magier.' },
-      { language: 'en', name: 'Dark Magician', description: 'The ultimate wizard.' },
+      { language: 'de', name: 'Dunkler Magier', description: 'Der ultimative Magier.', details: null },
+      { language: 'en', name: 'Dark Magician', description: 'The ultimate wizard.', details: null },
     ])
   })
 
@@ -84,6 +84,59 @@ describe('mergeLanguageCards', () => {
 
   it('needs at least one response', () => {
     expect(() => mergeLanguageCards([])).toThrow()
+  })
+})
+
+describe('mergeLanguageCards: details and variants', () => {
+  const pokemon = (language: string, details: Record<string, unknown> | null, overrides: Partial<CommonCard> = {}): CommonCard => ({
+    ...card(language),
+    name: 'Pikachu',
+    description: language === 'de' ? 'Deutscher Text.' : 'English text.',
+    details,
+    sets: [
+      { setCode: 'swsh3-1', setName: 'Set', rarity: 'Rare', edition: 'normal' },
+      { setCode: 'swsh3-1', setName: 'Set', rarity: 'Rare', edition: 'reverse' },
+    ],
+    ...overrides,
+  })
+
+  it('keeps the details of every language', () => {
+    const merged = mergeLanguageCards([
+      pokemon('de', { types: ['Elektro'] }),
+      pokemon('en', { types: ['Lightning'] }),
+    ])
+    expect(merged.translations).toEqual([
+      { language: 'de', name: 'Pikachu', description: 'Deutscher Text.', details: { types: ['Elektro'] } },
+      { language: 'en', name: 'Pikachu', description: 'English text.', details: { types: ['Lightning'] } },
+    ])
+  })
+
+  it('keeps German when the name is the same but the text and details differ', () => {
+    const merged = mergeLanguageCards([pokemon('de', { types: ['Elektro'] }), pokemon('en', { types: ['Lightning'] })])
+    expect(merged.translations.map(entry => entry.language)).toEqual(['de', 'en'])
+  })
+
+  it('drops a German response that equals the English one including the details', () => {
+    const english = pokemon('en', { types: ['Lightning'] })
+    const copy = pokemon('de', { types: ['Lightning'] }, { description: 'English text.' })
+    expect(mergeLanguageCards([copy, english]).translations.map(entry => entry.language)).toEqual(['en'])
+  })
+
+  it('does not duplicate a printing because its rarity is translated', () => {
+    const german = pokemon('de', null, { sets: [
+      { setCode: 'swsh3-1', setName: 'Satz', rarity: 'Selten', edition: 'normal' },
+      { setCode: 'swsh3-1', setName: 'Satz', rarity: 'Selten', edition: 'reverse' },
+    ] })
+    const merged = mergeLanguageCards([german, pokemon('en', null)])
+    expect(merged.sets).toEqual([
+      { setCode: 'swsh3-1', setName: 'Set', rarity: 'Rare', edition: 'normal' },
+      { setCode: 'swsh3-1', setName: 'Set', rarity: 'Rare', edition: 'reverse' },
+    ])
+  })
+
+  it('treats the variants of one card as separate printings', () => {
+    const merged = mergeLanguageCards([pokemon('de', null), pokemon('en', null)])
+    expect(merged.sets.map(set => set.edition)).toEqual(['normal', 'reverse'])
   })
 })
 

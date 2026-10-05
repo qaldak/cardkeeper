@@ -55,7 +55,18 @@
       "allRaces": "Alle Typen",
       "allAttributes": "Alle Attribute",
       "allRarities": "Alle Seltenheiten",
-      "reset": "Filter zurücksetzen"
+      "reset": "Filter zurücksetzen",
+      "category": "Kategorie",
+      "allCategories": "Alle Kategorien",
+      "pokemonType": "Typ",
+      "allPokemonTypes": "Alle Typen",
+      "stage": "Stufe",
+      "allStages": "Alle Stufen",
+      "variant": "Variante",
+      "allVariants": "Alle Varianten",
+      "hp": "KP",
+      "hpFrom": "KP von",
+      "hpTo": "KP bis"
     },
     "sort": {
       "label": "Sortieren nach",
@@ -65,8 +76,10 @@
       "purchaseDate": "Kaufdatum",
       "price": "Preis",
       "ascending": "Aufsteigend sortiert",
-      "descending": "Absteigend sortiert"
-    }
+      "descending": "Absteigend sortiert",
+      "hp": "KP"
+    },
+    "allGames": "Alle Spiele"
   },
   "card": {
     "noImage": "Bild",
@@ -93,7 +106,9 @@
       "statusPerson": "Person",
       "statusPersonPlaceholder": "Name der Person",
       "player": "Zugewiesen an",
-      "purchaseDate": "Kaufdatum"
+      "purchaseDate": "Kaufdatum",
+      "variant": "Variante",
+      "cardId": "Karten-ID"
     },
     "attributes": {
       "atk": "ATK",
@@ -133,7 +148,8 @@
       "hint": "Texte, Attribute und Preise neu abrufen. Set-Code, Edition, Status und Zuweisung bleiben unverändert.",
       "done": "Daten aktualisiert"
     },
-    "lastFetched": "Daten zuletzt von der API abgerufen am {date}"
+    "lastFetched": "Daten zuletzt von der API abgerufen am {date}",
+    "basicsHintVariant": "Namen, Texte und Daten stammen aus der Kartendatenbank. Nur die Variante deiner Karte (z. B. Reverse Holo oder 1st Edition) lässt sich anpassen."
   },
   "add": {
     "title": "Karte hinzufügen",
@@ -153,7 +169,12 @@
     "purchaseDate": "Kaufdatum (optional)",
     "submit": "Zur Sammlung hinzufügen",
     "added": "Karte hinzugefügt",
-    "languageHint": "Die Suche läuft zuerst auf Deutsch, danach auf Englisch. Gespeichert werden beide Sprachen, soweit vorhanden."
+    "languageHint": "Die Suche läuft zuerst auf Deutsch, danach auf Englisch. Gespeichert werden beide Sprachen, soweit vorhanden.",
+    "variant": "Variante",
+    "queryPlaceholderPokemon": "z. B. Pikachu oder swsh3-136",
+    "manyResults": "Es werden nur die ersten Treffer angezeigt. Grenze die Suche ein, z. B. mit der Karten-ID (swsh3-136).",
+    "idHint": "Pokémon: Name oder Karten-ID (Set-ID und Nummer, z. B. swsh3-136).",
+    "variantRequired": "Wähle die Variante deiner Karte."
   },
   "players": {
     "title": "Spieler",
@@ -186,6 +207,79 @@
     "file_too_large": "Die Datei ist zu groß.",
     "empty_file": "Die Datei ist leer.",
     "missing_file": "Es wurde keine Datei gewählt.",
-    "no_external_id": "Diese Karte ist nicht mit der Kartendatenbank verknüpft."
+    "no_external_id": "Diese Karte ist nicht mit der Kartendatenbank verknüpft.",
+    "printing_required": "Bitte wähle die Variante der Karte.",
+    "invalid_variant": "Diese Variante gibt es für die Karte nicht.",
+    "field_not_editable": "Dieses Feld kann bei dieser Karte nicht geändert werden."
+  },
+  "variant": {
+    "normal": "Normal",
+    "reverse": "Reverse Holo",
+    "holo": "Holo",
+    "firstEdition": "1st Edition",
+    "wPromo": "W-Promo"
+  },
+  "pokemon": {
+    "category": {
+      "Pokemon": "Pokémon",
+      "Trainer": "Trainer",
+      "Energy": "Energie"
+    },
+    "type": {
+      "Colorless": "Farblos",
+      "Darkness": "Finsternis",
+      "Dragon": "Drache",
+      "Fairy": "Fee",
+      "Fighting": "Kampf",
+      "Fire": "Feuer",
+      "Grass": "Pflanze",
+      "Lightning": "Elektro",
+      "Metal": "Metall",
+      "Psychic": "Psycho",
+      "Water": "Wasser"
+    },
+    "stage": {
+      "Basic": "Basis",
+      "Stage1": "Phase 1",
+      "Stage2": "Phase 2",
+      "VMAX": "VMAX",
+      "VSTAR": "VSTAR",
+      "Restored": "Wiederbelebt",
+      "BREAK": "BREAK",
+      "LEVEL-UP": "Level-Up",
+      "MEGA": "Mega"
+    },
+    "trainerType": {
+      "Item": "Item",
+      "Supporter": "Unterstützer",
+      "Stadium": "Stadion",
+      "Tool": "Ausrüstung"
+    },
+    "energyType": {
+      "Basic": "Basis",
+      "Special": "Spezial"
+    },
+    "fields": {
+      "category": "Kategorie",
+      "hp": "KP",
+      "types": "Typ",
+      "stage": "Stufe",
+      "retreat": "Rückzug",
+      "evolveFrom": "Entwickelt sich aus",
+      "illustrator": "Illustrator",
+      "regulationMark": "Regulationsmarke",
+      "number": "Nummer",
+      "trainerType": "Trainer-Typ",
+      "energyType": "Energie-Typ",
+      "dexId": "Pokédex-Nr."
+    },
+    "sections": {
+      "abilities": "Fähigkeiten",
+      "attacks": "Attacken",
+      "weakness": "Schwäche",
+      "resistance": "Resistenz",
+      "effect": "Effekt"
+    },
+    "noDetails": "Für diese Sprache sind keine weiteren Kartendetails vorhanden."
   }
 }

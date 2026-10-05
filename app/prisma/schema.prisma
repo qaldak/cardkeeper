@@ -84,6 +84,9 @@ model CardTranslation {
   language    String   @db.VarChar(5)
   name        String
   description String?
+  // Further language dependent data of games that have more than name and description
+  // (Pokémon: attack and ability texts, localized type names, ...). Null for Yu-Gi-Oh!.
+  details     Json?
   fetchedAt   DateTime @default(now()) @map("fetched_at")
   card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
 
@@ -92,7 +95,8 @@ model CardTranslation {
 }
 
 // The printing of the physical card. Set code and edition are corrected manually (e.g. German or
-// Japanese prints) and apply to every language of the card.
+// Japanese prints) and apply to every language of the card. For Pokémon the set code is the card id
+// and `edition` holds the variant of the physical card (normal, reverse, holo, firstEdition, ...).
 model CardSet {
   id      Int     @id @default(autoincrement())
   cardId  Int     @map("card_id")

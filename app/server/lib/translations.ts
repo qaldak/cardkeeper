@@ -5,6 +5,8 @@ export interface CardTranslation {
   language: string
   name: string
   description: string | null
+  /** Language dependent data beyond name and description (Pokémon); null if there is none. */
+  details: Record<string, unknown> | null
 }
 
 /** The per-language API responses of one card, merged into what is stored. */
@@ -27,8 +29,8 @@ export interface MergedCard {
  * Merges the responses for the same card in different languages. English is the canonical source
  * for the language independent data, and every language contributes its text.
  *
- * A translation that is identical to the English text (name and description) is dropped: it means
- * the API answered with the English card instead of a translation, and storing it would show
+ * A translation that is identical to the English one (name, description and details) is dropped: it
+ * means the API answered with the English card instead of a translation, and storing it would show
  * English text as if it were German.
  */
 export function mergeLanguageCards(cards: readonly CommonCard[]): MergedCard {
@@ -45,19 +47,32 @@ export function mergeLanguageCards(cards: readonly CommonCard[]): MergedCard {
       && card !== english
       && card.name === english.name
       && (card.description ?? null) === (english.description ?? null)
+      && JSON.stringify(card.details ?? null) === JSON.stringify(english.details ?? null)
     if (!isEnglishCopy) {
-      translations.push({ language: card.language, name: card.name, description: card.description })
+      translations.push({ language: card.language, name: card.name, description: card.description, details: card.details ?? null })
     }
   }
   const sortedTranslations = sortByLanguagePreference(translations)
 
-  const seenSets = new Set<string>()
+  // Printings: the canonical (English) response is complete; another language only adds printings
+  // with a set code or variant the canonical one does not have (e.g. a German-only print). Comparing
+  // the rarity there would duplicate every Pokémon, because its rarity is translated.
   const sets: CommonCardSet[] = []
-  for (const card of [canonical, ...cards.filter(other => other !== canonical)]) {
-    for (const set of card.sets) {
-      const key = `${set.setCode}\u0000${set.rarity ?? ''}`
-      if (!seenSets.has(key)) {
-        seenSets.add(key)
+  const seenFull = new Set<string>()
+  const seenPrinting = new Set<string>()
+  const printing = (set: CommonCardSet) => `${set.setCode}\u0000${set.edition ?? ''}`
+  for (const set of canonical.sets) {
+    const key = `${printing(set)}\u0000${set.rarity ?? ''}`
+    if (!seenFull.has(key)) {
+      seenFull.add(key)
+      seenPrinting.add(printing(set))
+      sets.push(set)
+    }
+  }
+  for (const other of cards.filter(entry => entry !== canonical)) {
+    for (const set of other.sets) {
+      if (!seenPrinting.has(printing(set))) {
+        seenPrinting.add(printing(set))
         sets.push(set)
       }
     }
@@ -79,7 +94,7 @@ export function mergeLanguageCards(cards: readonly CommonCard[]): MergedCard {
 }
 
 /** Name of the preferred language among already stored translations. */
-export function primaryName(translations: readonly CardTranslation[], fallback: string): string {
+export function primaryName<T extends { language: string, name: string }>(translations: readonly T[], fallback: string): string {
   const language = preferredLanguage(translations.map(entry => entry.language))
   return translations.find(entry => entry.language === language)?.name ?? fallback
 }

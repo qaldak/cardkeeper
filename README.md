@@ -2,13 +2,17 @@
 
 A self-hosted, game-agnostic trading card collection manager with price history and ownership tracking.
 
-The first version supports **Yu-Gi-Oh!** (card data and prices from [YGOPRODeck](https://ygoprodeck.com/api-guide/)).
-Other games (Pokémon is next) plug in through a small adapter interface without touching the core schema or the UI.
+Supported games: **Yu-Gi-Oh!** (card data and prices from [YGOPRODeck](https://ygoprodeck.com/api-guide/)) and
+**Pokémon** (card data and prices from [TCGdex](https://tcgdex.dev), free and without an API key).
+Further games plug in through a small adapter interface without touching the core schema or the UI.
 
 Everything runs in containers: there is nothing to install on the host except Docker.
 
 ## Features
 
+- Yu-Gi-Oh! and Pokémon in one collection: the game is chosen when adding a card, the overview shows one game or all
+  games, and each game has its own filters (Yu-Gi-Oh!: card type, type, attribute, rarity, level range; Pokémon: category,
+  type, stage, rarity, variant, HP range) and sort orders (level for Yu-Gi-Oh!, HP for Pokémon)
 - Collection overview with filters for status, player, card type, monster type, attribute, rarity and a level range
   (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
   sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come
@@ -125,6 +129,34 @@ The `make` targets are thin wrappers around `docker compose -f docker-compose.ym
 After changing `package.json`, rebuild the dev image and drop the `node_modules` volume:
 `docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v` (this also removes the dev database).
 
+### Trying out a branch
+
+Run the branch next to your real installation under another project name. A separate project has its own containers,
+network and volumes, so the real data stays untouched and the migrations of the branch only touch the test database:
+
+```bash
+git fetch origin && git checkout <branch>
+cp .env.example .env.test        # other passwords are fine, and set APP_PORT=3001
+docker compose -p cardkeeper-test --env-file .env.test up -d --build
+# open http://localhost:3001
+
+docker compose -p cardkeeper-test --env-file .env.test down -v    # remove it again, including its data
+```
+
+To try the branch with a copy of your real data (this also tests the upgrade of the database), start only the database,
+load a dump, and then start the app, which applies the new migrations:
+
+```bash
+docker compose exec -T db pg_dump -U postgres -d cardkeeper > real.sql          # in the real installation
+docker compose -p cardkeeper-test --env-file .env.test up -d db
+docker compose -p cardkeeper-test --env-file .env.test exec -T db psql -U postgres -d cardkeeper < real.sql
+docker compose -p cardkeeper-test --env-file .env.test up -d --build
+```
+
+The `make dev` and `make test` targets use the default project name and therefore the same volumes as the real
+installation; use `-p` as above (or a separate checkout) when you do not want that. Docker images are only published for
+releases, not for branches.
+
 ### Tests
 
 - **Unit tests** (`app/tests/unit`) cover the pure logic: status rules, filters, manual override tracking, image
@@ -196,7 +228,8 @@ docker-compose.dev.yml    Development and test overlay
 
 `games`, `cards` (one row per physical card), `card_sets`, `price_history`, `status_history`, `players`, `api_snapshots`
 (immutable raw API responses), `card_images` (files live on the `card-images` volume, the table stores relative paths),
-`audit_log`. Game specific values (ATK/DEF/level, later HP/types, ...) are JSONB in `cards.game_specific_attributes`.
+`audit_log`. Game specific values (ATK/DEF/level, HP/types/stage, ...) are JSONB in `cards.game_specific_attributes`,
+so a new game does not need a schema change.
 
 Differences from the original concept:
 
@@ -208,18 +241,47 @@ Differences from the original concept:
 - Names, texts and attributes are read-only in the UI, so there are no manual overrides of API data (`manual_overrides`
   was dropped). `card_sets` holds the printing of the physical card; its set code and edition are the only editable
   card data and apply to all languages. `cards.user_modified_at` records the last change made by a user.
-- `card_sets.edition` holds the manually entered edition (e.g. "1st Edition"), which the API does not provide.
+- `card_sets.edition` holds the manually entered edition of a Yu-Gi-Oh! card (e.g. "1st Edition"), which the API does
+  not provide. For Pokémon it holds the variant of the physical card (see below).
+- `card_translations.details` (JSONB) holds further language dependent data of a card: for Pokémon the attack and
+  ability texts and the localized names of types, stage and rarity. It is null for Yu-Gi-Oh!.
 - Prices keep their source currency instead of being shown in CHF.
 - The Nuxt app is the Nuxt 4 default layout, so its pages are in `app/app/`.
+
+### Pokémon
+
+The data model is explicit and typed in [`shared/types/pokemon.ts`](app/shared/types/pokemon.ts):
+
+- **`PokemonAttributes`** (language independent, `cards.game_specific_attributes`): category (`Pokemon`, `Trainer`,
+  `Energy`), set id and number, HP, energy types, stage, evolves from, Pokédex numbers, retreat cost, regulation mark,
+  illustrator, trainer and energy type, legality and the `variants` the card exists in. They always come from the English
+  response, so filters and sorting use one spelling (`Fire`, `Stage1`) whatever language is shown. The dropdowns show these
+  values translated.
+- **`PokemonDetails`** (language dependent, `card_translations.details`, German and English): the texts of attacks,
+  abilities, weakness and resistance, the rules text of Trainer and Energy cards, and the localized type, stage and
+  rarity names.
+- The printing (`card_sets`): the set code is the card id (`swsh3-136`), the set name and rarity come from the API and
+  `edition` is the variant of the physical card: `normal`, `reverse`, `holo`, `firstEdition` or `wPromo`. One printing is
+  offered per variant the card exists in. The variant is chosen when adding the card and can be changed afterwards among
+  the variants of that card; the card id cannot be changed, because the same card has the same id in every language.
+- Prices: `cardmarket` (EUR, price trend or average), `cardmarket-holo` where the API has a separate holo price, and
+  `tcgplayer-<variant>` (USD, market price) for every variant TCGplayer lists. The list and the total use `PRICE_SOURCE`
+  (default `cardmarket`) for both games.
+- Searching: by name (German first, then English) or by card id such as `swsh3-136`; the results show small images
+  loaded from `assets.tcgdex.net` (only in the result list, the card image itself is downloaded and stored locally).
+
+How the printing behaves per game is configured in [`shared/utils/game-config.ts`](app/shared/utils/game-config.ts).
 
 ### Adding a game
 
 1. Implement the `CardAdapter` interface (`server/tcg/types.ts`): `fetchCardById`, `fetchCardByName`, `searchCards`,
-   `mapToCommonSchema`; see `server/tcg/ygo/` for a complete example.
+   `mapToCommonSchema`; see `server/tcg/ygo/` and `server/tcg/tcgdex/` for complete examples. Language dependent data beyond
+   name and description goes to `details`.
 2. Register it in `server/tcg/registry.ts`.
-3. Add its editable attributes to `shared/utils/game-fields.ts` and the matching labels to `i18n/locales/*.json`.
+3. Describe how its printing behaves in `shared/utils/game-config.ts`, show its data in the card page and its filters in the
+   overview (`app/pages`), and add the labels to `i18n/locales/*.json`.
 
-No schema change and no change in the services is required.
+No schema change and no change in the core services is required.
 
 ### Notes on the card API
 
@@ -229,6 +291,11 @@ No schema change and no change in the services is required.
   recorded live data, so check a real lookup after the first deployment.
 - The API reports every error as HTTP 400 with `{ "error": "<message>" }`. Only "No card matching …" means an empty
   result; any other error text is passed on in the 502 message and the cause of network failures is kept in the logs.
+- TCGdex (`https://api.tcgdex.net/v2/<language>/cards`) needs no key. The adapter follows the documented card shape and
+  its tests use hand-written fixtures, not recorded live data, so check a real search after the first deployment.
+  A card that does not exist in a language answers 404 and that language is left out. The search returns brief cards (id,
+  number, name, image) and at most 50 hits; narrow a broad name down with the card id. Which prices exist depends on the
+  card, so a card may have none.
 - Every card is requested twice (`language=de` and English). If the API answers a German request for an untranslated card
   with the English card instead of "not found", that copy is detected (same name and text as the English one) and not
   stored as a German translation.
@@ -239,7 +306,8 @@ No schema change and no change in the services is required.
 - Export as PDF, CSV and Markdown
 - `/admin` area (games, players) behind HTTP basic auth and audit log view
 - Decision on a login (currently none; access control is the network and the reverse proxy)
-- Pokémon adapter (pokemontcg.io)
+- Pokémon: a list price that depends on the variant (holo and reverse holo have their own prices), paging through the search
+  results, more filters (set, illustrator, regulation mark), the Japanese card database
 
 ## License
 

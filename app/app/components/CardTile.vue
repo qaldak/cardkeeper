@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CardListItemDto } from '#shared/types/api'
 
-const props = defineProps<{ card: CardListItemDto }>()
+const props = defineProps<{ card: CardListItemDto, showGame?: boolean }>()
 const { t } = useI18n()
 const { money } = useFormat()
 
@@ -28,6 +28,7 @@ const subtitle = computed(() =>
       <span v-else>{{ t('card.noImage') }}</span>
     </div>
     <div class="flex flex-col gap-1.5 p-3.5">
+      <span v-if="showGame" class="text-[10px] font-medium uppercase tracking-wide text-dimmed">{{ card.gameName }}</span>
       <span class="text-sm font-semibold">{{ card.name }}</span>
       <span class="text-xs text-muted">{{ subtitle || t('common.none') }}</span>
       <div class="mt-1 flex items-center justify-between">

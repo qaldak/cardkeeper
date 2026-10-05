@@ -1,0 +1,37 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 card shape (https://tcgdex.dev/reference/card). Not a recorded live response.",
+  "category": "Trainer",
+  "id": "swsh3-154",
+  "illustrator": "Ayaka Yoshida",
+  "image": "https://assets.tcgdex.net/en/swsh/swsh3/154",
+  "localId": "154",
+  "name": "Boss's Orders",
+  "rarity": "Rare",
+  "set": {
+    "cardCount": {
+      "official": 189,
+      "total": 201
+    },
+    "id": "swsh3",
+    "name": "Darkness Ablaze"
+  },
+  "variants": {
+    "firstEdition": false,
+    "holo": true,
+    "normal": false,
+    "reverse": false,
+    "wPromo": false
+  },
+  "trainerType": "Supporter",
+  "regulationMark": "D",
+  "effect": "Switch 1 of your opponent's Benched Pokémon with their Active Pokémon.",
+  "pricing": {
+    "cardmarket": {
+      "unit": "EUR",
+      "avg": 1.2,
+      "trend": 1.1,
+      "avg-holo": 2.2,
+      "trend-holo": 2.0
+    }
+  }
+}

@@ -10,6 +10,7 @@ describe('loadConfig', () => {
       maxUploadBytes: 5 * 1024 * 1024,
       userHeader: 'x-remote-user',
       ygoBaseUrl: 'https://db.ygoprodeck.com/api/v7',
+      tcgdexBaseUrl: 'https://api.tcgdex.net/v2',
     })
   })
 
@@ -20,6 +21,7 @@ describe('loadConfig', () => {
       MAX_UPLOAD_MB: '1.5',
       AUTH_USER_HEADER: 'X-Forwarded-User',
       YGOPRODECK_API_URL: 'http://localhost:9999/api',
+      TCGDEX_API_URL: 'http://localhost:9998/v2',
     })
     expect(config).toMatchObject({
       priceSource: 'tcgplayer',
@@ -27,6 +29,7 @@ describe('loadConfig', () => {
       maxUploadBytes: 1.5 * 1024 * 1024,
       userHeader: 'x-forwarded-user',
       ygoBaseUrl: 'http://localhost:9999/api',
+      tcgdexBaseUrl: 'http://localhost:9998/v2',
     })
   })
 

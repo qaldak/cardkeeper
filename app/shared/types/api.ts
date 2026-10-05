@@ -29,6 +29,7 @@ export interface CardListItemDto {
   id: number
   name: string
   gameSlug: string
+  gameName: string
   setCode: string | null
   status: CardStatusValue
   player: PlayerRefDto | null
@@ -64,6 +65,8 @@ export interface CardTranslationDto {
   language: string
   name: string
   description: string | null
+  /** Further language dependent data (Pokémon: see `PokemonDetails`); null for Yu-Gi-Oh!. */
+  details: Record<string, unknown> | null
 }
 
 export interface CardImageDto {
@@ -89,7 +92,7 @@ export interface CardDetailDto {
   /** Texts per language, German first. A language that is not listed is not available for this card. */
   translations: CardTranslationDto[]
   /** Language independent attributes from the card API (read-only). */
-  attributes: Record<string, string | number | null>
+  attributes: Record<string, unknown>
   status: CardStatusValue
   statusDate: string | null
   statusPerson: string | null
@@ -114,14 +117,24 @@ export interface LookupCandidateDto {
   /** Language of the shown name and description (German, or English if the card has no German text). */
   language: string
   attributes: Record<string, unknown>
-  sets: { setCode: string, setName: string | null, rarity: string | null }[]
+  /** Printings to choose from; for Pokémon one entry per variant of the card. */
+  sets: { setCode: string, setName: string | null, rarity: string | null, edition: string | null }[]
+  /** Small image for the search results, only for games whose image host may be used that way. */
+  thumbnailUrl: string | null
 }
 
 /** Distinct values for the overview's filter dropdowns. */
 export interface FacetsDto {
+  // Yu-Gi-Oh!
   types: string[]
   races: string[]
   attributes: string[]
+  // Pokémon
+  categories: string[]
+  pokemonTypes: string[]
+  stages: string[]
+  variants: string[]
+  // both
   rarities: string[]
 }
 

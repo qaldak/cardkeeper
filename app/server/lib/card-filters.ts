@@ -16,6 +16,16 @@ export interface CardFilters {
   rarity?: string
   levelMin?: number
   levelMax?: number
+  /** Pokémon: "Pokemon", "Trainer" or "Energy" (`attributes.category`). */
+  category?: string
+  /** Pokémon: energy type such as "Fire", contained in `attributes.types`. */
+  pokemonType?: string
+  /** Pokémon: "Basic", "Stage1", ... (`attributes.stage`). */
+  stage?: string
+  /** Pokémon: variant of the physical card (the printing's edition). */
+  variant?: string
+  hpMin?: number
+  hpMax?: number
 }
 
 const attributeIs = (key: string, value: string): Prisma.CardWhereInput => ({
@@ -62,6 +72,24 @@ export function buildCardWhere(filters: CardFilters): Prisma.CardWhereInput {
   }
   if (filters.rarity) {
     conditions.push({ sets: { some: { rarity: filters.rarity } } })
+  }
+  if (filters.category) {
+    conditions.push(attributeIs('category', filters.category))
+  }
+  if (filters.pokemonType) {
+    conditions.push({ gameSpecificAttributes: { path: ['types'], array_contains: filters.pokemonType } })
+  }
+  if (filters.stage) {
+    conditions.push(attributeIs('stage', filters.stage))
+  }
+  if (filters.variant) {
+    conditions.push({ sets: { some: { edition: filters.variant } } })
+  }
+  if (filters.hpMin !== undefined) {
+    conditions.push({ gameSpecificAttributes: { path: ['hp'], gte: filters.hpMin } })
+  }
+  if (filters.hpMax !== undefined) {
+    conditions.push({ gameSpecificAttributes: { path: ['hp'], lte: filters.hpMax } })
   }
   if (filters.levelMin !== undefined) {
     conditions.push({ gameSpecificAttributes: { path: ['level'], gte: filters.levelMin } })

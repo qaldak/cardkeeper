@@ -16,6 +16,13 @@ export const listQuerySchema = z.object({
   rarity: z.string().trim().min(1).max(80).optional(),
   levelMin: z.coerce.number().int().min(0).max(99).optional(),
   levelMax: z.coerce.number().int().min(0).max(99).optional(),
+  // Pokémon:
+  category: z.string().trim().min(1).max(40).optional(),
+  pokemonType: z.string().trim().min(1).max(40).optional(),
+  stage: z.string().trim().min(1).max(40).optional(),
+  variant: z.string().trim().min(1).max(40).optional(),
+  hpMin: z.coerce.number().int().min(0).max(999).optional(),
+  hpMax: z.coerce.number().int().min(0).max(999).optional(),
   sort: z.enum(CARD_SORTS).default('created'),
   // Without a direction every order uses its default (see `defaultDirection`).
   dir: z.enum(['asc', 'desc']).optional(),
@@ -38,6 +45,8 @@ export const createCardSchema = z.object({
   set: z.object({
     setCode: z.string().trim().min(1).max(40),
     rarity: z.string().trim().max(80).nullable().optional(),
+    // Pokémon: the variant of the card (normal, reverse, holo, ...).
+    edition: z.string().trim().max(80).nullable().optional(),
   }).optional(),
   playerId: z.number().int().positive().nullable().optional(),
   purchaseDate: dateOnly.nullable().optional(),

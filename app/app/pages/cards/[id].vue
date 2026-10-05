@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { CardDetailDto, CardImageDto, PlayerDto } from '#shared/types/api'
+import { POKEMON_VARIANTS, type PokemonDetails } from '#shared/types/pokemon'
+import { getGameConfig } from '#shared/utils/game-config'
 import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
 import { CARD_LANGUAGES, preferredLanguage } from '#shared/utils/languages'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
@@ -9,6 +11,7 @@ const route = useRoute()
 const toast = useToast()
 const apiError = useApiError()
 const { money, dateTime } = useFormat()
+const labels = useGameLabels()
 
 const id = Number(route.params.id)
 const { data: card, error } = await useFetch<CardDetailDto>(`/api/cards/${id}`)
@@ -68,6 +71,23 @@ const form = reactive<FormState>(toForm(card.value))
 const saving = ref(false)
 
 const attributeFields = computed(() => getAttributeFields(card.value!.game.slug))
+const gameConfig = computed(() => getGameConfig(card.value!.game.slug))
+const isPokemon = computed(() => card.value!.game.slug === 'pokemon')
+
+// Language dependent data of the selected language (Pokémon: attacks, localized types, ...).
+const details = computed(() => (translation.value?.details ?? null) as PokemonDetails | null)
+const setNameShown = computed(() => details.value?.set?.name ?? card.value!.sets[0]?.setName ?? '')
+const rarityShown = computed(() => details.value?.rarity ?? card.value!.sets[0]?.rarity ?? '')
+
+// Pokémon: the variants this card exists in, plus the current one in case the data changed.
+const variantItems = computed<{ label: string, value: string }[]>(() => {
+  const available = (card.value!.attributes.variants ?? {}) as Record<string, boolean>
+  return POKEMON_VARIANTS
+    .filter(key => available[key] === true || key === form.edition)
+    .map(key => ({ label: labels.variant(key), value: key }))
+})
+const editionText = (edition: string | null | undefined) =>
+  gameConfig.value.editionKind === 'variant' ? labels.variant(edition) : (edition ?? '')
 const showDate = computed(() => statusNeedsDate(form.status))
 const showPerson = computed(() => statusNeedsPerson(form.status))
 
@@ -255,7 +275,7 @@ const subtitle = computed(() => [
   card.value!.externalId ? t('card.origin.api') : t('card.origin.manual'),
   card.value!.userModifiedAt ? t('card.modifiedOn', { date: dateTime(card.value!.userModifiedAt) }) : null,
 ].filter(Boolean).join(' · '))
-const imageCaption = computed(() => [card.value!.sets[0]?.edition, card.value!.sets[0]?.rarity].filter(Boolean).join(' · '))
+const imageCaption = computed(() => [editionText(card.value!.sets[0]?.edition), rarityShown.value].filter(Boolean).join(' · '))
 const readonlyUi = { base: 'bg-elevated text-muted' }
 </script>
 
@@ -376,33 +396,47 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             {{ t('card.sections.basics') }}
           </h2>
           <p class="mb-3 text-xs text-dimmed">
-            {{ t('card.basicsHint') }}
+            {{ isPokemon ? t('card.basicsHintVariant') : t('card.basicsHint') }}
           </p>
           <div class="flex flex-col gap-3.5">
             <UFormField :label="t('card.fields.name')">
               <UInput :model-value="shownName" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
             <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-              <UFormField :label="t('card.fields.setCode')">
-                <UInput v-model="form.setCode" maxlength="40" class="w-full" />
+              <UFormField :label="isPokemon ? t('card.fields.cardId') : t('card.fields.setCode')">
+                <UInput
+                  v-model="form.setCode"
+                  maxlength="40"
+                  class="w-full"
+                  :readonly="!gameConfig.setCodeEditable"
+                  :ui="gameConfig.setCodeEditable ? undefined : readonlyUi"
+                />
               </UFormField>
-              <UFormField :label="t('card.fields.edition')">
-                <UInput v-model="form.edition" maxlength="80" class="w-full" />
+              <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
+                <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" class="w-full" />
+                <UInput v-else v-model="form.edition" maxlength="80" class="w-full" />
               </UFormField>
               <UFormField :label="t('card.fields.setName')">
-                <UInput :model-value="card.sets[0]?.setName ?? ''" readonly class="w-full" :ui="readonlyUi" />
+                <UInput :model-value="setNameShown" readonly class="w-full" :ui="readonlyUi" />
               </UFormField>
               <UFormField :label="t('card.fields.rarity')">
-                <UInput :model-value="card.sets[0]?.rarity ?? ''" readonly class="w-full" :ui="readonlyUi" />
+                <UInput :model-value="rarityShown" readonly class="w-full" :ui="readonlyUi" />
               </UFormField>
             </div>
-            <UFormField v-if="card.externalId" :label="t('card.fields.externalId')">
+            <UFormField v-if="card.externalId && !isPokemon" :label="t('card.fields.externalId')">
               <UInput :model-value="card.externalId" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
           </div>
         </section>
 
-        <section v-if="attributeFields.length">
+        <section v-if="isPokemon">
+          <h2 class="mb-3 text-[15px] font-semibold">
+            {{ t('card.sections.attributes', { game: card.game.displayName }) }}
+          </h2>
+          <PokemonInfo :attributes="card.attributes" :details="translation?.details ?? null" />
+        </section>
+
+        <section v-else-if="attributeFields.length">
           <h2 class="mb-3 text-[15px] font-semibold">
             {{ t('card.sections.attributes', { game: card.game.displayName }) }}
           </h2>

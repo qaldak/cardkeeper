@@ -2,6 +2,8 @@ export interface CommonCardSet {
   setCode: string
   setName: string | null
   rarity: string | null
+  /** Yu-Gi-Oh!: not provided. Pokémon: the variant (normal, reverse, holo, ...), one entry per variant. */
+  edition?: string | null
 }
 
 export interface CommonCardImage {
@@ -25,6 +27,8 @@ export interface CommonCard {
   language: string
   /** Game specific attributes, stored as JSONB in `cards.game_specific_attributes`. */
   attributes: Record<string, unknown>
+  /** Language dependent data beyond name and description (Pokémon); null/absent if there is none. */
+  details?: Record<string, unknown> | null
   sets: CommonCardSet[]
   images: CommonCardImage[]
   prices: CommonCardPrice[]
@@ -42,6 +46,8 @@ export interface CardAdapter {
   readonly storedLanguages: readonly string[]
   /** Hosts card images may be downloaded from. */
   readonly imageHosts: readonly string[]
+  /** Whether search results may show small images loaded straight from the image host. */
+  readonly searchThumbnails: boolean
   fetchCardById(externalId: string, language?: string): Promise<CommonCard | null>
   fetchCardByName(name: string, language?: string): Promise<CommonCard | null>
   /** Fuzzy search used by the "add card" lookup. */

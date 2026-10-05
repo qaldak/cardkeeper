@@ -6,7 +6,9 @@ import { createPrisma, type PrismaClient } from '../../server/db'
 import type { AppConfig } from '../../server/lib/config'
 import { createServices, type Services } from '../../server/services'
 import { createRegistry } from '../../server/tcg/registry'
+import { createTcgdexAdapter } from '../../server/tcg/tcgdex/adapter'
 import { createYgoAdapter } from '../../server/tcg/ygo/adapter'
+import { bossOrders, createFakeTcgdexServer, fireEnergy, furret, type FakeTcgdexServer } from '../helpers/tcgdex-fake'
 import { BLUE_EYES, createFakeYgoServer, DARK_MAGICIAN, ENGLISH_ONLY, type FakeYgoServer } from '../helpers/ygo-fake'
 
 export const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL
@@ -15,6 +17,7 @@ export interface Harness {
   db: PrismaClient
   services: Services
   ygo: FakeYgoServer
+  tcgdex: FakeTcgdexServer
   config: AppConfig
 }
 
@@ -38,18 +41,28 @@ export function useHarness(): Harness {
       maxUploadBytes: 1024,
       userHeader: 'x-remote-user',
       ygoBaseUrl: 'https://ygo.test/api/v7',
+      tcgdexBaseUrl: 'https://tcgdex.test/v2',
     }
   })
 
   beforeEach(async () => {
     await harness.db.$executeRawUnsafe(`TRUNCATE ${TABLES.map(table => `"${table}"`).join(', ')} RESTART IDENTITY CASCADE`)
     harness.ygo = createFakeYgoServer([DARK_MAGICIAN, BLUE_EYES, ENGLISH_ONLY])
-    const registry = createRegistry([createYgoAdapter({ baseUrl: harness.config.ygoBaseUrl, fetchFn: harness.ygo.fetchFn })])
+    harness.tcgdex = createFakeTcgdexServer([furret(), bossOrders(), fireEnergy()])
+    const registry = createRegistry([
+      createYgoAdapter({ baseUrl: harness.config.ygoBaseUrl, fetchFn: harness.ygo.fetchFn }),
+      createTcgdexAdapter({ baseUrl: harness.config.tcgdexBaseUrl, fetchFn: harness.tcgdex.fetchFn }),
+    ])
+    // Image downloads: each fake serves its own image host.
+    const fetchFn = ((input: URL | RequestInfo, init?: RequestInit) =>
+      new URL(input instanceof Request ? input.url : String(input)).hostname === 'assets.tcgdex.net'
+        ? harness.tcgdex.fetchFn(input, init)
+        : harness.ygo.fetchFn(input, init)) as typeof fetch
     harness.services = createServices({
       db: harness.db,
       registry,
       config: harness.config,
-      fetchFn: harness.ygo.fetchFn,
+      fetchFn,
       now: () => new Date('2026-10-04T12:00:00Z'),
     })
   })

@@ -1,0 +1,99 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 card shape (https://tcgdex.dev/reference/card). Not a recorded live response.",
+  "category": "Pokémon",
+  "id": "swsh3-136",
+  "illustrator": "tetsuya koizumi",
+  "image": "https://assets.tcgdex.net/de/swsh/swsh3/136",
+  "localId": "136",
+  "name": "Wiesenior",
+  "rarity": "Nicht so selten",
+  "set": {
+    "cardCount": {
+      "official": 189,
+      "total": 201
+    },
+    "id": "swsh3",
+    "name": "Flammende Finsternis"
+  },
+  "variants": {
+    "firstEdition": false,
+    "holo": false,
+    "normal": true,
+    "reverse": true,
+    "wPromo": false
+  },
+  "dexId": [
+    162
+  ],
+  "hp": 110,
+  "types": [
+    "Farblos"
+  ],
+  "evolveFrom": "Wiesor",
+  "description": "Sein Nest ist ein langer Tunnel.",
+  "stage": "Phase1",
+  "attacks": [
+    {
+      "cost": [
+        "Farblos"
+      ],
+      "name": "Apportieren",
+      "effect": "Ziehe eine Karte."
+    },
+    {
+      "cost": [
+        "Farblos",
+        "Farblos",
+        "Farblos"
+      ],
+      "name": "Schweifhieb",
+      "damage": 120,
+      "effect": "Wirf eine Münze. Bei Zahl macht diese Attacke nichts."
+    }
+  ],
+  "weaknesses": [
+    {
+      "type": "Kampf",
+      "value": "×2"
+    }
+  ],
+  "retreat": 1,
+  "regulationMark": "D",
+  "legal": {
+    "standard": false,
+    "expanded": true
+  },
+  "pricing": {
+    "cardmarket": {
+      "updated": "2026-10-01T00:00:00.000Z",
+      "unit": "EUR",
+      "avg": 0.12,
+      "low": 0.02,
+      "trend": 0.1,
+      "avg1": 0.1,
+      "avg7": 0.11,
+      "avg30": 0.12,
+      "avg-holo": 0.5,
+      "low-holo": 0.1,
+      "trend-holo": 0.4
+    },
+    "tcgplayer": {
+      "updated": "2026-10-01T00:00:00.000Z",
+      "unit": "USD",
+      "normal": {
+        "lowPrice": 0.05,
+        "midPrice": 0.15,
+        "highPrice": 2.0,
+        "marketPrice": 0.13,
+        "directLowPrice": 0.1
+      },
+      "reverse": {
+        "lowPrice": 0.2,
+        "midPrice": 0.4,
+        "highPrice": 3.0,
+        "marketPrice": 0.35,
+        "directLowPrice": null
+      }
+    }
+  }
+}

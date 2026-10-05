@@ -9,6 +9,7 @@ export interface AppConfig {
   /** Request header set by the reverse proxy that carries the authenticated user name. */
   userHeader: string
   ygoBaseUrl: string
+  tcgdexBaseUrl: string
 }
 
 function positiveNumber(value: string | undefined, fallback: number, name: string): number {
@@ -29,5 +30,6 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     maxUploadBytes: Math.round(positiveNumber(env.MAX_UPLOAD_MB, 5, 'MAX_UPLOAD_MB') * 1024 * 1024),
     userHeader: (env.AUTH_USER_HEADER?.trim() || 'x-remote-user').toLowerCase(),
     ygoBaseUrl: env.YGOPRODECK_API_URL?.trim() || 'https://db.ygoprodeck.com/api/v7',
+    tcgdexBaseUrl: env.TCGDEX_API_URL?.trim() || 'https://api.tcgdex.net/v2',
   }
 }
