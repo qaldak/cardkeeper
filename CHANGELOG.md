@@ -1,3 +1,9 @@
+## [0.2.1](https://github.com/qaldak/cardkeeper/compare/v0.2.0...v0.2.1) (2026-10-05)
+
+### Bug Fixes
+
+* add sorting to the overview and drop the "editable" field hint ([443f9da](https://github.com/qaldak/cardkeeper/commit/443f9da1c6b35fba3eadb35326c7fc646b90d8ce))
+
 ## [0.2.0](https://github.com/qaldak/cardkeeper/compare/v0.1.1...v0.2.0) (2026-10-04)
 
 ### Features
