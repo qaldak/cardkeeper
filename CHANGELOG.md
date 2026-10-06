@@ -1,3 +1,9 @@
+## [0.3.0](https://github.com/qaldak/cardkeeper/compare/v0.2.1...v0.3.0) (2026-10-06)
+
+### Features
+
+* add Pokémon cards via TCGdex ([2cf7ced](https://github.com/qaldak/cardkeeper/commit/2cf7cedf71e1ab4234e63fb96c348ed68525a3e9))
+
 ## [0.2.1](https://github.com/qaldak/cardkeeper/compare/v0.2.0...v0.2.1) (2026-10-05)
 
 ### Bug Fixes
