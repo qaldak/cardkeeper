@@ -131,13 +131,13 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
             :data-test="`set-${set.id}`"
             @click="chooseSet(set)"
           >
-            <img v-if="set.symbolUrl" :src="set.symbolUrl" alt="" loading="lazy" referrerpolicy="no-referrer" class="size-8 shrink-0 object-contain">
+            <RemoteImage v-if="set.symbolUrl" :src="set.symbolUrl" alt="" loading="lazy" class="size-8 shrink-0 object-contain" />
             <span v-else class="size-8 shrink-0" />
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm font-medium">{{ set.name }}</span>
               <span class="block truncate text-xs text-muted">{{ set.id }} · {{ t('add.bySet.cards', { official: printed(set) }) }}</span>
             </span>
-            <img v-if="set.logoUrl" :src="set.logoUrl" :alt="set.name" loading="lazy" referrerpolicy="no-referrer" class="h-8 max-w-20 shrink-0 object-contain">
+            <RemoteImage v-if="set.logoUrl" :src="set.logoUrl" :alt="set.name" loading="lazy" class="h-8 max-w-20 shrink-0 object-contain" />
           </button>
         </li>
       </ul>
@@ -145,7 +145,7 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
 
     <section v-else>
       <div class="mb-3 flex flex-wrap items-center gap-3">
-        <img v-if="chosenSet.logoUrl" :src="chosenSet.logoUrl" :alt="chosenSet.name" referrerpolicy="no-referrer" class="h-8 max-w-24 object-contain">
+        <RemoteImage v-if="chosenSet.logoUrl" :src="chosenSet.logoUrl" :alt="chosenSet.name" class="h-8 max-w-24 object-contain" />
         <div>
           <p class="text-sm font-semibold">
             {{ chosenSet.name }}
@@ -171,7 +171,7 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
         class="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-primary bg-default p-4"
         data-test="picked"
       >
-        <img v-if="picked.thumbnailUrl" :src="picked.thumbnailUrl" :alt="picked.name" referrerpolicy="no-referrer" class="h-24 w-[70px] rounded bg-primary-50 object-cover">
+        <RemoteImage v-if="picked.thumbnailUrl" :src="picked.thumbnailUrl" :alt="picked.name" class="h-24 w-[70px] rounded bg-primary-50 object-cover" />
         <div class="min-w-0 flex-1">
           <p class="text-xs text-muted">
             {{ t('add.bySet.found') }}
@@ -200,7 +200,7 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
             :data-test="`card-${card.externalId}`"
             @click="pickedId = card.externalId"
           >
-            <img v-if="card.thumbnailUrl" :src="card.thumbnailUrl" :alt="card.name" loading="lazy" referrerpolicy="no-referrer" class="aspect-[5/7] w-full rounded bg-primary-50 object-cover">
+            <RemoteImage v-if="card.thumbnailUrl" :src="card.thumbnailUrl" :alt="card.name" loading="lazy" class="aspect-[5/7] w-full rounded bg-primary-50 object-cover" />
             <span class="text-xs font-medium">{{ card.number }}</span>
             <span class="w-full truncate text-[11px] text-muted">{{ card.name }}</span>
           </button>
