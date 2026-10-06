@@ -314,7 +314,8 @@ No schema change and no change in the core services is required.
   with the English card instead of "not found", that copy is detected (same name and text as the English one) and not
   stored as a German translation.
 - The set browser and the Japanese data are not yet checked against the live TCGdex API (it is not reachable from the
-  development environment). Assumptions to verify after deploying: set logo and symbol are served as `<url>.webp`, the brief
+  development environment). Single set symbols were found to be missing as webp (HTTP 400), so images in the set picker fall back
+  to png and then to an empty box. Assumptions to verify after deploying: set logo and symbol are served as `<url>.webp`, the brief
   set list contains `cardCount`, `localId` is padded as printed (`040`), and the Japanese categorical values match the
   mapping in `server/tcg/tcgdex/normalize.ts`.
 
