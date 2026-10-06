@@ -7,6 +7,9 @@ name: cardkeeper
 services:
   db:
     image: postgres:16-alpine
+    # Fixed container names are unique per Docker host: a second stack (e.g. a branch test with `-p cardkeeper-test`)
+    # needs another prefix, see CONTAINER_PREFIX in .env.example.
+    container_name: ${CONTAINER_PREFIX:-cardkeeper}_db
     restart: unless-stopped
     environment:
       # Superuser, only used by the init script and never by the application.
@@ -34,6 +37,7 @@ services:
     image: ${APP_IMAGE:-ghcr.io/qaldak/cardkeeper:latest}
     build:
       context: ./app
+    container_name: ${CONTAINER_PREFIX:-cardkeeper}_app
     restart: unless-stopped
     depends_on:
       db:

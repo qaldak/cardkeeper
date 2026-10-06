@@ -137,7 +137,7 @@ network and volumes, so the real data stays untouched and the migrations of the 
 
 ```bash
 git fetch origin && git checkout <branch>
-cp .env.example .env.test        # other passwords are fine, and set APP_PORT=3001
+cp .env.example .env.test        # other passwords are fine; set APP_PORT=3001 and CONTAINER_PREFIX=cardkeeper-test
 docker compose -p cardkeeper-test --env-file .env.test up -d --build
 # open http://localhost:3001
 
@@ -154,7 +154,8 @@ docker compose -p cardkeeper-test --env-file .env.test exec -T db psql -U postgr
 docker compose -p cardkeeper-test --env-file .env.test up -d --build
 ```
 
-The `make dev` and `make test` targets use the default project name and therefore the same volumes as the real
+The containers are named `cardkeeper_app` and `cardkeeper_db` (prefix `CONTAINER_PREFIX`); the test stack therefore needs its own prefix, as
+above. The `make dev` and `make test` targets use the default project name and therefore the same volumes as the real
 installation; use `-p` as above (or a separate checkout) when you do not want that. Docker images are only published for
 releases, not for branches.
 
