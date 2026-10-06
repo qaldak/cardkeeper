@@ -1,5 +1,6 @@
-import type { Prisma, PrismaClient } from '../generated/prisma/client'
+import { Prisma, type PrismaClient } from '../generated/prisma/client'
 import type { CardDetailDto, CardListResponseDto, FacetsDto, LookupCandidateDto } from '../../shared/types/api'
+import { getGameConfig } from '../../shared/utils/game-config'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import type { AppConfig } from '../lib/config'
 import { buildCardWhere, type CardFilters } from '../lib/card-filters'
@@ -14,6 +15,7 @@ import { normalizeStatusChange } from '../lib/status'
 import { mergeLanguageCards, primaryName, type MergedCard } from '../lib/translations'
 import type { AdapterRegistry } from '../tcg/registry'
 import type { CardAdapter, CommonCard, CommonCardImage } from '../tcg/types'
+import { POKEMON_VARIANTS } from '../../shared/types/pokemon'
 import { detailInclude, listInclude, toDetail, toListItem } from './mappers'
 
 export interface CardServiceDeps {
@@ -25,6 +27,10 @@ export interface CardServiceDeps {
 }
 
 type Json = Prisma.InputJsonValue
+
+/** Prisma needs an explicit marker to store SQL NULL in a JSON column. */
+const jsonOrNull = (value: Record<string, unknown> | null | undefined) =>
+  value ? (value as Json) : Prisma.DbNull
 
 const stringify = (value: unknown): string | null =>
   value === null || value === undefined ? null : typeof value === 'object' ? JSON.stringify(value) : String(value)
@@ -98,7 +104,22 @@ export function createCardService(deps: CardServiceDeps) {
     }
   }
 
-  const candidateOf = (merged: MergedCard): LookupCandidateDto => {
+  /** The image host of the game must allow it, and only URLs on that host are passed on. */
+  const thumbnailOf = (adapter: CardAdapter, card: { images: CommonCardImage[] }): string | null => {
+    const url = card.images[0]?.smallUrl ?? null
+    if (!adapter.searchThumbnails || !url) {
+      return null
+    }
+    try {
+      const parsed = new URL(url)
+      return parsed.protocol === 'https:' && adapter.imageHosts.includes(parsed.hostname) ? url : null
+    }
+    catch {
+      return null
+    }
+  }
+
+  const candidateOf = (adapter: CardAdapter, merged: MergedCard): LookupCandidateDto => {
     const text = merged.translations.find(entry => entry.name === merged.name) ?? merged.translations[0]!
     return {
       externalId: merged.externalId,
@@ -106,7 +127,8 @@ export function createCardService(deps: CardServiceDeps) {
       description: text.description,
       language: text.language,
       attributes: merged.attributes,
-      sets: merged.sets,
+      sets: merged.sets.map(set => ({ ...set, edition: set.edition ?? null })),
+      thumbnailUrl: thumbnailOf(adapter, merged),
     }
   }
 
@@ -149,13 +171,14 @@ export function createCardService(deps: CardServiceDeps) {
       const sortRowsInput: SortRow[] = []
       for (const row of rows) {
         const latest = row.priceHistory[0]
-        const level = (row.gameSpecificAttributes as Record<string, unknown>).level
+        const attributes = row.gameSpecificAttributes as Record<string, unknown>
         sortRowsInput.push({
           id: row.id,
           name: row.name,
           createdAt: row.createdAt,
           purchaseDate: row.purchaseDate,
-          level: typeof level === 'number' ? level : null,
+          level: typeof attributes.level === 'number' ? attributes.level : null,
+          hp: typeof attributes.hp === 'number' ? attributes.hp : null,
           priceCents: latest ? toCents(Number(latest.price)) : null,
         })
         if (row.status === 'ACTIVE') {
@@ -196,6 +219,7 @@ export function createCardService(deps: CardServiceDeps) {
     /** Distinct values of the collection for the filter dropdowns. */
     async facets(gameSlug?: string): Promise<FacetsDto> {
       const game = gameSlug ?? null
+      // Values are the English API spellings, the same for every language (see PokemonAttributes).
       const rows = await db.$queryRaw<{ kind: string, value: string }[]>`
         SELECT kind, value FROM (
           SELECT 'type' AS kind, c.game_specific_attributes->>'type' AS value
@@ -207,9 +231,26 @@ export function createCardService(deps: CardServiceDeps) {
           SELECT 'attribute', c.game_specific_attributes->>'attribute'
             FROM cards c JOIN games g ON g.id = c.game_id WHERE (${game}::text IS NULL OR g.slug = ${game})
           UNION ALL
+          SELECT 'category', c.game_specific_attributes->>'category'
+            FROM cards c JOIN games g ON g.id = c.game_id WHERE (${game}::text IS NULL OR g.slug = ${game})
+          UNION ALL
+          SELECT 'pokemonType', t.value
+            FROM cards c JOIN games g ON g.id = c.game_id
+            CROSS JOIN LATERAL jsonb_array_elements_text(
+              CASE WHEN jsonb_typeof(c.game_specific_attributes->'types') = 'array'
+                   THEN c.game_specific_attributes->'types' ELSE '[]'::jsonb END) AS t(value)
+            WHERE (${game}::text IS NULL OR g.slug = ${game})
+          UNION ALL
+          SELECT 'stage', c.game_specific_attributes->>'stage'
+            FROM cards c JOIN games g ON g.id = c.game_id WHERE (${game}::text IS NULL OR g.slug = ${game})
+          UNION ALL
           SELECT 'rarity', s.rarity
             FROM card_sets s JOIN cards c ON c.id = s.card_id JOIN games g ON g.id = c.game_id
             WHERE (${game}::text IS NULL OR g.slug = ${game})
+          UNION ALL
+          SELECT 'variant', s.edition
+            FROM card_sets s JOIN cards c ON c.id = s.card_id JOIN games g ON g.id = c.game_id
+            WHERE (${game}::text IS NULL OR g.slug = ${game}) AND s.edition IN (${Prisma.join(POKEMON_VARIANTS)})
         ) AS facets
         WHERE value IS NOT NULL AND value <> ''
         GROUP BY kind, value
@@ -219,6 +260,10 @@ export function createCardService(deps: CardServiceDeps) {
         types: valuesOf('type'),
         races: valuesOf('race'),
         attributes: valuesOf('attribute'),
+        categories: valuesOf('category'),
+        pokemonTypes: valuesOf('pokemonType'),
+        stages: valuesOf('stage'),
+        variants: valuesOf('variant'),
         rarities: valuesOf('rarity'),
       }
     },
@@ -235,7 +280,8 @@ export function createCardService(deps: CardServiceDeps) {
             description: card.description,
             language: card.language,
             attributes: card.attributes,
-            sets: card.sets,
+            sets: card.sets.map(set => ({ ...set, edition: set.edition ?? null })),
+            thumbnailUrl: thumbnailOf(adapter, card),
           }))
         }
       }
@@ -244,11 +290,12 @@ export function createCardService(deps: CardServiceDeps) {
 
     /** One card of the lookup with the data of all languages, in particular all known printings. */
     async lookupDetails(gameSlug: string, externalId: string): Promise<LookupCandidateDto> {
-      const merged = await fetchMerged(registry.require(gameSlug), externalId)
+      const adapter = registry.require(gameSlug)
+      const merged = await fetchMerged(adapter, externalId)
       if (!merged) {
         throw notFound('upstream_card_not_found', 'Card not found at the card database')
       }
-      return candidateOf(merged)
+      return candidateOf(adapter, merged)
     },
 
     async create(input: CreateCardInput, actor: string): Promise<CardDetailDto> {
@@ -261,10 +308,15 @@ export function createCardService(deps: CardServiceDeps) {
       let chosenSet: MergedCard['sets'][number] | undefined
       if (input.set) {
         chosenSet = merged.sets.find(set =>
-          set.setCode === input.set!.setCode && (set.rarity ?? null) === (input.set!.rarity ?? null))
+          set.setCode === input.set!.setCode
+          && (set.rarity ?? null) === (input.set!.rarity ?? null)
+          && (set.edition ?? null) === (input.set!.edition ?? null))
         if (!chosenSet) {
           throw badRequest('invalid_set', 'The selected printing does not exist for this card')
         }
+      }
+      else if (getGameConfig(input.game).printingRequired) {
+        throw badRequest('printing_required', 'A printing (variant) must be chosen for this game')
       }
       if (input.playerId) {
         await requirePlayer(input.playerId)
@@ -285,9 +337,17 @@ export function createCardService(deps: CardServiceDeps) {
             lastFetchedAt: timestamp,
             lastModifiedBy: actor,
             translations: {
-              create: merged.translations.map(entry => ({ ...entry, fetchedAt: timestamp })),
+              create: merged.translations.map(entry => ({
+                language: entry.language,
+                name: entry.name,
+                description: entry.description,
+                details: jsonOrNull(entry.details),
+                fetchedAt: timestamp,
+              })),
             },
-            sets: chosenSet ? { create: { setCode: chosenSet.setCode, setName: chosenSet.setName, rarity: chosenSet.rarity } } : undefined,
+            sets: chosenSet
+              ? { create: { setCode: chosenSet.setCode, setName: chosenSet.setName, rarity: chosenSet.rarity, edition: chosenSet.edition ?? null } }
+              : undefined,
             priceHistory: { create: priceRows(merged).map(row => ({ ...row, fetchedAt: timestamp })) },
             snapshots: {
               create: merged.snapshots.map(snapshot => ({
@@ -317,6 +377,7 @@ export function createCardService(deps: CardServiceDeps) {
       const card = await db.card.findUnique({
         where: { id },
         include: {
+          game: { select: { slug: true } },
           sets: { orderBy: { id: 'asc' }, take: 1 },
           statusHistory: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 1 },
         },
@@ -324,6 +385,7 @@ export function createCardService(deps: CardServiceDeps) {
       if (!card) {
         throw notFound('card_not_found', 'Card not found')
       }
+      const gameConfig = getGameConfig(card.game.slug)
 
       const audit: FieldChange[] = []
       const data: Prisma.CardUpdateInput = { lastModifiedBy: actor }
@@ -356,6 +418,17 @@ export function createCardService(deps: CardServiceDeps) {
       const existingSet = card.sets[0]
       const setPatch = patch.set
       if (setPatch) {
+        if (setPatch.setCode !== undefined && setPatch.setCode !== existingSet?.setCode && !gameConfig.setCodeEditable) {
+          throw badRequest('field_not_editable', 'The set code of this game cannot be changed')
+        }
+        if (setPatch.edition !== undefined && gameConfig.editionKind === 'variant') {
+          // The variant must be one of those the card exists in (e.g. no 1st Edition of a modern card).
+          const variants = (card.gameSpecificAttributes as { variants?: Record<string, boolean> }).variants ?? {}
+          const edition = setPatch.edition
+          if (edition === null || !(POKEMON_VARIANTS as readonly string[]).includes(edition) || variants[edition] !== true) {
+            throw badRequest('invalid_variant', 'This variant does not exist for this card')
+          }
+        }
         const setData: Prisma.CardSetUpdateWithoutCardInput = {}
         if (setPatch.setCode !== undefined && track('set.setCode', existingSet?.setCode ?? null, setPatch.setCode)) {
           setData.setCode = setPatch.setCode
@@ -368,11 +441,13 @@ export function createCardService(deps: CardServiceDeps) {
             data.sets = { update: { where: { id: existingSet.id }, data: setData } }
           }
           else {
-            // A card imported without a printing: the first edit creates it.
-            if (!setPatch.setCode) {
+            // A card imported without a printing: the first edit creates it. Where the set code is
+            // fixed it is the card id.
+            const setCode = setPatch.setCode ?? (gameConfig.setCodeEditable ? undefined : card.externalId ?? undefined)
+            if (!setCode) {
               throw badRequest('invalid_set', 'A set code is required')
             }
-            data.sets = { create: { setCode: setPatch.setCode, edition: setPatch.edition ?? null } }
+            data.sets = { create: { setCode, edition: setPatch.edition ?? null } }
           }
         }
       }
@@ -458,8 +533,15 @@ export function createCardService(deps: CardServiceDeps) {
         for (const entry of merged.translations) {
           await tx.cardTranslation.upsert({
             where: { cardId_language: { cardId: id, language: entry.language } },
-            update: { name: entry.name, description: entry.description, fetchedAt: timestamp },
-            create: { cardId: id, ...entry, fetchedAt: timestamp },
+            update: { name: entry.name, description: entry.description, details: jsonOrNull(entry.details), fetchedAt: timestamp },
+            create: {
+              cardId: id,
+              language: entry.language,
+              name: entry.name,
+              description: entry.description,
+              details: jsonOrNull(entry.details),
+              fetchedAt: timestamp,
+            },
           })
         }
         // A language the API no longer returns keeps its stored text.

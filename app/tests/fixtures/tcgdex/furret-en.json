@@ -1,0 +1,99 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 card shape (https://tcgdex.dev/reference/card). Not a recorded live response.",
+  "category": "Pokemon",
+  "id": "swsh3-136",
+  "illustrator": "tetsuya koizumi",
+  "image": "https://assets.tcgdex.net/en/swsh/swsh3/136",
+  "localId": "136",
+  "name": "Furret",
+  "rarity": "Uncommon",
+  "set": {
+    "cardCount": {
+      "official": 189,
+      "total": 201
+    },
+    "id": "swsh3",
+    "name": "Darkness Ablaze"
+  },
+  "variants": {
+    "firstEdition": false,
+    "holo": false,
+    "normal": true,
+    "reverse": true,
+    "wPromo": false
+  },
+  "dexId": [
+    162
+  ],
+  "hp": 110,
+  "types": [
+    "Colorless"
+  ],
+  "evolveFrom": "Sentret",
+  "description": "Its nest is a long, narrow tunnel.",
+  "stage": "Stage1",
+  "attacks": [
+    {
+      "cost": [
+        "Colorless"
+      ],
+      "name": "Fetch",
+      "effect": "Draw a card."
+    },
+    {
+      "cost": [
+        "Colorless",
+        "Colorless",
+        "Colorless"
+      ],
+      "name": "Tail Smash",
+      "damage": 120,
+      "effect": "Flip a coin. If tails, this attack does nothing."
+    }
+  ],
+  "weaknesses": [
+    {
+      "type": "Fighting",
+      "value": "×2"
+    }
+  ],
+  "retreat": 1,
+  "regulationMark": "D",
+  "legal": {
+    "standard": false,
+    "expanded": true
+  },
+  "pricing": {
+    "cardmarket": {
+      "updated": "2026-10-01T00:00:00.000Z",
+      "unit": "EUR",
+      "avg": 0.12,
+      "low": 0.02,
+      "trend": 0.1,
+      "avg1": 0.1,
+      "avg7": 0.11,
+      "avg30": 0.12,
+      "avg-holo": 0.5,
+      "low-holo": 0.1,
+      "trend-holo": 0.4
+    },
+    "tcgplayer": {
+      "updated": "2026-10-01T00:00:00.000Z",
+      "unit": "USD",
+      "normal": {
+        "lowPrice": 0.05,
+        "midPrice": 0.15,
+        "highPrice": 2.0,
+        "marketPrice": 0.13,
+        "directLowPrice": 0.1
+      },
+      "reverse": {
+        "lowPrice": 0.2,
+        "midPrice": 0.4,
+        "highPrice": 3.0,
+        "marketPrice": 0.35,
+        "directLowPrice": null
+      }
+    }
+  }
+}

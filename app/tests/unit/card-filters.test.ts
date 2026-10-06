@@ -57,4 +57,24 @@ describe('buildCardWhere', () => {
     })
     expect(buildCardWhere({ levelMin: 0 })).toEqual({ AND: [{ gameSpecificAttributes: { path: ['level'], gte: 0 } }] })
   })
+
+  it('filters Pokémon by category, stage and energy type (a type is contained in the card\'s types)', () => {
+    expect(buildCardWhere({ category: 'Trainer', stage: 'Stage1', pokemonType: 'Fire' })).toEqual({
+      AND: [
+        { gameSpecificAttributes: { path: ['category'], equals: 'Trainer' } },
+        { gameSpecificAttributes: { path: ['types'], array_contains: 'Fire' } },
+        { gameSpecificAttributes: { path: ['stage'], equals: 'Stage1' } },
+      ],
+    })
+  })
+
+  it('filters Pokémon by variant and HP range', () => {
+    expect(buildCardWhere({ variant: 'reverse', hpMin: 60, hpMax: 120 })).toEqual({
+      AND: [
+        { sets: { some: { edition: 'reverse' } } },
+        { gameSpecificAttributes: { path: ['hp'], gte: 60 } },
+        { gameSpecificAttributes: { path: ['hp'], lte: 120 } },
+      ],
+    })
+  })
 })

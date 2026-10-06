@@ -1,0 +1,26 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 card shape (https://tcgdex.dev/reference/card). Not a recorded live response.",
+  "category": "Energy",
+  "id": "swsh1-232",
+  "image": "https://assets.tcgdex.net/de/swsh/swsh1/232",
+  "localId": "232",
+  "name": "Feuer-Energie",
+  "rarity": "Nicht so selten",
+  "set": {
+    "cardCount": {
+      "official": 202,
+      "total": 216
+    },
+    "id": "swsh1",
+    "name": "Schwert & Schild"
+  },
+  "variants": {
+    "firstEdition": false,
+    "holo": false,
+    "normal": true,
+    "reverse": false,
+    "wPromo": false
+  },
+  "energyType": "Basis",
+  "effect": "Liefert 1 Feuer-Energie."
+}

@@ -1,0 +1,26 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 card shape (https://tcgdex.dev/reference/card). Not a recorded live response.",
+  "category": "Energy",
+  "id": "swsh1-232",
+  "image": "https://assets.tcgdex.net/en/swsh/swsh1/232",
+  "localId": "232",
+  "name": "Fire Energy",
+  "rarity": "Uncommon",
+  "set": {
+    "cardCount": {
+      "official": 202,
+      "total": 216
+    },
+    "id": "swsh1",
+    "name": "Sword & Shield"
+  },
+  "variants": {
+    "firstEdition": false,
+    "holo": false,
+    "normal": true,
+    "reverse": false,
+    "wPromo": false
+  },
+  "energyType": "Basic",
+  "effect": "Provides 1 Fire Energy."
+}

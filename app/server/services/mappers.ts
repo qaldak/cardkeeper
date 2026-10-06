@@ -7,7 +7,7 @@ const toNumber = (value: { toString: () => string }): number => Number(value.toS
 
 export function listInclude(priceSource: string) {
   return {
-    game: { select: { slug: true } },
+    game: { select: { slug: true, displayName: true } },
     assignedPlayer: { select: { id: true, name: true } },
     sets: { select: { setCode: true }, orderBy: { id: 'asc' }, take: 1 },
     images: { where: { isPrimary: true }, select: { id: true }, take: 1 },
@@ -39,6 +39,7 @@ export function toListItem(card: ListCard): CardListItemDto {
     id: card.id,
     name: card.name,
     gameSlug: card.game.slug,
+    gameName: card.game.displayName,
     setCode: card.sets[0]?.setCode ?? null,
     status: card.status,
     player: card.assignedPlayer,
@@ -60,6 +61,7 @@ export function toDetail(card: DetailCard, priceSource: string): CardDetailDto {
       language: entry.language,
       name: entry.name,
       description: entry.description,
+      details: (entry.details as Record<string, unknown> | null) ?? null,
     })),
     attributes: card.gameSpecificAttributes as CardDetailDto['attributes'],
     status: card.status,

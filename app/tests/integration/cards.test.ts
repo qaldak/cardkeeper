@@ -32,8 +32,8 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
         userModifiedAt: null,
       })
       expect(card.translations).toEqual([
-        { language: 'de', name: 'Dunkler Magier', description: 'Der ultimative Magier in Angriff und Verteidigung.' },
-        { language: 'en', name: 'Dark Magician', description: 'Description of Dark Magician' },
+        { language: 'de', name: 'Dunkler Magier', description: 'Der ultimative Magier in Angriff und Verteidigung.', details: null },
+        { language: 'en', name: 'Dark Magician', description: 'Description of Dark Magician', details: null },
       ])
       expect(card.attributes).toMatchObject({ atk: 2500, def: 2100, level: 7, race: 'Spellcaster', type: 'Normal Monster', attribute: 'DARK' })
       expect(card.sets).toMatchObject([{ setCode: 'LOB-005', setName: 'Legend of Blue Eyes White Dragon', rarity: 'Ultra Rare', edition: null }])
@@ -307,10 +307,14 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
         types: ['Normal Monster', 'Spell Card'],
         races: ['Dragon', 'Normal', 'Spellcaster'],
         attributes: ['DARK', 'LIGHT'],
+        categories: [],
+        pokemonTypes: [],
+        stages: [],
+        variants: [],
         rarities: ['Rare', 'Ultra Rare'],
       })
       expect(await h.services.cards.facets()).toMatchObject({ types: ['Normal Monster', 'Spell Card'] })
-      expect(await h.services.cards.facets('pokemon')).toEqual({ types: [], races: [], attributes: [], rarities: [] })
+      expect(await h.services.cards.facets('pokemon')).toEqual({ types: [], races: [], attributes: [], categories: [], pokemonTypes: [], stages: [], variants: [], rarities: [] })
     })
   })
 

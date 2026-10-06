@@ -7,6 +7,8 @@ export interface SortRow {
   createdAt: Date
   purchaseDate: Date | null
   level: number | null
+  /** Pokémon hit points. */
+  hp: number | null
   /** Latest price of the configured source in cents. */
   priceCents: number | null
 }
@@ -18,6 +20,7 @@ function sortKey(row: SortRow, sort: CardSort): number | string | null {
   switch (sort) {
     case 'name': return row.name
     case 'level': return row.level
+    case 'hp': return row.hp
     case 'purchaseDate': return row.purchaseDate?.getTime() ?? null
     case 'price': return row.priceCents
     case 'created': return row.createdAt.getTime()

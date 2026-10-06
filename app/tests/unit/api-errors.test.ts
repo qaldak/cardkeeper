@@ -71,6 +71,19 @@ describe('request schemas', () => {
     expect(listQuerySchema.parse({ player: 'none' }).player).toBe('none')
   })
 
+  it('accepts the Pokémon filters and validates their ranges', () => {
+    expect(listQuerySchema.parse({ category: 'Trainer', pokemonType: 'Fire', stage: 'Basic', variant: 'holo', hpMin: '30', hpMax: '200' }))
+      .toMatchObject({ category: 'Trainer', pokemonType: 'Fire', stage: 'Basic', variant: 'holo', hpMin: 30, hpMax: 200 })
+    expect(() => listQuerySchema.parse({ hpMin: '-5' })).toThrow()
+    expect(() => listQuerySchema.parse({ hpMax: '5000' })).toThrow()
+    expect(listQuerySchema.parse({ sort: 'hp' }).sort).toBe('hp')
+  })
+
+  it('accepts a variant when adding a card', () => {
+    expect(createCardSchema.parse({ game: 'pokemon', externalId: 'swsh3-136', set: { setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' } }).set)
+      .toEqual({ setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' })
+  })
+
   it('validates the sort order', () => {
     expect(listQuerySchema.parse({})).toMatchObject({ sort: 'created' })
     expect(listQuerySchema.parse({ sort: 'price', dir: 'desc' })).toMatchObject({ sort: 'price', dir: 'desc' })

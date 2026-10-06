@@ -1,6 +1,7 @@
 import { badRequest } from '../lib/errors'
 import type { AppConfig } from '../lib/config'
 import type { CardAdapter } from './types'
+import { createTcgdexAdapter } from './tcgdex/adapter'
 import { createYgoAdapter } from './ygo/adapter'
 
 export interface AdapterRegistry {
@@ -29,5 +30,6 @@ export function createRegistry(adapters: CardAdapter[]): AdapterRegistry {
 export function createDefaultRegistry(config: AppConfig): AdapterRegistry {
   return createRegistry([
     createYgoAdapter({ baseUrl: config.ygoBaseUrl }),
+    createTcgdexAdapter({ baseUrl: config.tcgdexBaseUrl }),
   ])
 }

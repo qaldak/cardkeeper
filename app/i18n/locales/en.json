@@ -55,7 +55,18 @@
       "allRaces": "All types",
       "allAttributes": "All attributes",
       "allRarities": "All rarities",
-      "reset": "Reset filters"
+      "reset": "Reset filters",
+      "category": "Category",
+      "allCategories": "All categories",
+      "pokemonType": "Type",
+      "allPokemonTypes": "All types",
+      "stage": "Stage",
+      "allStages": "All stages",
+      "variant": "Variant",
+      "allVariants": "All variants",
+      "hp": "HP",
+      "hpFrom": "HP from",
+      "hpTo": "HP to"
     },
     "sort": {
       "label": "Sort by",
@@ -65,8 +76,10 @@
       "purchaseDate": "Purchase date",
       "price": "Price",
       "ascending": "Sorted ascending",
-      "descending": "Sorted descending"
-    }
+      "descending": "Sorted descending",
+      "hp": "HP"
+    },
+    "allGames": "All games"
   },
   "card": {
     "noImage": "Image",
@@ -93,7 +106,9 @@
       "statusPerson": "Person",
       "statusPersonPlaceholder": "Name of the person",
       "player": "Assigned to",
-      "purchaseDate": "Purchase date"
+      "purchaseDate": "Purchase date",
+      "variant": "Variant",
+      "cardId": "Card ID"
     },
     "attributes": {
       "atk": "ATK",
@@ -133,7 +148,8 @@
       "hint": "Fetch texts, attributes and prices again. Set code, edition, status and assignment stay unchanged.",
       "done": "Data updated"
     },
-    "lastFetched": "Data last fetched from the API on {date}"
+    "lastFetched": "Data last fetched from the API on {date}",
+    "basicsHintVariant": "Names, texts and data come from the card database. Only the variant of your card (e.g. Reverse Holo or 1st Edition) can be adjusted."
   },
   "add": {
     "title": "Add card",
@@ -153,7 +169,12 @@
     "purchaseDate": "Purchase date (optional)",
     "submit": "Add to collection",
     "added": "Card added",
-    "languageHint": "The search looks for German first, then English. Both languages are stored where available."
+    "languageHint": "The search looks for German first, then English. Both languages are stored where available.",
+    "variant": "Variant",
+    "queryPlaceholderPokemon": "e.g. Pikachu or swsh3-136",
+    "manyResults": "Only the first results are shown. Narrow the search, e.g. with the card id (swsh3-136).",
+    "idHint": "Pokémon: name or card id (set id and number, e.g. swsh3-136).",
+    "variantRequired": "Choose the variant of your card."
   },
   "players": {
     "title": "Players",
@@ -186,6 +207,79 @@
     "file_too_large": "The file is too large.",
     "empty_file": "The file is empty.",
     "missing_file": "No file was selected.",
-    "no_external_id": "This card is not linked to the card database."
+    "no_external_id": "This card is not linked to the card database.",
+    "printing_required": "Please choose the variant of the card.",
+    "invalid_variant": "This variant does not exist for the card.",
+    "field_not_editable": "This field cannot be changed for this card."
+  },
+  "variant": {
+    "normal": "Normal",
+    "reverse": "Reverse Holo",
+    "holo": "Holo",
+    "firstEdition": "1st Edition",
+    "wPromo": "W Promo"
+  },
+  "pokemon": {
+    "category": {
+      "Pokemon": "Pokémon",
+      "Trainer": "Trainer",
+      "Energy": "Energy"
+    },
+    "type": {
+      "Colorless": "Colorless",
+      "Darkness": "Darkness",
+      "Dragon": "Dragon",
+      "Fairy": "Fairy",
+      "Fighting": "Fighting",
+      "Fire": "Fire",
+      "Grass": "Grass",
+      "Lightning": "Lightning",
+      "Metal": "Metal",
+      "Psychic": "Psychic",
+      "Water": "Water"
+    },
+    "stage": {
+      "Basic": "Basic",
+      "Stage1": "Stage 1",
+      "Stage2": "Stage 2",
+      "VMAX": "VMAX",
+      "VSTAR": "VSTAR",
+      "Restored": "Restored",
+      "BREAK": "BREAK",
+      "LEVEL-UP": "Level-Up",
+      "MEGA": "Mega"
+    },
+    "trainerType": {
+      "Item": "Item",
+      "Supporter": "Supporter",
+      "Stadium": "Stadium",
+      "Tool": "Tool"
+    },
+    "energyType": {
+      "Basic": "Basic",
+      "Special": "Special"
+    },
+    "fields": {
+      "category": "Category",
+      "hp": "HP",
+      "types": "Type",
+      "stage": "Stage",
+      "retreat": "Retreat",
+      "evolveFrom": "Evolves from",
+      "illustrator": "Illustrator",
+      "regulationMark": "Regulation mark",
+      "number": "Number",
+      "trainerType": "Trainer type",
+      "energyType": "Energy type",
+      "dexId": "Pokédex no."
+    },
+    "sections": {
+      "abilities": "Abilities",
+      "attacks": "Attacks",
+      "weakness": "Weakness",
+      "resistance": "Resistance",
+      "effect": "Effect"
+    },
+    "noDetails": "There are no further card details for this language."
   }
 }
