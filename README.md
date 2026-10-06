@@ -272,11 +272,11 @@ The data model is explicit and typed in [`shared/types/pokemon.ts`](app/shared/t
 - Searching: by name (German first, then English) or by card id such as `swsh3-136`; the results show small images
   loaded from `assets.tcgdex.net` (only in the result list, the card image itself is downloaded and stored locally).
 
-- **Finding a card by set and number**: a Pokémon card has no set code, only a symbol and a number such as `040/088`.
+- **Finding a card by set and number**: a Pokémon card has no set code, only a set symbol and a number such as `040/088`.
   When adding a card, "By set and number" lets you pick the card database language (German, English or Japanese), type the
-  number as printed and pick the set by its symbol, logo or name. The part after the slash is the *printed* size of the set
+  number as printed and pick the set by its name or logo (the set symbol is not shown: TCGdex does not serve it for every set). The part after the slash is the *printed* size of the set
   (TCGdex `cardCount.official`, which can be smaller than the real number of cards because of secret rares), and it narrows
-  the set list down. Several sets can have the same size, so the symbol still has to be checked. The number is matched
+  the set list down. Several sets can have the same size, so check the set name. The number is matched
   without leading zeros (`040` = `40`, `TG01` = `tg01`). The chosen card is shown with its number, set and image before it
   is added; the set and its card list come from `GET /api/sets` and `GET /api/sets/<id>` and are cached for six hours.
 - **Japanese cards** live in their own TCGdex database with their own ids (`SV9-040`), they are not translations of the
@@ -315,8 +315,8 @@ No schema change and no change in the core services is required.
   with the English card instead of "not found", that copy is detected (same name and text as the English one) and not
   stored as a German translation.
 - The set browser and the Japanese data are not yet checked against the live TCGdex API (it is not reachable from the
-  development environment). Single set symbols were found to be missing as webp (HTTP 400), so images in the set picker fall back
-  to png and then to an empty box. Assumptions to verify after deploying: set logo and symbol are served as `<url>.webp`, the brief
+  development environment). Some set symbols were found to be missing (HTTP 400), so only the logo is shown; images in the set picker fall
+  back to png and then to an empty box. Assumptions to verify after deploying: set logos are served as `<url>.webp`, the brief
   set list contains `cardCount`, `localId` is padded as printed (`040`), and the Japanese categorical values match the
   mapping in `server/tcg/tcgdex/normalize.ts`.
 

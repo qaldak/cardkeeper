@@ -6,7 +6,8 @@ import { createYgoAdapter } from '../../server/tcg/ygo/adapter'
 
 function setup(overrides: Partial<CardAdapter> = {}) {
   const listSets = vi.fn(async () => [
-    { id: 'me03', name: 'ME03', logoUrl: 'https://assets.tcgdex.net/logo.webp', symbolUrl: 'https://evil.test/symbol.webp', official: 88, total: 120 },
+    { id: 'me03', name: 'ME03', logoUrl: 'https://assets.tcgdex.net/logo.webp', official: 88, total: 120 },
+    { id: 'x1', name: 'X1', logoUrl: 'https://evil.test/logo.webp', official: 1, total: 1 },
   ])
   const listSetCards = vi.fn(async (setId: string) => setId === 'me03'
     ? [{ id: 'me03-040', number: '040', name: 'Hippoterus', imageUrl: 'https://assets.tcgdex.net/040/high.webp', thumbnailUrl: 'https://assets.tcgdex.net/040/low.webp' }]
@@ -24,7 +25,8 @@ describe('catalog service', () => {
   it('lists the sets and drops image urls of foreign hosts', async () => {
     const { catalog } = setup()
     expect(await catalog.sets('pokemon', 'ja')).toEqual([
-      { id: 'me03', name: 'ME03', logoUrl: 'https://assets.tcgdex.net/logo.webp', symbolUrl: null, official: 88, total: 120 },
+      { id: 'me03', name: 'ME03', logoUrl: 'https://assets.tcgdex.net/logo.webp', official: 88, total: 120 },
+      { id: 'x1', name: 'X1', logoUrl: null, official: 1, total: 1 },
     ])
   })
 

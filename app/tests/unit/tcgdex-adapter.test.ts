@@ -269,14 +269,13 @@ describe('TCGdex adapter: sets', () => {
       return path in routes ? json(routes[path]) : json({ error: 'not found' }, 404)
     })
 
-  it('lists the sets with logo, symbol and the printed and total card counts', async () => {
+  it('lists the sets with logo and the printed and total card counts', async () => {
     const fetchFn = setRoutes({ '/v2/en/sets': load('sets-en') })
     const sets = await adapterWith(fetchFn as unknown as typeof fetch).listSets!('en')
     expect(sets.find(set => set.id === 'me03')).toEqual({
       id: 'me03',
       name: 'Fixture Set ME03',
       logoUrl: 'https://assets.tcgdex.net/en/me/me03/logo.webp',
-      symbolUrl: 'https://assets.tcgdex.net/univ/me/me03/symbol.webp',
       official: 88,
       total: 120,
     })

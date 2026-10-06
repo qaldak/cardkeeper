@@ -19,7 +19,7 @@ const CARD_ID = /^[A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)+$/
 // Set ids are a card id without the number; Japanese sets use the printed code in mixed case ("SV9", "S12a").
 const SET_ID = /^[A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*$/
 
-/** Logos and symbols are delivered without a file extension, like the card images. */
+/** Logos are delivered without a file extension, like the card images. */
 const asset = (base: string | undefined) => (base ? `${base}.webp` : null)
 
 export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter {
@@ -169,7 +169,6 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
         id: set.id,
         name: set.name,
         logoUrl: asset(set.logo),
-        symbolUrl: asset(set.symbol),
         official: set.cardCount?.official ?? null,
         total: set.cardCount?.total ?? null,
       }))
