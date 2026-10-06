@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import type { PokemonAttributes, PokemonDetails } from '../../shared/types/pokemon'
 import { DARK_MAGICIAN } from '../helpers/ygo-fake'
 import { furret } from '../helpers/tcgdex-fake'
+import { parseCardNumber, sameCardNumber } from '../../shared/utils/pokemon-number'
 import { TEST_DATABASE_URL, useHarness } from './helpers'
 
 const ACTOR = 'anna'
@@ -59,9 +60,9 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       expect(existsSync(join(h.config.imageDir, stored.filePath))).toBe(true)
     })
 
-    it('requests both languages and registers the game', async () => {
+    it('requests every stored language and registers the game', async () => {
       await addFurret()
-      expect([...h.tcgdex.requestedLanguages].sort()).toEqual(['de', 'en'])
+      expect([...h.tcgdex.requestedLanguages].sort()).toEqual(['de', 'en', 'ja'])
       expect(await h.db.game.findMany({ select: { slug: true, displayName: true } })).toEqual([{ slug: 'pokemon', displayName: 'Pokémon' }])
     })
 
@@ -196,7 +197,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       const before = await h.services.cards.get(card.id)
 
       const updated = furret()
-      updated.en = { ...updated.en, hp: 120, pricing: { cardmarket: { unit: 'EUR', trend: 0.5 } } }
+      updated.en = { ...updated.en!, hp: 120, pricing: { cardmarket: { unit: 'EUR', trend: 0.5 } } }
       updated.de = { ...updated.de!, name: 'Wiesenior (neu)' }
       h.tcgdex.cards.set(FURRET, updated)
 
@@ -214,7 +215,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
     it('adds a language that became available', async () => {
       const card = await add(TRAINER, 'holo', 'Rare')
       const updated = h.tcgdex.cards.get(TRAINER)!
-      updated.de = { ...updated.en, name: 'Chef-Befehle', description: undefined, effect: 'Deutscher Text.', trainerType: 'Unterstützer' }
+      updated.de = { ...updated.en!, name: 'Chef-Befehle', description: undefined, effect: 'Deutscher Text.', trainerType: 'Unterstützer' }
       const refreshed = await h.services.cards.refresh(card.id, ACTOR)
       expect(refreshed.translations.map(entry => entry.language)).toEqual(['de', 'en'])
       expect(refreshed.name).toBe('Chef-Befehle')
@@ -310,6 +311,76 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       const { summary } = await h.services.cards.list({ game: 'pokemon' }, all)
       // 0.10 (Furret) + 1.10 (Boss's Orders); the energy has no price.
       expect(summary.totals).toEqual([{ currency: 'EUR', amount: 1.2 }])
+    })
+  })
+  // The user's example: a Hippoterus printed "040/088" has the id me03-040. Without a set code on the card, the card is
+  // found by the printed set size and the number.
+  describe('finding a card by set and number', () => {
+    async function findByNumber(printed: string, setId: string, language = 'en') {
+      const parsed = parseCardNumber(printed)!
+      const cards = await h.services.catalog.setCards('pokemon', setId, language)
+      return cards.find(card => sameCardNumber(card.number, parsed.number))
+    }
+
+    it('narrows the sets down by the printed size 088', async () => {
+      const sets = await h.services.catalog.sets('pokemon', 'en')
+      const candidates = sets.filter(set => set.official === parseCardNumber('040/088')!.total)
+      expect(candidates.map(set => set.id)).toEqual(['me03', 'fx1'])
+    })
+
+    it('finds me03-040 in the chosen set, in German and English', async () => {
+      expect(await findByNumber('040/088', 'me03', 'de')).toMatchObject({ externalId: 'me03-040', number: '040', name: 'Hippoterus' })
+      expect(await findByNumber('040/088', 'me03', 'en')).toMatchObject({ externalId: 'me03-040', name: 'Hippowdon' })
+    })
+
+    it('matches the number without its leading zeros ("040" and "40")', async () => {
+      expect(await findByNumber('040/088', 'fx1')).toMatchObject({ number: '40' })
+      expect(await findByNumber('40', 'me03')).toMatchObject({ externalId: 'me03-040' })
+    })
+
+    it('finds nothing for a number the set does not have', async () => {
+      expect(await findByNumber('099/088', 'me03')).toBeUndefined()
+    })
+
+    it('shows the correct values of the card that was found', async () => {
+      const found = await findByNumber('040/088', 'me03', 'de')
+      const candidate = await h.services.cards.lookupDetails('pokemon', found!.externalId)
+      expect(candidate).toMatchObject({ externalId: 'me03-040', name: 'Hippoterus', language: 'de' })
+      expect(candidate.attributes).toMatchObject({ localId: '040', setId: 'me03', setCardCount: { official: 88, total: 120 }, hp: 150 })
+      expect(candidate.sets.map(set => [set.setCode, set.setName, set.edition])).toEqual([
+        ['me03-040', 'Fixture Set ME03', 'normal'],
+        ['me03-040', 'Fixture Set ME03', 'reverse'],
+      ])
+
+      const card = await add('me03-040', 'reverse', 'Rare')
+      expect(card).toMatchObject({ externalId: 'me03-040', name: 'Hippoterus' })
+      expect(card.translations.map(entry => [entry.language, entry.name])).toEqual([['de', 'Hippoterus'], ['en', 'Hippowdon']])
+      expect(card.sets).toEqual([expect.objectContaining({ setName: 'Fixture Set ME03', edition: 'reverse' })])
+    })
+  })
+
+  describe('Japanese cards', () => {
+    it('adds a card that only exists in the Japanese database', async () => {
+      const card = await add('SV9-040', 'normal', 'C')
+      expect(card.translations.map(entry => [entry.language, entry.name])).toEqual([['ja', 'ピカチュウ']])
+      expect(card.name).toBe('ピカチュウ')
+      expect(card.attributes).toMatchObject({ category: 'Pokemon', types: ['Lightning'], stage: 'Basic', setId: 'SV9' })
+    })
+
+    it('lists Japanese cards under the English filter values', async () => {
+      await add('SV9-040', 'normal', 'C')
+      await addFurret()
+      const { items } = await h.services.cards.list({ game: 'pokemon', pokemonType: 'Lightning' }, { page: 1, pageSize: 50 })
+      expect(items.map(item => [item.name, item.setCode])).toEqual([['ピカチュウ', 'SV9-040']])
+      expect((await h.services.cards.facets('pokemon')).pokemonTypes).toEqual(['Colorless', 'Lightning'])
+    })
+
+    it('finds a Japanese card by its id, but not by a Latin name', async () => {
+      expect((await h.services.cards.lookup('pokemon', 'SV9-040')).map(card => card.externalId)).toEqual(['SV9-040'])
+    })
+
+    it('lists the Japanese sets', async () => {
+      expect((await h.services.catalog.sets('pokemon', 'ja')).map(set => [set.id, set.official])).toEqual([['SV9', 100]])
     })
   })
 })

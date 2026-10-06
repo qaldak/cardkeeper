@@ -8,7 +8,7 @@ import { createServices, type Services } from '../../server/services'
 import { createRegistry } from '../../server/tcg/registry'
 import { createTcgdexAdapter } from '../../server/tcg/tcgdex/adapter'
 import { createYgoAdapter } from '../../server/tcg/ygo/adapter'
-import { bossOrders, createFakeTcgdexServer, fireEnergy, furret, type FakeTcgdexServer } from '../helpers/tcgdex-fake'
+import { bossOrders, createFakeTcgdexServer, fireEnergy, furret, hippowdon, japanesePikachu, type FakeTcgdexServer } from '../helpers/tcgdex-fake'
 import { BLUE_EYES, createFakeYgoServer, DARK_MAGICIAN, ENGLISH_ONLY, type FakeYgoServer } from '../helpers/ygo-fake'
 
 export const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL
@@ -48,7 +48,7 @@ export function useHarness(): Harness {
   beforeEach(async () => {
     await harness.db.$executeRawUnsafe(`TRUNCATE ${TABLES.map(table => `"${table}"`).join(', ')} RESTART IDENTITY CASCADE`)
     harness.ygo = createFakeYgoServer([DARK_MAGICIAN, BLUE_EYES, ENGLISH_ONLY])
-    harness.tcgdex = createFakeTcgdexServer([furret(), bossOrders(), fireEnergy()])
+    harness.tcgdex = createFakeTcgdexServer([furret(), bossOrders(), fireEnergy(), hippowdon(), japanesePikachu()])
     const registry = createRegistry([
       createYgoAdapter({ baseUrl: harness.config.ygoBaseUrl, fetchFn: harness.ygo.fetchFn }),
       createTcgdexAdapter({ baseUrl: harness.config.tcgdexBaseUrl, fetchFn: harness.tcgdex.fetchFn }),

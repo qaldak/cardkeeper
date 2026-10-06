@@ -11,13 +11,16 @@ export interface GameConfig {
   setCodeEditable: boolean
   /** Whether a card can only be added together with a printing (Pokémon needs its variant). */
   printingRequired: boolean
+  /** Languages the texts of a card are stored in; must match the adapter's `storedLanguages`. */
+  languages: readonly string[]
 }
 
-const DEFAULT_CONFIG: GameConfig = { editionKind: 'text', setCodeEditable: true, printingRequired: false }
+const DEFAULT_CONFIG: GameConfig = { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'] }
 
 export const GAME_CONFIG: Record<string, GameConfig> = {
-  ygo: { editionKind: 'text', setCodeEditable: true, printingRequired: false },
-  pokemon: { editionKind: 'variant', setCodeEditable: false, printingRequired: true },
+  ygo: { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'] },
+  // Japanese cards exist in their own database with their own ids, so Japanese is a stored language.
+  pokemon: { editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'] },
 }
 
 export function getGameConfig(gameSlug: string): GameConfig {

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { CARD_LANGUAGES, preferredLanguage, sortByLanguagePreference } from '../../shared/utils/languages'
 
 describe('language preference', () => {
-  it('downloads German and English', () => {
-    expect(CARD_LANGUAGES).toEqual(['de', 'en'])
+  it('downloads German, English and Japanese', () => {
+    expect(CARD_LANGUAGES).toEqual(['de', 'en', 'ja'])
   })
 
   it('prefers German, then English, then whatever is there', () => {

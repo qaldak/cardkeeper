@@ -169,12 +169,41 @@
     "purchaseDate": "Kaufdatum (optional)",
     "submit": "Zur Sammlung hinzufügen",
     "added": "Karte hinzugefügt",
-    "languageHint": "Die Suche läuft zuerst auf Deutsch, danach auf Englisch. Gespeichert werden beide Sprachen, soweit vorhanden.",
+    "languageHint": "Die Suche sucht zuerst auf Deutsch, dann auf Englisch. Deutsche, englische und (bei Pokémon) japanische Texte werden gespeichert, soweit vorhanden.",
     "variant": "Variante",
     "queryPlaceholderPokemon": "z. B. Pikachu oder swsh3-136",
     "manyResults": "Es werden nur die ersten Treffer angezeigt. Grenze die Suche ein, z. B. mit der Karten-ID (swsh3-136).",
     "idHint": "Pokémon: Name oder Karten-ID (Set-ID und Nummer, z. B. swsh3-136).",
-    "variantRequired": "Wähle die Variante deiner Karte."
+    "variantRequired": "Wähle die Variante deiner Karte.",
+    "bySet": {
+      "modeLabel": "So wird die Karte gefunden",
+      "mode": {
+        "set": "Nach Set und Nummer",
+        "name": "Nach Name oder ID"
+      },
+      "language": {
+        "label": "Sprache der Karte",
+        "de": "Deutsch",
+        "en": "Englisch",
+        "ja": "Japanisch"
+      },
+      "number": "Nummer auf der Karte",
+      "numberPlaceholder": "040/088",
+      "filter": "Sets filtern",
+      "filterPlaceholder": "Name oder Set-ID",
+      "invalidNumber": "Nummer wie auf der Karte gedruckt eingeben, z. B. 040/088 oder 40.",
+      "sets": "Sets",
+      "setHint": "Set am Symbol oder Namen auswählen. Wird die Nummer als 040/088 eingegeben, werden die Sets nach ihrer aufgedruckten Größe eingegrenzt.",
+      "filteredBySize": "Nur Sets mit {total} aufgedruckten Karten. Mehrere Sets können dieselbe Größe haben, daher das Symbol prüfen.",
+      "loading": "Lädt …",
+      "noSets": "Kein Set passt.",
+      "cards": "{official} Karten",
+      "changeSet": "Anderes Set wählen",
+      "sizeMismatch": "Die Kartennummer nennt {typed} Karten, dieses Set hat aber {official}. Bitte prüfen, ob es das richtige Set ist.",
+      "numberMissing": "Dieses Set hat keine Karte mit der Nummer {number}.",
+      "found": "Karte nach Set und Nummer gefunden",
+      "use": "Diese Karte verwenden"
+    }
   },
   "players": {
     "title": "Spieler",

@@ -141,3 +141,26 @@ export interface FacetsDto {
 export interface ApiErrorData {
   code?: string
 }
+
+/** A set (expansion) of a game that can be browsed when adding a card. */
+export interface GameSetDto {
+  /** Same in every language, e.g. "me03" or the printed code of a Japanese set ("SV9"). */
+  id: string
+  name: string
+  logoUrl: string | null
+  /** The set symbol, as printed on the card. */
+  symbolUrl: string | null
+  /** Size of the set as printed on the cards ("088" of "040/088"). */
+  official: number | null
+  /** Including cards that are not part of the printed numbering (secret rares). */
+  total: number | null
+}
+
+/** A card in a set, as listed when browsing the set. */
+export interface SetCardDto {
+  externalId: string
+  /** Number in the set as in the database ("040"). */
+  number: string
+  name: string
+  thumbnailUrl: string | null
+}

@@ -1,0 +1,50 @@
+{
+  "_comment": "Hand-written fixture following the documented TCGdex REST API v2 shapes (https://tcgdex.dev/reference). Not a recorded live response; only the id, the number and the printed set size come from the user's example (me03-040, 040/088), everything else is invented.",
+  "category": "ポケモン",
+  "id": "SV9-040",
+  "illustrator": "fixture artist",
+  "image": "https://assets.tcgdex.net/ja/SV/SV9/040",
+  "localId": "040",
+  "name": "ピカチュウ",
+  "rarity": "C",
+  "set": {
+    "cardCount": {
+      "official": 100,
+      "total": 120
+    },
+    "id": "SV9",
+    "name": "バトルパートナーズ"
+  },
+  "variants": {
+    "normal": true,
+    "reverse": true,
+    "holo": false,
+    "firstEdition": false,
+    "wPromo": false
+  },
+  "dexId": [
+    25
+  ],
+  "hp": 60,
+  "types": [
+    "雷"
+  ],
+  "stage": "たね",
+  "description": "テキスト",
+  "attacks": [
+    {
+      "cost": [
+        "雷"
+      ],
+      "name": "でんきショック",
+      "damage": 20
+    }
+  ],
+  "weaknesses": [
+    {
+      "type": "闘",
+      "value": "×2"
+    }
+  ],
+  "retreat": 1
+}
