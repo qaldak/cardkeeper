@@ -12,7 +12,7 @@ Everything runs in containers: there is nothing to install on the host except Do
 
 - Yu-Gi-Oh! and Pokémon in one collection: the game is chosen when adding a card (the last choice is remembered per
   browser in a cookie, so adding several Pokémon cards in a row needs no switching), the overview shows one game or all
-  games, and each game has its own filters (Yu-Gi-Oh!: card type, type, attribute, rarity, level range; Pokémon: category,
+  games (all games on the first visit, afterwards the last choice of that browser), and each game has its own filters (Yu-Gi-Oh!: card type, type, attribute, rarity, level range; Pokémon: category,
   type, stage, rarity, variant, HP range) and sort orders (level for Yu-Gi-Oh!, HP for Pokémon)
 - Collection overview with filters for status, player, card type, monster type, attribute, rarity and a level range
   (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
