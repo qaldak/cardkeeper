@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CardListResponseDto, FacetsDto, GameDto, PlayerDto } from '#shared/types/api'
 import { defaultDirection, isCardSort, isSortDirection, sortsForGame } from '#shared/utils/sorting'
+import { ALL_GAMES, overviewGame, OVERVIEW_GAME_COOKIE } from '#shared/utils/last-game'
 import { CARD_STATUSES, isCardStatus } from '#shared/utils/status'
 
 const { t } = useI18n()
@@ -21,14 +22,12 @@ const numberOf = (value: unknown) => {
   return Number.isInteger(parsed) && parsed >= 0 ? parsed : undefined
 }
 
-const ALL = 'all'
+const ALL = ALL_GAMES
 
-// The first registered game is selected by default so a game chip is always filled, as in the mockup;
-// "all games" is an explicit choice.
-const game = computed(() => {
-  const value = one(route.query.game)
-  return value === ALL ? undefined : (value ?? games.value?.[0]?.slug)
-})
+// Without a game in the url the overview shows the game chosen last in this browser (a cookie, so every person keeps
+// their own choice and the server renders the right game), and all games on the first visit.
+const lastGame = useCookie<string | null>(OVERVIEW_GAME_COOKIE, { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax', default: () => null })
+const game = computed(() => overviewGame((games.value ?? []).map(entry => entry.slug), one(route.query.game), lastGame.value))
 const status = computed(() => {
   const value = one(route.query.status)
   return isCardStatus(value) ? value : undefined
@@ -94,6 +93,7 @@ function setQuery(patch: Record<string, string | number | undefined>) {
 }
 
 function setGame(slug: string | undefined) {
+  lastGame.value = slug ?? ALL
   const cleared = Object.fromEntries(GAME_FILTER_KEYS.map(key => [key, undefined]))
   setQuery({ ...cleared, game: slug ?? ALL, sort: sortsForGame(slug).includes(sort.value) && sort.value !== 'created' ? sort.value : undefined, dir: undefined })
 }

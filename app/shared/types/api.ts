@@ -148,8 +148,6 @@ export interface GameSetDto {
   id: string
   name: string
   logoUrl: string | null
-  /** The set symbol, as printed on the card. */
-  symbolUrl: string | null
   /** Size of the set as printed on the cards ("088" of "040/088"). */
   official: number | null
   /** Including cards that are not part of the printed numbering (secret rares). */

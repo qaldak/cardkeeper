@@ -3,7 +3,6 @@
     "id": "me03",
     "name": "Fixture-Set ME03",
     "logo": "https://assets.tcgdex.net/de/me/me03/logo",
-    "symbol": "https://assets.tcgdex.net/univ/me/me03/symbol",
     "cardCount": {
       "official": 88,
       "total": 120
@@ -13,7 +12,6 @@
     "id": "fx1",
     "name": "Fixture-Set Zwei",
     "logo": "https://assets.tcgdex.net/de/fx/fx1/logo",
-    "symbol": "https://assets.tcgdex.net/univ/fx/fx1/symbol",
     "cardCount": {
       "official": 88,
       "total": 100
@@ -23,7 +21,6 @@
     "id": "swsh3",
     "name": "Flammende Finsternis",
     "logo": "https://assets.tcgdex.net/de/swsh/swsh3/logo",
-    "symbol": "https://assets.tcgdex.net/univ/swsh/swsh3/symbol",
     "cardCount": {
       "official": 189,
       "total": 201
@@ -33,7 +30,6 @@
     "id": "base1",
     "name": "Basis-Set",
     "logo": "https://assets.tcgdex.net/de/base/base1/logo",
-    "symbol": "https://assets.tcgdex.net/univ/base/base1/symbol",
     "cardCount": {
       "official": 102,
       "total": 102

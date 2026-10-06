@@ -39,7 +39,6 @@ export function createCatalogService({ registry, now = () => new Date() }: Catal
         return sets.map(set => ({
           ...set,
           logoUrl: allowedImageUrl(set.logoUrl, adapter.imageHosts),
-          symbolUrl: allowedImageUrl(set.symbolUrl, adapter.imageHosts),
         }))
       })
     },

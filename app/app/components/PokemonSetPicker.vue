@@ -3,7 +3,7 @@ import type { GameSetDto, SetCardDto } from '#shared/types/api'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatPrintedNumber, parseCardNumber, sameCardNumber } from '#shared/utils/pokemon-number'
 
-// Finds a Pokémon card by what is printed on it: the set (symbol, name) and the number ("040/088").
+// Finds a Pokémon card by what is printed on it: the set (name, logo) and the number ("040/088").
 // There is no set code on the card, and Japanese cards cannot be searched by name, so the set is chosen first.
 
 const emit = defineEmits<{ select: [externalId: string] }>()
@@ -131,8 +131,6 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
             :data-test="`set-${set.id}`"
             @click="chooseSet(set)"
           >
-            <RemoteImage v-if="set.symbolUrl" :src="set.symbolUrl" alt="" loading="lazy" class="size-8 shrink-0 object-contain" />
-            <span v-else class="size-8 shrink-0" />
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm font-medium">{{ set.name }}</span>
               <span class="block truncate text-xs text-muted">{{ set.id }} · {{ t('add.bySet.cards', { official: printed(set) }) }}</span>

@@ -12,7 +12,7 @@ Everything runs in containers: there is nothing to install on the host except Do
 
 - Yu-Gi-Oh! and Pokémon in one collection: the game is chosen when adding a card (the last choice is remembered per
   browser in a cookie, so adding several Pokémon cards in a row needs no switching), the overview shows one game or all
-  games, and each game has its own filters (Yu-Gi-Oh!: card type, type, attribute, rarity, level range; Pokémon: category,
+  games (all games on the first visit, afterwards the last choice of that browser), and each game has its own filters (Yu-Gi-Oh!: card type, type, attribute, rarity, level range; Pokémon: category,
   type, stage, rarity, variant, HP range) and sort orders (level for Yu-Gi-Oh!, HP for Pokémon)
 - Collection overview with filters for status, player, card type, monster type, attribute, rarity and a level range
   (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
@@ -137,7 +137,7 @@ network and volumes, so the real data stays untouched and the migrations of the 
 
 ```bash
 git fetch origin && git checkout <branch>
-cp .env.example .env.test        # other passwords are fine, and set APP_PORT=3001
+cp .env.example .env.test        # other passwords are fine; set APP_PORT=3001 and CONTAINER_PREFIX=cardkeeper-test
 docker compose -p cardkeeper-test --env-file .env.test up -d --build
 # open http://localhost:3001
 
@@ -154,7 +154,8 @@ docker compose -p cardkeeper-test --env-file .env.test exec -T db psql -U postgr
 docker compose -p cardkeeper-test --env-file .env.test up -d --build
 ```
 
-The `make dev` and `make test` targets use the default project name and therefore the same volumes as the real
+The containers are named `cardkeeper_app` and `cardkeeper_db` (prefix `CONTAINER_PREFIX`); the test stack therefore needs its own prefix, as
+above. The `make dev` and `make test` targets use the default project name and therefore the same volumes as the real
 installation; use `-p` as above (or a separate checkout) when you do not want that. Docker images are only published for
 releases, not for branches.
 
@@ -271,11 +272,11 @@ The data model is explicit and typed in [`shared/types/pokemon.ts`](app/shared/t
 - Searching: by name (German first, then English) or by card id such as `swsh3-136`; the results show small images
   loaded from `assets.tcgdex.net` (only in the result list, the card image itself is downloaded and stored locally).
 
-- **Finding a card by set and number**: a Pokémon card has no set code, only a symbol and a number such as `040/088`.
+- **Finding a card by set and number**: a Pokémon card has no set code, only a set symbol and a number such as `040/088`.
   When adding a card, "By set and number" lets you pick the card database language (German, English or Japanese), type the
-  number as printed and pick the set by its symbol, logo or name. The part after the slash is the *printed* size of the set
+  number as printed and pick the set by its name or logo (the set symbol is not shown: TCGdex does not serve it for every set). The part after the slash is the *printed* size of the set
   (TCGdex `cardCount.official`, which can be smaller than the real number of cards because of secret rares), and it narrows
-  the set list down. Several sets can have the same size, so the symbol still has to be checked. The number is matched
+  the set list down. Several sets can have the same size, so check the set name. The number is matched
   without leading zeros (`040` = `40`, `TG01` = `tg01`). The chosen card is shown with its number, set and image before it
   is added; the set and its card list come from `GET /api/sets` and `GET /api/sets/<id>` and are cached for six hours.
 - **Japanese cards** live in their own TCGdex database with their own ids (`SV9-040`), they are not translations of the
@@ -314,8 +315,8 @@ No schema change and no change in the core services is required.
   with the English card instead of "not found", that copy is detected (same name and text as the English one) and not
   stored as a German translation.
 - The set browser and the Japanese data are not yet checked against the live TCGdex API (it is not reachable from the
-  development environment). Single set symbols were found to be missing as webp (HTTP 400), so images in the set picker fall back
-  to png and then to an empty box. Assumptions to verify after deploying: set logo and symbol are served as `<url>.webp`, the brief
+  development environment). Some set symbols were found to be missing (HTTP 400), so only the logo is shown; images in the set picker fall
+  back to png and then to an empty box. Assumptions to verify after deploying: set logos are served as `<url>.webp`, the brief
   set list contains `cardCount`, `localId` is padded as printed (`040`), and the Japanese categorical values match the
   mapping in `server/tcg/tcgdex/normalize.ts`.
 

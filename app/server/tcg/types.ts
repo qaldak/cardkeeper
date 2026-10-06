@@ -64,7 +64,6 @@ export interface GameSet {
   id: string
   name: string
   logoUrl: string | null
-  symbolUrl: string | null
   /** Size of the set as printed on the cards. */
   official: number | null
   total: number | null
