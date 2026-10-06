@@ -1,3 +1,14 @@
+## [0.4.3](https://github.com/qaldak/cardkeeper/compare/v0.4.2...v0.4.3) (2026-10-06)
+
+### Bug Fixes
+
+* drop the set symbol from the set picker ([322b884](https://github.com/qaldak/cardkeeper/commit/322b8843bf666245c3bb7ec70a2246acddbab6a4))
+* show all games in the overview by default and remember the choice ([bfe042f](https://github.com/qaldak/cardkeeper/commit/bfe042f8a433272c54b513eb4a651f1e68683f09))
+
+### Maintenance
+
+* name the containers cardkeeper_app and cardkeeper_db ([d3fd9f1](https://github.com/qaldak/cardkeeper/commit/d3fd9f1ea3a6e1d1ee2c6d73dfca910fa07e73d9))
+
 ## [0.4.2](https://github.com/qaldak/cardkeeper/compare/v0.4.1...v0.4.2) (2026-10-06)
 
 ### Bug Fixes
