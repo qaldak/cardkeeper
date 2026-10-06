@@ -4,6 +4,7 @@ import type { PokemonAttributes } from '#shared/types/pokemon'
 import { formatAttributeValue } from '#shared/utils/game-fields'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatPrintedNumber } from '#shared/utils/pokemon-number'
+import { initialGame, LAST_GAME_COOKIE } from '#shared/utils/last-game'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -17,7 +18,10 @@ const { data: players } = await useFetch<PlayerDto[]>('/api/players')
 
 const NONE = 'none'
 
-const gameSlug = ref(games.value?.[0]?.slug ?? '')
+// The game chosen last stays selected for the next card. It is remembered per browser in a cookie (not on the
+// server), so every person keeps their own choice, and the server can already render the right game.
+const lastGame = useCookie<string | null>(LAST_GAME_COOKIE, { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax', default: () => null })
+const gameSlug = ref(initialGame((games.value ?? []).map(entry => entry.slug), lastGame.value))
 const config = computed(() => getGameConfig(gameSlug.value))
 const isPokemon = computed(() => gameSlug.value === 'pokemon')
 
@@ -36,7 +40,8 @@ const purchaseDate = ref('')
 const submitting = ref(false)
 
 // A search belongs to one game: switching the game starts over.
-watch(gameSlug, () => {
+watch(gameSlug, (slug) => {
+  lastGame.value = slug
   results.value = null
   chosen.value = null
   searchError.value = ''
