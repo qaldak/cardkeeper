@@ -1,3 +1,9 @@
+## [0.4.0](https://github.com/qaldak/cardkeeper/compare/v0.3.0...v0.4.0) (2026-10-06)
+
+### Features
+
+* find Pokémon cards by set and number, add Japanese cards ([13dc9df](https://github.com/qaldak/cardkeeper/commit/13dc9df14e592d1b4eb9c09374c8cb9d573774f7))
+
 ## [0.3.0](https://github.com/qaldak/cardkeeper/compare/v0.2.1...v0.3.0) (2026-10-06)
 
 ### Features
