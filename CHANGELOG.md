@@ -1,3 +1,9 @@
+## [0.4.2](https://github.com/qaldak/cardkeeper/compare/v0.4.1...v0.4.2) (2026-10-06)
+
+### Bug Fixes
+
+* fall back to png and an empty box for missing set images ([9cd7580](https://github.com/qaldak/cardkeeper/commit/9cd7580c3c4666804d0ea5e9cb8aa708cd376b12))
+
 ## [0.4.1](https://github.com/qaldak/cardkeeper/compare/v0.4.0...v0.4.1) (2026-10-06)
 
 ### Bug Fixes
