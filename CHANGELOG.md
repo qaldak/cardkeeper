@@ -1,3 +1,9 @@
+## [0.4.1](https://github.com/qaldak/cardkeeper/compare/v0.4.0...v0.4.1) (2026-10-06)
+
+### Bug Fixes
+
+* remember the game chosen last when adding cards ([3180985](https://github.com/qaldak/cardkeeper/commit/3180985b5ec80a741e9c0b1b8d0df22f4a8c7cb6))
+
 ## [0.4.0](https://github.com/qaldak/cardkeeper/compare/v0.3.0...v0.4.0) (2026-10-06)
 
 ### Features
