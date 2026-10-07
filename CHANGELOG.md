@@ -1,3 +1,9 @@
+## [0.4.4](https://github.com/qaldak/cardkeeper/compare/v0.4.3...v0.4.4) (2026-10-07)
+
+### Bug Fixes
+
+* preselect German in the set picker ([216bd58](https://github.com/qaldak/cardkeeper/commit/216bd583668184746f7ae10bbeecac6b6624b201))
+
 ## [0.4.3](https://github.com/qaldak/cardkeeper/compare/v0.4.2...v0.4.3) (2026-10-06)
 
 ### Bug Fixes
