@@ -328,6 +328,12 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       expect(candidates.map(set => set.id)).toEqual(['me03', 'fx1'])
     })
 
+    it('reads "040088" without the slash the same way as "040/088"', async () => {
+      const sets = await h.services.catalog.sets('pokemon', 'en')
+      expect(sets.filter(set => set.official === parseCardNumber('040088')!.total).map(set => set.id)).toEqual(['me03', 'fx1'])
+      expect(await findByNumber('040088', 'me03', 'de')).toMatchObject({ externalId: 'me03-040', name: 'Hippoterus' })
+    })
+
     it('finds me03-040 in the chosen set, in German and English', async () => {
       expect(await findByNumber('040/088', 'me03', 'de')).toMatchObject({ externalId: 'me03-040', number: '040', name: 'Hippoterus' })
       expect(await findByNumber('040/088', 'me03', 'en')).toMatchObject({ externalId: 'me03-040', name: 'Hippowdon' })

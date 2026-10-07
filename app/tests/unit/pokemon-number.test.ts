@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { formatPrintedNumber, parseCardNumber, sameCardNumber } from '../../shared/utils/pokemon-number'
+import { formatPrintedNumber, normalizeCardNumberInput, parseCardNumber, sameCardNumber } from '../../shared/utils/pokemon-number'
 
 describe('parseCardNumber', () => {
   it('reads the number and the printed set size of "040/088"', () => {
     expect(parseCardNumber('040/088')).toEqual({ number: '040', total: 88 })
     expect(parseCardNumber(' 40 / 88 ')).toEqual({ number: '40', total: 88 })
+  })
+
+  it('reads a number typed without the slash', () => {
+    expect(parseCardNumber('040088')).toEqual({ number: '040', total: 88 })
+    expect(parseCardNumber('040 088')).toEqual({ number: '040', total: 88 })
   })
 
   it('accepts a number without the set size', () => {
@@ -20,6 +25,30 @@ describe('parseCardNumber', () => {
   it('rejects anything that is not a card number', () => {
     for (const input of ['', '  ', '/88', '1/2/3', 'hello world', '04 0']) {
       expect(parseCardNumber(input), input).toBeNull()
+    }
+  })
+})
+
+describe('normalizeCardNumberInput', () => {
+  it('adds the slash when it was left out', () => {
+    expect(normalizeCardNumberInput('040088')).toBe('040/088')
+    expect(normalizeCardNumberInput(' 136189 ')).toBe('136/189')
+    expect(normalizeCardNumberInput('00400088')).toBe('0040/0088')
+  })
+
+  it('takes a space as the slash', () => {
+    expect(normalizeCardNumberInput('040 088')).toBe('040/088')
+    expect(normalizeCardNumberInput('40  88')).toBe('40/88')
+  })
+
+  it('keeps a typed slash and tidies the spaces around it', () => {
+    expect(normalizeCardNumberInput('040/088')).toBe('040/088')
+    expect(normalizeCardNumberInput('40 / 88')).toBe('40/88')
+  })
+
+  it('leaves ambiguous or lettered input as typed', () => {
+    for (const input of ['040', '40088', '4088', '1234567', 'TG01', 'SWSH001', 'TG01/TG30', '04 0', '']) {
+      expect(normalizeCardNumberInput(input), input).toBe(input)
     }
   })
 })

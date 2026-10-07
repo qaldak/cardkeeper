@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { GameSetDto, SetCardDto } from '#shared/types/api'
 import { getGameConfig } from '#shared/utils/game-config'
-import { formatPrintedNumber, parseCardNumber, sameCardNumber } from '#shared/utils/pokemon-number'
+import { formatPrintedNumber, normalizeCardNumberInput, parseCardNumber, sameCardNumber } from '#shared/utils/pokemon-number'
 
 // Finds a Pokémon card by what is printed on it: the set (name, logo) and the number ("040/088").
 // There is no set code on the card, and Japanese cards cannot be searched by name, so the set is chosen first.
@@ -29,6 +29,10 @@ const pickedId = ref<string | null>(null)
 
 const languageItems = computed(() => languages.map(code => ({ label: t(`add.bySet.language.${code}`), value: code })))
 const parsed = computed(() => parseCardNumber(numberInput.value))
+// The slash is optional while typing ("040088"); the field shows the printed form "040/088" once it is left.
+const showPrintedForm = () => {
+  numberInput.value = normalizeCardNumberInput(numberInput.value)
+}
 
 async function loadSets() {
   loadingSets.value = true
@@ -98,7 +102,14 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
         <USelect v-model="language" :items="languageItems" class="w-full" />
       </UFormField>
       <UFormField :label="t('add.bySet.number')" class="w-56">
-        <UInput v-model="numberInput" :placeholder="t('add.bySet.numberPlaceholder')" class="w-full" data-test="number-input" />
+        <UInput
+          v-model="numberInput"
+          :placeholder="t('add.bySet.numberPlaceholder')"
+          class="w-full"
+          data-test="number-input"
+          @blur="showPrintedForm"
+          @keydown.enter.prevent="showPrintedForm"
+        />
       </UFormField>
       <UFormField :label="t('add.bySet.filter')" class="min-w-52 flex-1">
         <UInput v-model="setFilter" :placeholder="t('add.bySet.filterPlaceholder')" class="w-full" />
