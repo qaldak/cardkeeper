@@ -52,6 +52,11 @@
   --ui-text-dimmed: #7c8ba1;
 }
 
+/* A page without a scrollbar (the user list) must not be wider than one with it (the overview): the header would move. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: var(--app-page);
 }

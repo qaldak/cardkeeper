@@ -86,6 +86,23 @@ const apiQuery = computed(() => ({
 const { data, error } = await useFetch<CardListResponseDto>('/api/cards', { query: apiQuery })
 const { data: facets } = await useFetch<FacetsDto>('/api/facets', { query: computed(() => ({ game: game.value })) })
 
+// The search box filters through the `q` query parameter; it waits a moment after the last keystroke.
+const search = ref(q.value ?? '')
+let searchTimer: ReturnType<typeof setTimeout> | undefined
+watch(search, (value) => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    router.replace({ query: { ...route.query, page: undefined, q: value.trim() || undefined } })
+  }, 300)
+})
+// Resetting the filters (or following a link) changes `q` from outside.
+watch(q, (value) => {
+  if ((value ?? '') !== search.value.trim()) {
+    search.value = value ?? ''
+  }
+})
+onBeforeUnmount(() => clearTimeout(searchTimer))
+
 function setQuery(patch: Record<string, string | number | undefined>) {
   const merged = { ...route.query, page: undefined, ...patch }
   const query = Object.fromEntries(Object.entries(merged).filter(([, value]) => value !== undefined && value !== ''))
@@ -200,32 +217,43 @@ function resetFilters() {
       </div>
     </div>
 
-    <div v-if="games && games.length > 1" class="mb-3 flex flex-wrap gap-2">
-      <button
-        type="button"
-        class="rounded-full border px-4 py-2 text-sm"
-        :class="game === undefined
-          ? 'border-primary bg-primary font-medium text-inverted'
-          : 'border-default bg-default text-muted hover:text-default'"
-        @click="setGame(undefined)"
-      >
-        {{ t('overview.allGames') }}
-      </button>
-      <button
-        v-for="entry in games"
-        :key="entry.slug"
-        type="button"
-        class="rounded-full border px-4 py-2 text-sm"
-        :class="game === entry.slug
-          ? 'border-primary bg-primary font-medium text-inverted'
-          : 'border-default bg-default text-muted hover:text-default'"
-        @click="setGame(entry.slug)"
-      >
-        {{ entry.displayName }}
-      </button>
-    </div>
-    <div v-else-if="games?.[0]" class="mb-3 flex flex-wrap gap-2">
-      <span class="rounded-full bg-primary px-4 py-2 text-sm font-medium text-inverted">{{ games[0].displayName }}</span>
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <div v-if="games && games.length > 1" class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="rounded-full border px-4 py-2 text-sm"
+          :class="game === undefined
+            ? 'border-primary bg-primary font-medium text-inverted'
+            : 'border-default bg-default text-muted hover:text-default'"
+          @click="setGame(undefined)"
+        >
+          {{ t('overview.allGames') }}
+        </button>
+        <button
+          v-for="entry in games"
+          :key="entry.slug"
+          type="button"
+          class="rounded-full border px-4 py-2 text-sm"
+          :class="game === entry.slug
+            ? 'border-primary bg-primary font-medium text-inverted'
+            : 'border-default bg-default text-muted hover:text-default'"
+          @click="setGame(entry.slug)"
+        >
+          {{ entry.displayName }}
+        </button>
+      </div>
+      <div v-else-if="games?.[0]" class="flex flex-wrap gap-2">
+        <span class="rounded-full bg-primary px-4 py-2 text-sm font-medium text-inverted">{{ games[0].displayName }}</span>
+      </div>
+      <UInput
+        v-model="search"
+        type="search"
+        icon="i-lucide-search"
+        :placeholder="t('overview.searchPlaceholder')"
+        :aria-label="t('overview.searchLabel')"
+        class="w-full sm:w-[320px]"
+        data-test="search"
+      />
     </div>
 
     <div class="mb-6 flex flex-wrap items-center gap-2">
