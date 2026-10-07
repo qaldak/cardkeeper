@@ -1,3 +1,9 @@
+## [0.8.2](https://github.com/qaldak/cardkeeper/compare/v0.8.1...v0.8.2) (2026-10-07)
+
+### Bug Fixes
+
+* put the name of the app first in the page title ([b493d25](https://github.com/qaldak/cardkeeper/commit/b493d256d2f4634e6898402cc1ef5dc9fb34e823))
+
 ## [0.8.1](https://github.com/qaldak/cardkeeper/compare/v0.8.0...v0.8.1) (2026-10-07)
 
 ### Bug Fixes
