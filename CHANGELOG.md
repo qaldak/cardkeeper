@@ -1,3 +1,9 @@
+## [0.5.1](https://github.com/qaldak/cardkeeper/compare/v0.5.0...v0.5.1) (2026-10-07)
+
+### Maintenance
+
+* change the license to PolyForm Noncommercial 1.0.0 ([8032a94](https://github.com/qaldak/cardkeeper/commit/8032a9411ad1435646e0dd0e4eef552495889549))
+
 ## [0.5.0](https://github.com/qaldak/cardkeeper/compare/v0.4.5...v0.5.0) (2026-10-07)
 
 ### Features
