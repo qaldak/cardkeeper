@@ -182,7 +182,7 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
         class="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-primary bg-default p-4"
         data-test="picked"
       >
-        <RemoteImage v-if="picked.thumbnailUrl" :src="picked.thumbnailUrl" :alt="picked.name" class="h-24 w-[70px] rounded bg-primary-50 object-cover" />
+        <RemoteImage v-if="picked.thumbnailUrl" :src="picked.thumbnailUrl" :alt="picked.name" class="h-24 w-[70px] rounded bg-(--app-art) object-cover" />
         <div class="min-w-0 flex-1">
           <p class="text-xs text-muted">
             {{ t('add.bySet.found') }}
@@ -207,11 +207,11 @@ const printed = (set: GameSetDto) => set.official === null ? `${set.total ?? '?'
           <button
             type="button"
             class="flex w-full flex-col items-center gap-1 rounded-lg border p-1.5 text-center hover:border-primary"
-            :class="picked?.externalId === card.externalId ? 'border-primary bg-primary-50' : 'border-default bg-default'"
+            :class="picked?.externalId === card.externalId ? 'border-primary bg-(--app-art)' : 'border-default bg-default'"
             :data-test="`card-${card.externalId}`"
             @click="pickedId = card.externalId"
           >
-            <RemoteImage v-if="card.thumbnailUrl" :src="card.thumbnailUrl" :alt="card.name" loading="lazy" class="aspect-[5/7] w-full rounded bg-primary-50 object-cover" />
+            <RemoteImage v-if="card.thumbnailUrl" :src="card.thumbnailUrl" :alt="card.name" loading="lazy" class="aspect-[5/7] w-full rounded bg-(--app-art) object-cover" />
             <span class="text-xs font-medium">{{ card.number }}</span>
             <span class="w-full truncate text-[11px] text-muted">{{ card.name }}</span>
           </button>

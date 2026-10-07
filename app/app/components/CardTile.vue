@@ -17,7 +17,7 @@ const subtitle = computed(() =>
     :to="`/cards/${card.id}`"
     class="flex w-[220px] flex-col overflow-hidden rounded-xl border border-default bg-default transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary"
   >
-    <div class="flex h-[140px] items-center justify-center bg-primary-50 text-[13px] text-primary">
+    <div class="flex h-[140px] items-center justify-center bg-(--app-art) text-[13px] text-primary">
       <img
         v-if="card.imageId"
         :src="`/api/images/${card.imageId}`"

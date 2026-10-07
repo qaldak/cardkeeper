@@ -6,11 +6,11 @@ const { t } = useI18n()
 
 // Colors follow the UI mockups: green for active, red for lost, neutral for everything given away.
 const styles: Record<CardStatusValue, string> = {
-  ACTIVE: 'bg-[#E6F4EA] text-[#1F7A3D]',
-  SOLD: 'bg-[#EEF1F5] text-[#51606F]',
-  TRADED: 'bg-[#EEF1F5] text-[#51606F]',
-  GIFTED: 'bg-[#EEF1F5] text-[#51606F]',
-  LOST: 'bg-[#FBEAE7] text-[#AD4634]',
+  ACTIVE: 'bg-(--app-ok-bg) text-(--app-ok-fg)',
+  SOLD: 'bg-(--app-neutral-bg) text-(--app-neutral-fg)',
+  TRADED: 'bg-(--app-neutral-bg) text-(--app-neutral-fg)',
+  GIFTED: 'bg-(--app-neutral-bg) text-(--app-neutral-fg)',
+  LOST: 'bg-(--app-lost-bg) text-(--app-lost-fg)',
 }
 </script>
 

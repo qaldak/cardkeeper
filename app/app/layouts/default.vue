@@ -58,7 +58,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="text-muted hover:text-primary-600"
+          class="text-muted hover:text-primary"
           active-class="!font-semibold !text-primary"
           exact-active-class="!font-semibold !text-primary"
         >
@@ -79,6 +79,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
         <UButton v-if="!restricted" to="/cards/new" icon="i-lucide-plus">
           {{ t('nav.addCard') }}
         </UButton>
+        <ThemeSwitch />
         <USelect
           :model-value="locale"
           :items="localeItems"
@@ -88,7 +89,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
           @update:model-value="(value: string) => setLocale(value as 'de' | 'en')"
         />
         <div v-if="auth.user.value" class="flex items-center gap-2 text-sm" data-test="user-menu">
-          <NuxtLink v-if="!restricted" to="/account" class="text-muted hover:text-primary-600" :title="t('nav.account')">
+          <NuxtLink v-if="!restricted" to="/account" class="text-muted hover:text-primary" :title="t('nav.account')">
             {{ auth.user.value.name }}
           </NuxtLink>
           <span v-else class="text-muted">{{ auth.user.value.name }}</span>
