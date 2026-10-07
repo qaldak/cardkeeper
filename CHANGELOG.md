@@ -1,3 +1,9 @@
+## [0.9.0](https://github.com/qaldak/cardkeeper/compare/v0.8.2...v0.9.0) (2026-10-07)
+
+### Features
+
+* offer the usual Yu-Gi-Oh! editions as a quick choice ([76f6c00](https://github.com/qaldak/cardkeeper/commit/76f6c00c285b0509e67901c6320ae321dbcbbfab))
+
 ## [0.8.2](https://github.com/qaldak/cardkeeper/compare/v0.8.1...v0.8.2) (2026-10-07)
 
 ### Bug Fixes
