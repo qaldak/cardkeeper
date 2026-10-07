@@ -28,8 +28,9 @@ Everything runs in containers: there is nothing to install on the host except Do
   purchase date and images are never touched
 - "Add card" lookup by name or passcode against the card database, including the exact printing (set and rarity). There
   is no language to choose: the search looks for German first and falls back to English, and both languages are
-  stored where available. For Yu-Gi-Oh! the edition is a one-click choice (1st Edition, Unlimited, Limited Edition)
-  next to the printing; any other edition can be typed on the card page
+  stored where available. For Yu-Gi-Oh! the edition is a one-click choice (1st Edition, Unlimited, Limited Edition,
+  shown in the language of the interface) next to the printing; on the card page the same editions are a dropdown
+  that also takes any other text
 - Card images are downloaded once and stored on a volume, never hotlinked
 - Prices are stored per marketplace in the currency of that marketplace and are **not converted**
   (Cardmarket in EUR, TCGplayer/eBay/Amazon/CoolStuffInc in USD); the list uses the marketplace set in `PRICE_SOURCE`
@@ -260,8 +261,11 @@ Differences from the original concept:
 - Names, texts and attributes are read-only in the UI, so there are no manual overrides of API data (`manual_overrides`
   was dropped). `card_sets` holds the printing of the physical card; its set code and edition are the only editable
   card data and apply to all languages. `cards.user_modified_at` records the last change made by a user.
-- `card_sets.edition` holds the edition of a Yu-Gi-Oh! card, which the API does not provide: one of the quick choices
-  (`1st Edition`, `Unlimited`, `Limited Edition`, shown translated) or any text typed on the card page. For Pokémon it holds the variant of the physical card (see below).
+- `card_sets.edition` holds the edition of a Yu-Gi-Oh! card, which the API does not provide. The three presets are
+  stored as the keys `FIRST_EDITION`, `UNLIMITED` and `LIMITED_EDITION` and translated when shown (`edition.<KEY>` in
+  the locale files, like `status.<KEY>`); any other edition is free text, stored and shown exactly as typed. For
+  Pokémon it holds the variant key of the physical card (`normal`, `reverse`, ... translated through `variant.<key>`,
+  see below).
 - `card_translations.details` (JSONB) holds further language dependent data of a card: for Pokémon the attack and
   ability texts and the localized names of types, stage and rarity. It is null for Yu-Gi-Oh!.
 - Prices keep their source currency instead of being shown in CHF.

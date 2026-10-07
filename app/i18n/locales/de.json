@@ -84,6 +84,7 @@
     "noOwner": "Ohne Besitzer"
   },
   "card": {
+    "editionCreate": "„{label}“ als Edition übernehmen",
     "noImage": "Bild",
     "origin": {
       "api": "aus API übernommen",
@@ -360,8 +361,8 @@
     "system": "System (folgt dem Gerät)"
   },
   "edition": {
-    "first": "1. Auflage",
-    "unlimited": "Unlimitierte Auflage",
-    "limited": "Limitierte Auflage"
+    "FIRST_EDITION": "1. Auflage",
+    "UNLIMITED": "Unlimitierte Auflage",
+    "LIMITED_EDITION": "Limitierte Auflage"
   }
 }

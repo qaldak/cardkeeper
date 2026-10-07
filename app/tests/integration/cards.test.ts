@@ -92,13 +92,16 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
     })
 
     it('stores the edition that was chosen for a Yu-Gi-Oh! printing, which the card database does not know', async () => {
-      const card = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '1st Edition' } })
-      expect(card.sets).toEqual([expect.objectContaining({ setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '1st Edition' })])
+      const card = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: 'FIRST_EDITION' } })
+      expect(card.sets).toEqual([expect.objectContaining({ setCode: 'LOB-005', rarity: 'Ultra Rare', edition: 'FIRST_EDITION' })])
     })
 
     it('accepts any text as the edition of a Yu-Gi-Oh! card and treats a blank one as none', async () => {
       const special = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '  Special Edition ' } })
       expect(special.sets[0]!.edition).toBe('Special Edition')
+      // Typed text is kept as typed: a spelling of a preset is not turned into its key.
+      const typed = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '1st Edition' } })
+      expect(typed.sets[0]!.edition).toBe('1st Edition')
       const blank = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '  ' } })
       expect(blank.sets[0]!.edition).toBeNull()
       const none = await addDarkMagician()

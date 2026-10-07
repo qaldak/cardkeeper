@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { CardDetailDto, CardImageDto, UserDto } from '#shared/types/api'
 import { POKEMON_VARIANTS, type PokemonDetails } from '#shared/types/pokemon'
+import { isEditionKey } from '#shared/utils/editions'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
 import { preferredLanguage } from '#shared/utils/languages'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const toast = useToast()
 const apiError = useApiError()
@@ -91,6 +92,19 @@ const variantItems = computed<{ label: string, value: string }[]>(() => {
     .filter(key => available[key] === true || key === form.edition)
     .map(key => ({ label: labels.variant(key), value: key }))
 })
+// Yu-Gi-Oh!: the preset editions (stored as keys, shown translated) plus the current free text, so that it stays selectable.
+const editionItems = computed(() => {
+  const items = gameConfig.value.editions.map(key => ({ label: labels.edition(key), value: key }))
+  const current = form.edition.trim()
+  return current && !isEditionKey(current) ? [...items, { label: current, value: current }] : items
+})
+// Typed text that matches no preset: stored exactly as entered, in both languages, never mapped to a key.
+function createEdition(text: string) {
+  const typed = text.trim().slice(0, 80)
+  if (typed) {
+    form.edition = typed
+  }
+}
 const editionText = (edition: string | null | undefined) =>
   gameConfig.value.editionKind === 'variant' ? labels.variant(edition) : labels.edition(edition)
 const showDate = computed(() => statusNeedsDate(form.status))
@@ -448,14 +462,29 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
               </UFormField>
               <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
                 <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" :disabled="!canEdit" class="w-full" />
-                <UInput v-else v-model="form.edition" maxlength="80" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
-                <EditionChips
-                  v-if="canEdit && gameConfig.editions.length > 0"
-                  :model-value="form.edition || null"
-                  :choices="gameConfig.editions"
-                  class="mt-2"
-                  @update:model-value="(value: string | null) => (form.edition = value ?? '')"
-                />
+                <!-- A preset is shown translated but stored as its key; a typed text (create item) is stored as typed. -->
+                <!-- keyed by the language: the shown label of the selected key is only read again on a new mount -->
+                <UInputMenu
+                  v-else-if="canEdit && gameConfig.editions.length > 0"
+                  :key="locale"
+                  :model-value="form.edition || undefined"
+                  :items="editionItems"
+                  value-key="value"
+                  create-item
+                  open-on-click
+                  open-on-focus
+                  clear
+                  class="w-full"
+                  data-test="edition-input"
+                  @update:model-value="(value?: string | null) => (form.edition = value ?? '')"
+                  @create="createEdition"
+                >
+                  <template #create-item-label="{ item }">
+                    {{ t('card.editionCreate', { label: item }) }}
+                  </template>
+                </UInputMenu>
+                <UInput v-else-if="canEdit" v-model="form.edition" maxlength="80" class="w-full" />
+                <UInput v-else :model-value="editionText(form.edition)" readonly :ui="readonlyUi" class="w-full" />
               </UFormField>
               <UFormField :label="t('card.fields.setName')">
                 <UInput :model-value="setNameShown" readonly class="w-full" :ui="readonlyUi" />

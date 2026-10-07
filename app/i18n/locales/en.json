@@ -84,6 +84,7 @@
     "noOwner": "No owner"
   },
   "card": {
+    "editionCreate": "Use “{label}” as edition",
     "noImage": "Image",
     "origin": {
       "api": "imported from API",
@@ -360,8 +361,8 @@
     "system": "System (follows the device)"
   },
   "edition": {
-    "first": "1st Edition",
-    "unlimited": "Unlimited",
-    "limited": "Limited Edition"
+    "FIRST_EDITION": "1st Edition",
+    "UNLIMITED": "Unlimited",
+    "LIMITED_EDITION": "Limited Edition"
   }
 }
