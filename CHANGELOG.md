@@ -1,3 +1,9 @@
+## [0.5.0](https://github.com/qaldak/cardkeeper/compare/v0.4.5...v0.5.0) (2026-10-07)
+
+### Features
+
+* add logins and card ownership ([1846b99](https://github.com/qaldak/cardkeeper/commit/1846b99974972e84158283c02ee31a7d45cff3d8))
+
 ## [0.4.5](https://github.com/qaldak/cardkeeper/compare/v0.4.4...v0.4.5) (2026-10-07)
 
 ### Bug Fixes
