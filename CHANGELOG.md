@@ -1,3 +1,13 @@
+## [0.7.0](https://github.com/qaldak/cardkeeper/compare/v0.6.0...v0.7.0) (2026-10-07)
+
+### Features
+
+* show a card image enlarged on click ([ea8605c](https://github.com/qaldak/cardkeeper/commit/ea8605cbbfdf15ead4d08fa5bd414e4c193da691))
+
+### Bug Fixes
+
+* keep the header in place when switching pages ([82e205d](https://github.com/qaldak/cardkeeper/commit/82e205da8a245443d1a5d0deba1d25c070abffa8))
+
 ## [0.6.0](https://github.com/qaldak/cardkeeper/compare/v0.5.1...v0.6.0) (2026-10-07)
 
 ### Features
