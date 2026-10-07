@@ -6,14 +6,14 @@ describe('buildCardWhere', () => {
     expect(buildCardWhere({})).toEqual({})
   })
 
-  it('filters by game, status and player', () => {
-    expect(buildCardWhere({ game: 'ygo', status: 'ACTIVE', player: 3 })).toEqual({
-      AND: [{ game: { slug: 'ygo' } }, { status: 'ACTIVE' }, { assignedPlayerId: 3 }],
+  it('filters by game, status and owner', () => {
+    expect(buildCardWhere({ game: 'ygo', status: 'ACTIVE', owner: 3 })).toEqual({
+      AND: [{ game: { slug: 'ygo' } }, { status: 'ACTIVE' }, { ownerUserId: 3 }],
     })
   })
 
-  it('maps player "none" to unassigned cards', () => {
-    expect(buildCardWhere({ player: 'none' })).toEqual({ AND: [{ assignedPlayerId: null }] })
+  it('maps owner "none" to cards without an owner', () => {
+    expect(buildCardWhere({ owner: 'none' })).toEqual({ AND: [{ ownerUserId: null }] })
   })
 
   it('searches names in all languages, set code, set name and external id case-insensitively', () => {

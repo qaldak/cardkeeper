@@ -8,7 +8,7 @@ const toNumber = (value: { toString: () => string }): number => Number(value.toS
 export function listInclude(priceSource: string) {
   return {
     game: { select: { slug: true, displayName: true } },
-    assignedPlayer: { select: { id: true, name: true } },
+    owner: { select: { id: true, name: true } },
     sets: { select: { setCode: true }, orderBy: { id: 'asc' }, take: 1 },
     images: { where: { isPrimary: true }, select: { id: true }, take: 1 },
     priceHistory: {
@@ -22,6 +22,7 @@ export function listInclude(priceSource: string) {
 export function detailInclude() {
   return {
     game: { select: { slug: true, displayName: true } },
+    owner: { select: { id: true, name: true } },
     translations: true,
     sets: { orderBy: { id: 'asc' } },
     images: { orderBy: [{ isPrimary: 'desc' }, { id: 'asc' }] },
@@ -42,7 +43,7 @@ export function toListItem(card: ListCard): CardListItemDto {
     gameName: card.game.displayName,
     setCode: card.sets[0]?.setCode ?? null,
     status: card.status,
-    player: card.assignedPlayer,
+    owner: card.owner,
     imageId: card.images[0]?.id ?? null,
     price: latest ? { amount: toNumber(latest.price), currency: latest.currency, source: latest.source } : null,
   }
@@ -67,7 +68,7 @@ export function toDetail(card: DetailCard, priceSource: string): CardDetailDto {
     status: card.status,
     statusDate: showStatusInfo ? formatDateOnly(latestStatus.date) : null,
     statusPerson: showStatusInfo ? latestStatus.personText : null,
-    assignedPlayerId: card.assignedPlayerId,
+    owner: card.owner,
     purchaseDate: card.purchaseDate ? formatDateOnly(card.purchaseDate) : null,
     sets: card.sets.map(set => ({
       id: set.id,

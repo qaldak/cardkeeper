@@ -13,16 +13,23 @@ export interface GameDto {
   defaultLanguage: string
 }
 
-export interface PlayerDto {
+/** A user of the collection; every user can see all cards, but only change their own. */
+export interface UserDto {
   id: number
   name: string
-  contact: string | null
   cardCount: number
 }
 
-export interface PlayerRefDto {
+export interface UserRefDto {
   id: number
   name: string
+}
+
+/** The logged in user. While `mustChangePassword` is set only the password change is available. */
+export interface SessionUserDto {
+  id: number
+  name: string
+  mustChangePassword: boolean
 }
 
 export interface CardListItemDto {
@@ -32,7 +39,7 @@ export interface CardListItemDto {
   gameName: string
   setCode: string | null
   status: CardStatusValue
-  player: PlayerRefDto | null
+  owner: UserRefDto | null
   imageId: number | null
   price: MoneyDto | null
 }
@@ -96,7 +103,8 @@ export interface CardDetailDto {
   status: CardStatusValue
   statusDate: string | null
   statusPerson: string | null
-  assignedPlayerId: number | null
+  /** The only user who may change the card; null for cards that predate the logins (nobody may change them). */
+  owner: UserRefDto | null
   purchaseDate: string | null
   sets: CardSetDto[]
   images: CardImageDto[]

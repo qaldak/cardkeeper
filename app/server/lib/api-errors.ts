@@ -28,11 +28,3 @@ export function toErrorResponse(error: unknown): ErrorResponse {
 export function isUniqueViolation(error: unknown): boolean {
   return typeof error === 'object' && error !== null && (error as { code?: unknown }).code === 'P2002'
 }
-
-const ACTOR_PATTERN = /^[\p{L}\p{N} ._@+-]{1,100}$/u
-
-/** Name of the authenticated user as forwarded by the reverse proxy; falls back to "anonymous". */
-export function resolveActor(headerValue: string | undefined | null): string {
-  const value = headerValue?.trim()
-  return value && ACTOR_PATTERN.test(value) ? value : 'anonymous'
-}

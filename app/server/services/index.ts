@@ -5,7 +5,7 @@ import type { AdapterRegistry } from '../tcg/registry'
 import { createCardService } from './cards'
 import { createCatalogService } from './catalog'
 import { createImageService } from './images'
-import { createPlayerService } from './players'
+import { createUserService } from './users'
 
 export interface ServiceDeps {
   db: PrismaClient
@@ -22,7 +22,7 @@ export function createServices(deps: ServiceDeps) {
     cards: createCardService(deps),
     catalog: createCatalogService(deps),
     images: createImageService(deps),
-    players: createPlayerService(deps.db),
+    users: createUserService(deps),
     games: (): GameDto[] => deps.registry.list().map(adapter => ({
       slug: adapter.slug,
       displayName: adapter.displayName,

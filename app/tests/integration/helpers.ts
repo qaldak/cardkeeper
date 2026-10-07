@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterAll, beforeAll, beforeEach } from 'vitest'
 import { createPrisma, type PrismaClient } from '../../server/db'
+import type { Actor } from '../../server/lib/actor'
 import type { AppConfig } from '../../server/lib/config'
 import { createServices, type Services } from '../../server/services'
 import { createRegistry } from '../../server/tcg/registry'
@@ -19,9 +20,12 @@ export interface Harness {
   ygo: FakeYgoServer
   tcgdex: FakeTcgdexServer
   config: AppConfig
+  /** Two users ("Anna" and "Sven") that exist in every test; they are the people on whose behalf cards are changed. */
+  anna: Actor
+  sven: Actor
 }
 
-const TABLES = ['audit_log', 'card_images', 'api_snapshots', 'status_history', 'price_history', 'card_sets', 'card_translations', 'cards', 'players', 'games']
+const TABLES = ['audit_log', 'card_images', 'api_snapshots', 'status_history', 'price_history', 'card_sets', 'card_translations', 'cards', 'users', 'games']
 
 /**
  * Sets up services against the real test database with a fake YGOPRODeck and a temporary image
@@ -39,7 +43,8 @@ export function useHarness(): Harness {
       priceSource: 'cardmarket',
       imageDir,
       maxUploadBytes: 1024,
-      userHeader: 'x-remote-user',
+      sessionSecret: 'test-session-secret-test-session-secret',
+      users: [],
       ygoBaseUrl: 'https://ygo.test/api/v7',
       tcgdexBaseUrl: 'https://tcgdex.test/v2',
     }
@@ -65,6 +70,12 @@ export function useHarness(): Harness {
       fetchFn,
       now: () => new Date('2026-10-04T12:00:00Z'),
     })
+    const [anna, sven] = await Promise.all([
+      harness.db.user.create({ data: { name: 'Anna' } }),
+      harness.db.user.create({ data: { name: 'Sven' } }),
+    ])
+    harness.anna = { id: anna.id, name: anna.name }
+    harness.sven = { id: sven.id, name: sven.name }
   })
 
   afterAll(async () => {

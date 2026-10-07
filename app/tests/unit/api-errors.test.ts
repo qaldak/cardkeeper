@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { ZodError, z } from 'zod'
-import { isUniqueViolation, resolveActor, toErrorResponse } from '../../server/lib/api-errors'
+import { isUniqueViolation, toErrorResponse } from '../../server/lib/api-errors'
 import { badRequest, HttpError, notFound } from '../../server/lib/errors'
-import { createCardSchema, listQuerySchema, playerSchema, updateCardSchema } from '../../server/lib/schemas'
+import { changePasswordSchema, createCardSchema, listQuerySchema, loginSchema, updateCardSchema } from '../../server/lib/schemas'
 
 describe('toErrorResponse', () => {
   it('passes HttpError details through', () => {
@@ -48,27 +48,11 @@ describe('isUniqueViolation', () => {
   })
 })
 
-describe('resolveActor', () => {
-  it('accepts normal user names', () => {
-    expect(resolveActor('anna')).toBe('anna')
-    expect(resolveActor(' Sven Müller ')).toBe('Sven Müller')
-    expect(resolveActor('anna@example.org')).toBe('anna@example.org')
-  })
-
-  it('falls back to anonymous for missing or suspicious values', () => {
-    expect(resolveActor(undefined)).toBe('anonymous')
-    expect(resolveActor('')).toBe('anonymous')
-    expect(resolveActor('a'.repeat(101))).toBe('anonymous')
-    expect(resolveActor('evil\nheader')).toBe('anonymous')
-    expect(resolveActor('<script>')).toBe('anonymous')
-  })
-})
-
 describe('request schemas', () => {
   it('applies list defaults and coerces query strings', () => {
     expect(listQuerySchema.parse({})).toEqual({ page: 1, pageSize: 48, sort: 'created' })
-    expect(listQuerySchema.parse({ player: '4', page: '2', status: 'SOLD' })).toMatchObject({ player: 4, page: 2, status: 'SOLD' })
-    expect(listQuerySchema.parse({ player: 'none' }).player).toBe('none')
+    expect(listQuerySchema.parse({ owner: '4', page: '2', status: 'SOLD' })).toMatchObject({ owner: 4, page: 2, status: 'SOLD' })
+    expect(listQuerySchema.parse({ owner: 'none' }).owner).toBe('none')
   })
 
   it('accepts the Pokémon filters and validates their ranges', () => {
@@ -106,7 +90,7 @@ describe('request schemas', () => {
 
   it('only allows the printing and the user\'s own data on card updates', () => {
     expect(updateCardSchema.parse({ set: { setCode: ' LOB-DE005 ', edition: '1st Edition' } }).set).toEqual({ setCode: 'LOB-DE005', edition: '1st Edition' })
-    expect(updateCardSchema.parse({ status: 'SOLD', assignedPlayerId: 3 })).toEqual({ status: 'SOLD', assignedPlayerId: 3 })
+    expect(updateCardSchema.parse({ status: 'SOLD', ownerId: 3 })).toEqual({ status: 'SOLD', ownerId: 3 })
     // Texts, attributes, rarity and set name come from the API and cannot be edited.
     for (const field of [{ name: 'x' }, { description: 'x' }, { attributes: { atk: 1 } }, { gameId: 2 }, { set: { rarity: 'Common' } }, { set: { setName: 'x' } }]) {
       expect(() => updateCardSchema.parse(field)).toThrow()
@@ -120,8 +104,20 @@ describe('request schemas', () => {
     expect(() => listQuerySchema.parse({ levelMax: 'high' })).toThrow()
   })
 
-  it('validates players', () => {
-    expect(playerSchema.parse({ name: ' Anna ' })).toEqual({ name: 'Anna' })
-    expect(() => playerSchema.parse({ name: '   ' })).toThrow()
+  it('validates the login and trims the name, but never the password', () => {
+    expect(loginSchema.parse({ name: ' Anna ', password: ' secret ' })).toEqual({ name: 'Anna', password: ' secret ' })
+    expect(() => loginSchema.parse({ name: '   ', password: 'x' })).toThrow()
+    expect(() => loginSchema.parse({ name: 'Anna', password: '' })).toThrow()
+  })
+
+  it('validates the password change', () => {
+    expect(changePasswordSchema.parse({ currentPassword: 'a', newPassword: 'b' })).toEqual({ currentPassword: 'a', newPassword: 'b' })
+    expect(() => changePasswordSchema.parse({ currentPassword: '', newPassword: 'b' })).toThrow()
+    expect(() => changePasswordSchema.parse({ currentPassword: 'a', newPassword: 'x'.repeat(300) })).toThrow()
+  })
+
+  it('does not accept an owner when adding a card and cannot clear it on an update', () => {
+    expect(createCardSchema.parse({ game: 'ygo', externalId: '1', ownerId: 2 })).not.toHaveProperty('ownerId')
+    expect(() => updateCardSchema.parse({ ownerId: null })).toThrow()
   })
 })

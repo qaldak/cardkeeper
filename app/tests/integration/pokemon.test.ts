@@ -7,8 +7,6 @@ import { furret } from '../helpers/tcgdex-fake'
 import { parseCardNumber, sameCardNumber } from '../../shared/utils/pokemon-number'
 import { TEST_DATABASE_URL, useHarness } from './helpers'
 
-const ACTOR = 'anna'
-
 describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
   const h = useHarness()
 
@@ -17,7 +15,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
   const ENERGY = 'swsh1-232'
 
   const add = (externalId: string, edition: string | null, rarity: string | null, extra: Record<string, unknown> = {}) =>
-    h.services.cards.create({ game: 'pokemon', externalId, set: { setCode: externalId, rarity, edition }, ...extra }, ACTOR)
+    h.services.cards.create({ game: 'pokemon', externalId, set: { setCode: externalId, rarity, edition }, ...extra }, h.anna)
   const addFurret = (edition = 'reverse', extra: Record<string, unknown> = {}) => add(FURRET, edition, 'Uncommon', extra)
 
   describe('create', () => {
@@ -88,7 +86,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
     })
 
     it('requires a printing, and only the variants the card exists in', async () => {
-      await expect(h.services.cards.create({ game: 'pokemon', externalId: FURRET }, ACTOR)).rejects.toMatchObject({ status: 400, code: 'printing_required' })
+      await expect(h.services.cards.create({ game: 'pokemon', externalId: FURRET }, h.anna)).rejects.toMatchObject({ status: 400, code: 'printing_required' })
       await expect(addFurret('holo')).rejects.toMatchObject({ status: 400, code: 'invalid_set' })
       await expect(addFurret('firstEdition')).rejects.toMatchObject({ status: 400, code: 'invalid_set' })
       expect(await h.db.card.count()).toBe(0)
@@ -154,46 +152,44 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
   describe('update', () => {
     it('changes the variant to another one the card exists in', async () => {
       const card = await addFurret('reverse')
-      const updated = await h.services.cards.update(card.id, { set: { edition: 'normal' } }, 'sven')
+      const updated = await h.services.cards.update(card.id, { set: { edition: 'normal' } }, h.anna)
       expect(updated.sets[0]).toMatchObject({ setCode: FURRET, edition: 'normal' })
       expect(updated.userModifiedAt).toBe('2026-10-04T12:00:00.000Z')
-      expect(await h.db.auditLog.findFirst({ where: { entityId: card.id, field: 'set.edition' } })).toMatchObject({ oldValue: 'reverse', newValue: 'normal', changedBy: 'sven' })
+      expect(await h.db.auditLog.findFirst({ where: { entityId: card.id, field: 'set.edition' } })).toMatchObject({ oldValue: 'reverse', newValue: 'normal', changedBy: 'Anna' })
     })
 
     it('rejects variants the card does not exist in, unknown ones and clearing the variant', async () => {
       const card = await addFurret('reverse')
       for (const edition of ['holo', 'firstEdition', 'shiny', null]) {
-        await expect(h.services.cards.update(card.id, { set: { edition } }, ACTOR)).rejects.toMatchObject({ status: 400, code: 'invalid_variant' })
+        await expect(h.services.cards.update(card.id, { set: { edition } }, h.anna)).rejects.toMatchObject({ status: 400, code: 'invalid_variant' })
       }
       expect((await h.services.cards.get(card.id)).sets[0]!.edition).toBe('reverse')
     })
 
     it('does not allow changing the set code, but accepts the unchanged one', async () => {
       const card = await addFurret()
-      await expect(h.services.cards.update(card.id, { set: { setCode: 'swsh3-137' } }, ACTOR)).rejects.toMatchObject({ status: 400, code: 'field_not_editable' })
-      const same = await h.services.cards.update(card.id, { set: { setCode: FURRET } }, ACTOR)
+      await expect(h.services.cards.update(card.id, { set: { setCode: 'swsh3-137' } }, h.anna)).rejects.toMatchObject({ status: 400, code: 'field_not_editable' })
+      const same = await h.services.cards.update(card.id, { set: { setCode: FURRET } }, h.anna)
       expect(same.userModifiedAt).toBeNull()
     })
 
-    it('still lets the status, assignment and purchase date be changed', async () => {
+    it('still lets the status, owner and purchase date be changed', async () => {
       const card = await addFurret()
-      const anna = await h.services.players.create({ name: 'Anna' })
-      const updated = await h.services.cards.update(card.id, { status: 'SOLD', statusPerson: 'Max', assignedPlayerId: anna.id, purchaseDate: '2026-01-02' }, ACTOR)
-      expect(updated).toMatchObject({ status: 'SOLD', statusPerson: 'Max', assignedPlayerId: anna.id, purchaseDate: '2026-01-02' })
+      const updated = await h.services.cards.update(card.id, { status: 'SOLD', statusPerson: 'Max', ownerId: h.sven.id, purchaseDate: '2026-01-02' }, h.anna)
+      expect(updated).toMatchObject({ status: 'SOLD', statusPerson: 'Max', owner: { id: h.sven.id, name: 'Sven' }, purchaseDate: '2026-01-02' })
     })
 
     it('keeps Yu-Gi-Oh! printings freely editable', async () => {
-      const card = await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' } }, ACTOR)
-      const updated = await h.services.cards.update(card.id, { set: { setCode: 'LOB-DE005', edition: 'Any text' } }, ACTOR)
+      const card = await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' } }, h.anna)
+      const updated = await h.services.cards.update(card.id, { set: { setCode: 'LOB-DE005', edition: 'Any text' } }, h.anna)
       expect(updated.sets[0]).toMatchObject({ setCode: 'LOB-DE005', edition: 'Any text' })
     })
   })
 
   describe('refresh', () => {
     it('updates texts, attributes, details and prices but keeps the variant and the user data', async () => {
-      const anna = await h.services.players.create({ name: 'Anna' })
-      const card = await addFurret('reverse', { playerId: anna.id })
-      await h.services.cards.update(card.id, { status: 'SOLD', statusPerson: 'Max' }, ACTOR)
+      const card = await addFurret('reverse')
+      await h.services.cards.update(card.id, { status: 'SOLD', statusPerson: 'Max' }, h.anna)
       const before = await h.services.cards.get(card.id)
 
       const updated = furret()
@@ -201,14 +197,14 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       updated.de = { ...updated.de!, name: 'Wiesenior (neu)' }
       h.tcgdex.cards.set(FURRET, updated)
 
-      const after = await h.services.cards.refresh(card.id, 'sven')
+      const after = await h.services.cards.refresh(card.id, h.anna)
 
       expect((after.attributes as unknown as PokemonAttributes).hp).toBe(120)
       expect(after.name).toBe('Wiesenior (neu)')
       expect(after.priceHistory.filter(p => p.source === 'cardmarket').map(p => p.price)).toEqual([0.5, 0.1])
       expect(after.sets).toEqual(before.sets)
       expect(after.sets[0]!.edition).toBe('reverse')
-      expect(after).toMatchObject({ status: 'SOLD', statusPerson: 'Max', assignedPlayerId: anna.id, userModifiedAt: before.userModifiedAt })
+      expect(after).toMatchObject({ status: 'SOLD', statusPerson: 'Max', owner: { id: h.anna.id, name: 'Anna' }, userModifiedAt: before.userModifiedAt })
       expect(after.images).toEqual(before.images)
     })
 
@@ -216,7 +212,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       const card = await add(TRAINER, 'holo', 'Rare')
       const updated = h.tcgdex.cards.get(TRAINER)!
       updated.de = { ...updated.en!, name: 'Chef-Befehle', description: undefined, effect: 'Deutscher Text.', trainerType: 'Unterstützer' }
-      const refreshed = await h.services.cards.refresh(card.id, ACTOR)
+      const refreshed = await h.services.cards.refresh(card.id, h.anna)
       expect(refreshed.translations.map(entry => entry.language)).toEqual(['de', 'en'])
       expect(refreshed.name).toBe('Chef-Befehle')
     })
@@ -227,7 +223,7 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       const reverse = await addFurret('reverse', { purchaseDate: '2026-03-01' })
       const trainer = await add(TRAINER, 'holo', 'Rare', { purchaseDate: '2026-01-01' })
       const energy = await add(ENERGY, 'normal', 'Uncommon')
-      const magician = await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' } }, ACTOR)
+      const magician = await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' } }, h.anna)
       return { reverse, trainer, energy, magician }
     }
     const all = { page: 1, pageSize: 48 }
