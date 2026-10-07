@@ -345,4 +345,10 @@ No schema change and no change in the core services is required.
 
 ## License
 
-[GNU AGPL v3](LICENSE)
+[PolyForm Noncommercial License 1.0.0](LICENSE): free to use, copy and change for any noncommercial purpose (private use,
+hobby, research, education, charitable and similar organizations); commercial use is not permitted. The license is not
+an open source license in the sense of the OSI. The copyright notice that has to be passed on with the software is in
+[`NOTICE`](NOTICE).
+
+Versions released before this change were published under the GNU AGPL v3 and stay available under it for everybody
+who received them.

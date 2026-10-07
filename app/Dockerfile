@@ -50,6 +50,7 @@ RUN npx prisma generate && npm run build
 
 # ---------------------------------------------------------------------------------------------
 FROM base AS runtime
+LABEL org.opencontainers.image.licenses="PolyForm-Noncommercial-1.0.0"
 ENV NODE_ENV=production \
     NITRO_HOST=0.0.0.0 \
     NITRO_PORT=3000 \
