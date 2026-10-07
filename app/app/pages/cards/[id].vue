@@ -190,6 +190,14 @@ const selectedImage = computed<CardImageDto | undefined>(() =>
   images.value.find(image => image.id === selectedImageId.value) ?? images.value.find(image => image.isPrimary) ?? images.value[0],
 )
 
+const zoomOpen = ref(false)
+
+function stepImage(delta: number) {
+  const list = images.value
+  const index = list.findIndex(image => image.id === selectedImage.value?.id)
+  selectedImageId.value = list[(index + delta + list.length) % list.length]!.id
+}
+
 async function reloadCard() {
   card.value = await $fetch<CardDetailDto>(`/api/cards/${id}`)
 }
@@ -337,12 +345,13 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
       <!-- Images -->
       <div class="flex max-w-[300px] flex-[1_1_280px] flex-col gap-4">
         <div class="flex h-[380px] items-center justify-center overflow-hidden rounded-xl bg-(--app-art) text-sm text-primary">
-          <img
-            v-if="selectedImage"
-            :src="`/api/images/${selectedImage.id}`"
-            :alt="shownName"
-            class="size-full object-contain"
-          >
+          <button v-if="selectedImage" type="button" class="size-full cursor-zoom-in" :aria-label="t('card.image.zoom')" data-test="zoom-open" @click="zoomOpen = true">
+            <img
+              :src="`/api/images/${selectedImage.id}`"
+              :alt="shownName"
+              class="size-full object-contain"
+            >
+          </button>
           <span v-else>{{ t('card.noImage') }}</span>
         </div>
 
@@ -528,6 +537,25 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
         </section>
       </div>
     </form>
+
+    <!-- The stored image in its full size; with several images the arrows go through them. -->
+    <UModal v-model:open="zoomOpen" :title="shownName" :ui="{ content: 'max-w-4xl' }">
+      <template #body>
+        <div class="relative flex items-center justify-center">
+          <img
+            v-if="selectedImage"
+            :src="`/api/images/${selectedImage.id}`"
+            :alt="shownName"
+            class="max-h-[78vh] w-auto max-w-full rounded-lg object-contain"
+            data-test="zoom-image"
+          >
+          <template v-if="images.length > 1">
+            <UButton color="neutral" variant="subtle" icon="i-lucide-chevron-left" class="absolute left-0" :aria-label="t('card.image.previous')" @click="stepImage(-1)" />
+            <UButton color="neutral" variant="subtle" icon="i-lucide-chevron-right" class="absolute right-0" :aria-label="t('card.image.next')" @click="stepImage(1)" />
+          </template>
+        </div>
+      </template>
+    </UModal>
 
     <UModal v-model:open="deleteOpen" :title="t('card.delete.title')">
       <template #body>

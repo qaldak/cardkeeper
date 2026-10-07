@@ -127,7 +127,10 @@
       "makePrimary": "Make primary",
       "delete": "Delete image",
       "deleted": "Image deleted",
-      "primaryChanged": "Primary image changed"
+      "primaryChanged": "Primary image changed",
+      "zoom": "Enlarge image",
+      "previous": "Previous image",
+      "next": "Next image"
     },
     "prices": {
       "empty": "No prices yet.",

@@ -22,7 +22,7 @@ Everything runs in containers: there is nothing to install on the host except Do
   last); total value of the active cards
 - Card detail page: texts in German and English with a language switch (German first, a language the card does not
   have is disabled), the set code and edition can be corrected (e.g. German or Japanese prints, applies to all
-  languages), manual image upload, status handling (active, sold, traded, gifted, lost) with date and counterpart,
+  languages), manual image upload, click on the image to see it enlarged (arrows between several images), status handling (active, sold, traded, gifted, lost) with date and counterpart,
   the owner (who can hand the card over to another user), price history
 - "Update from API" refreshes texts, attributes and prices of a card; set code, edition, status, owner,
   purchase date and images are never touched
