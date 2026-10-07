@@ -1,3 +1,9 @@
+## [0.8.1](https://github.com/qaldak/cardkeeper/compare/v0.8.0...v0.8.1) (2026-10-07)
+
+### Bug Fixes
+
+* stop the page from jumping when a dropdown or dialog opens ([b1fbe54](https://github.com/qaldak/cardkeeper/commit/b1fbe54f6737b3c4a503369b0a017bc73f9db294))
+
 ## [0.8.0](https://github.com/qaldak/cardkeeper/compare/v0.7.0...v0.8.0) (2026-10-07)
 
 ### Features
