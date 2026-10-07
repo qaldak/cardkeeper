@@ -297,12 +297,15 @@ export function createCardService(deps: CardServiceDeps) {
         throw notFound('upstream_card_not_found', 'Card not found at the card database')
       }
 
+      // Yu-Gi-Oh!: the card database does not know the edition, so it is whatever the user says ("1st Edition").
+      // A game with variants only offers the variants of the card.
+      const freeEdition = getGameConfig(input.game).editionKind === 'text'
       let chosenSet: MergedCard['sets'][number] | undefined
       if (input.set) {
         chosenSet = merged.sets.find(set =>
           set.setCode === input.set!.setCode
           && (set.rarity ?? null) === (input.set!.rarity ?? null)
-          && (set.edition ?? null) === (input.set!.edition ?? null))
+          && (freeEdition || (set.edition ?? null) === (input.set!.edition ?? null)))
         if (!chosenSet) {
           throw badRequest('invalid_set', 'The selected printing does not exist for this card')
         }
@@ -335,7 +338,7 @@ export function createCardService(deps: CardServiceDeps) {
               })),
             },
             sets: chosenSet
-              ? { create: { setCode: chosenSet.setCode, setName: chosenSet.setName, rarity: chosenSet.rarity, edition: chosenSet.edition ?? null } }
+              ? { create: { setCode: chosenSet.setCode, setName: chosenSet.setName, rarity: chosenSet.rarity, edition: (freeEdition ? input.set?.edition?.trim() || null : chosenSet.edition) ?? null } }
               : undefined,
             priceHistory: { create: priceRows(merged).map(row => ({ ...row, fetchedAt: timestamp })) },
             snapshots: {
