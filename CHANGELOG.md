@@ -1,3 +1,9 @@
+## [0.4.5](https://github.com/qaldak/cardkeeper/compare/v0.4.4...v0.4.5) (2026-10-07)
+
+### Bug Fixes
+
+* accept Pokémon card numbers without the slash ([a744ca0](https://github.com/qaldak/cardkeeper/commit/a744ca0dea437c4212d0e4f472b0b1c6fedd8e41))
+
 ## [0.4.4](https://github.com/qaldak/cardkeeper/compare/v0.4.3...v0.4.4) (2026-10-07)
 
 ### Bug Fixes
