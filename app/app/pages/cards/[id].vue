@@ -471,6 +471,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
                   :items="editionItems"
                   value-key="value"
                   create-item
+                  :placeholder="t('card.editionPlaceholder')"
                   open-on-click
                   open-on-focus
                   clear
@@ -480,7 +481,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
                   @create="createEdition"
                 >
                   <template #create-item-label="{ item }">
-                    {{ t('card.editionCreate', { label: item }) }}
+                    <span class="font-medium text-primary">+ {{ t('card.editionCreate', { label: item }) }}</span>
                   </template>
                 </UInputMenu>
                 <UInput v-else-if="canEdit" v-model="form.edition" maxlength="80" class="w-full" />

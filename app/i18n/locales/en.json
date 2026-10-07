@@ -84,7 +84,8 @@
     "noOwner": "No owner"
   },
   "card": {
-    "editionCreate": "Use “{label}” as edition",
+    "editionCreate": "Create “{label}”",
+    "editionPlaceholder": "Choose or type an edition…",
     "noImage": "Image",
     "origin": {
       "api": "imported from API",

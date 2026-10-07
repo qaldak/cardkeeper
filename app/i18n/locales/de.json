@@ -84,7 +84,8 @@
     "noOwner": "Ohne Besitzer"
   },
   "card": {
-    "editionCreate": "„{label}“ als Edition übernehmen",
+    "editionCreate": "Erstelle „{label}“",
+    "editionPlaceholder": "Edition wählen oder eingeben…",
     "noImage": "Bild",
     "origin": {
       "api": "aus API übernommen",
