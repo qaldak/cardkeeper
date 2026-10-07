@@ -276,7 +276,9 @@ The data model is explicit and typed in [`shared/types/pokemon.ts`](app/shared/t
   When adding a card, "By set and number" lets you pick the card database language (German by default, or English or Japanese), type the
   number as printed and pick the set by its name or logo (the set symbol is not shown: TCGdex does not serve it for every set). The part after the slash is the *printed* size of the set
   (TCGdex `cardCount.official`, which can be smaller than the real number of cards because of secret rares), and it narrows
-  the set list down. Several sets can have the same size, so check the set name. The number is matched
+  the set list down. Several sets can have the same size, so check the set name. The slash is optional: `040088` or
+  `040 088` become `040/088` when the field is left (only digit counts that split evenly, 3+3 or 4+4, are recognized;
+  the API itself does not need the slash, it only serves to narrow down the set list). The number is matched
   without leading zeros (`040` = `40`, `TG01` = `tg01`). The chosen card is shown with its number, set and image before it
   is added; the set and its card list come from `GET /api/sets` and `GET /api/sets/<id>` and are cached for six hours.
 - **Japanese cards** live in their own TCGdex database with their own ids (`SV9-040`), they are not translations of the

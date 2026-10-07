@@ -8,9 +8,20 @@ export interface CardNumber {
   total: number | null
 }
 
-/** Parses "040/088", "40 / 88", "040", "TG01/TG30" or "SWSH001". Returns null for anything else. */
+/**
+ * Brings a typed card number into the printed form "040/088". The slash may be left out when the digits split evenly
+ * ("040088" → "040/088", "00400088" → "0040/0088") or replaced by a space ("040 088"). Anything else is only tidied up
+ * ("40 / 88" → "40/88"): numbers with an uneven digit count ("40088") are ambiguous and stay as typed.
+ */
+export function normalizeCardNumberInput(input: string): string {
+  const text = input.trim()
+  const joined = text.match(/^(\d{3})(\d{3})$/) ?? text.match(/^(\d{4})(\d{4})$/) ?? text.match(/^(\d{1,4})\s+(\d{2,4})$/)
+  return joined ? `${joined[1]}/${joined[2]}` : text.replace(/\s*\/\s*/, '/')
+}
+
+/** Parses "040/088", "040088", "40 / 88", "040", "TG01/TG30" or "SWSH001". Returns null for anything else. */
 export function parseCardNumber(input: string): CardNumber | null {
-  const [numberPart, totalPart, ...rest] = input.split('/').map(part => part.trim())
+  const [numberPart, totalPart, ...rest] = normalizeCardNumberInput(input).split('/').map(part => part.trim())
   if (rest.length > 0 || !numberPart || !/^[A-Za-z0-9-]{1,12}$/.test(numberPart)) {
     return null
   }

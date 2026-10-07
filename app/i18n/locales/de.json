@@ -188,7 +188,7 @@
         "ja": "Japanisch"
       },
       "number": "Nummer auf der Karte",
-      "numberPlaceholder": "040/088",
+      "numberPlaceholder": "040/088 oder 040088",
       "filter": "Sets filtern",
       "filterPlaceholder": "Name oder Set-ID",
       "invalidNumber": "Nummer wie auf der Karte gedruckt eingeben, z. B. 040/088 oder 40.",
