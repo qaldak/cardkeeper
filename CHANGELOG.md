@@ -1,3 +1,9 @@
+## [0.6.0](https://github.com/qaldak/cardkeeper/compare/v0.5.1...v0.6.0) (2026-10-07)
+
+### Features
+
+* add a dark mode ([0ae88a4](https://github.com/qaldak/cardkeeper/commit/0ae88a43b3589a3553ea9d03da00880d4c8fc491))
+
 ## [0.5.1](https://github.com/qaldak/cardkeeper/compare/v0.5.0...v0.5.1) (2026-10-07)
 
 ### Maintenance
