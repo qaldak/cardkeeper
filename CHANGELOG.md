@@ -1,3 +1,13 @@
+## [0.8.0](https://github.com/qaldak/cardkeeper/compare/v0.7.0...v0.8.0) (2026-10-07)
+
+### Features
+
+* close the enlarged image with a click and make it easier to browse ([4e7d270](https://github.com/qaldak/cardkeeper/commit/4e7d2706b8e04528f6f7ec332367ab22522ed96b))
+
+### Bug Fixes
+
+* show the abilities and attacks of a Pokémon card as read-only ([58cb06e](https://github.com/qaldak/cardkeeper/commit/58cb06ed2a7e81988318840038568fc54fecc47a))
+
 ## [0.7.0](https://github.com/qaldak/cardkeeper/compare/v0.6.0...v0.7.0) (2026-10-07)
 
 ### Features
