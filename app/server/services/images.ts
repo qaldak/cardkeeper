@@ -2,7 +2,7 @@ import type { PrismaClient } from '../generated/prisma/client'
 import { assertOwner, type Actor } from '../lib/actor'
 import type { AppConfig } from '../lib/config'
 import { badRequest, HttpError, notFound } from '../lib/errors'
-import { detectImageType, mimeFromExtension, removeImageFile, resolveImagePath, saveImage } from '../lib/image-files'
+import { detectImageType, downloadFileName, mimeFromExtension, removeImageFile, resolveImagePath, saveImage } from '../lib/image-files'
 
 export interface ImageServiceDeps {
   db: PrismaClient
@@ -103,11 +103,15 @@ export function createImageService({ db, config, now = () => new Date() }: Image
 
     /** Absolute path and content type of a stored image, for serving it. */
     async getFile(imageId: number) {
-      const image = await db.cardImage.findUnique({ where: { id: imageId }, select: { filePath: true } })
+      const image = await db.cardImage.findUnique({ where: { id: imageId }, select: { filePath: true, card: { select: { name: true } } } })
       if (!image) {
         throw notFound('image_not_found', 'Image not found')
       }
-      return { path: resolveImagePath(config.imageDir, image.filePath), mime: mimeFromExtension(image.filePath) }
+      return {
+        path: resolveImagePath(config.imageDir, image.filePath),
+        mime: mimeFromExtension(image.filePath),
+        fileName: downloadFileName(image.card.name, image.filePath),
+      }
     },
   }
 }

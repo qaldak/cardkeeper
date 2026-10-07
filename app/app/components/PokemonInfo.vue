@@ -72,9 +72,9 @@ const hasTexts = computed(() =>
         {{ t('pokemon.sections.abilities') }}
       </h3>
       <ul class="flex flex-col gap-2">
-        <li v-for="ability in text.abilities" :key="ability.name" class="rounded-lg border border-default bg-default px-3.5 py-2.5 text-sm">
+        <li v-for="ability in text.abilities" :key="ability.name" class="rounded-lg border border-default bg-elevated px-3.5 py-2.5 text-sm">
           <p class="font-medium">
-            <span v-if="ability.type" class="mr-1.5 rounded bg-elevated px-1.5 py-0.5 text-[11px] font-normal text-muted">{{ ability.type }}</span>{{ ability.name }}
+            <span v-if="ability.type" class="mr-1.5 rounded bg-default px-1.5 py-0.5 text-[11px] font-normal text-muted">{{ ability.type }}</span>{{ ability.name }}
           </p>
           <p v-if="ability.effect" class="mt-0.5 whitespace-pre-line text-muted">
             {{ ability.effect }}
@@ -88,7 +88,7 @@ const hasTexts = computed(() =>
         {{ t('pokemon.sections.attacks') }}
       </h3>
       <ul class="flex flex-col gap-2">
-        <li v-for="attack in text.attacks" :key="attack.name" class="rounded-lg border border-default bg-default px-3.5 py-2.5 text-sm">
+        <li v-for="attack in text.attacks" :key="attack.name" class="rounded-lg border border-default bg-elevated px-3.5 py-2.5 text-sm">
           <p class="flex flex-wrap items-baseline justify-between gap-2 font-medium">
             <span>{{ attack.name }}</span>
             <span class="text-xs font-normal text-muted">

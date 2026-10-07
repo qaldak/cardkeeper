@@ -34,6 +34,27 @@ export function mimeFromExtension(filePath: string): string {
   }
 }
 
+/** The name a saved image gets: the card's name plus the extension of the stored file ("Dunkler Magier.webp"). */
+export function downloadFileName(cardName: string, filePath: string): string {
+  const extension = filePath.split('.').pop()?.toLowerCase() ?? 'jpg'
+  const base = [...cardName]
+    .map(char => (char.charCodeAt(0) < 32 ? '_' : char))
+    .join('')
+    .replace(/[\\/:*?"<>|]/g, '_')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 80)
+    .trim()
+  return `${base || 'card'}.${extension}`
+}
+
+/** `Content-Disposition` that shows the image in the browser but names it for "Save image as" and downloads. */
+export function inlineDisposition(fileName: string): string {
+  const ascii = fileName.replace(/[^\x20-\x7e]/g, '_').replace(/["\\]/g, '_')
+  const encoded = encodeURIComponent(fileName).replace(/['()*]/g, char => `%${char.charCodeAt(0).toString(16).toUpperCase()}`)
+  return `inline; filename="${ascii}"; filename*=UTF-8''${encoded}`
+}
+
 /** Resolves a stored relative path inside the image directory and rejects anything that escapes it. */
 export function resolveImagePath(imageDir: string, relativePath: string): string {
   const root = resolve(imageDir)
