@@ -35,8 +35,7 @@ Everything runs in containers: there is nothing to install on the host except Do
 - User interface in German and English
 - Semantic releases, multi-arch (amd64 + arm64) Docker images, automated dependency updates
 
-Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): scheduled price refresh,
-PDF/CSV/Markdown export and an admin area for users and games. See [Roadmap](#roadmap).
+Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): scheduled price refresh and PDF/CSV/Markdown export. See [Roadmap](#roadmap).
 
 ## Quick start
 
@@ -114,30 +113,10 @@ without them). The existing players become users with the initial password and k
 
 ### Reverse proxy
 
-The app speaks plain HTTP on its port; the reverse proxy terminates TLS and forwards the requests. It must pass
-`X-Forwarded-Proto`: the login cookie is only marked `secure` when the browser used https, which is how the app learns it.
-Keep the port on localhost (`APP_BIND_ADDRESS=127.0.0.1`) when the proxy runs on the same host, and never expose it
-directly to an untrusted network. Example for nginx:
-
-```nginx
-server {
-    listen 443 ssl;
-    server_name cards.example.home;
-
-    client_max_body_size 6m;   # a bit more than MAX_UPLOAD_MB
-
-    location / {
-        proxy_pass         http://127.0.0.1:3000;
-        proxy_set_header   Host              $host;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-No WebSocket support and no asset caching are needed (the app sets its own cache headers). HTTP basic auth at the proxy is
-not needed any more; if it stays as an additional barrier, the app ignores it (the user name header `X-Remote-User` is no
-longer evaluated).
+The app does its own login, so a reverse proxy only has to forward the requests (and terminate TLS). Two settings matter:
+nginx rejects uploads over 1 MB by default, so set `client_max_body_size` a little above `MAX_UPLOAD_MB` (default 5), and
+pass `X-Forwarded-Proto $scheme` so that the login cookie is marked `secure` for https. Keep the port on localhost
+(`APP_BIND_ADDRESS=127.0.0.1`) when the proxy runs on the same host.
 
 ### Backup
 
@@ -361,7 +340,6 @@ No schema change and no change in the core services is required.
 
 - Scheduler container for periodic price refresh (`node-cron`)
 - Export as PDF, CSV and Markdown
-- Admin area: create users and reset passwords in the app (today: `USERS` in the `.env` file and a SQL statement), audit log view
 - Pokémon: a list price that depends on the variant (holo and reverse holo have their own prices), paging through the search
   results, more filters (set, illustrator, regulation mark)
 
