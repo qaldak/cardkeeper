@@ -4,8 +4,8 @@ import type { CardStatusValue } from '../../shared/utils/status'
 export interface CardFilters {
   game?: string
   status?: CardStatusValue
-  /** A player id, or "none" for cards that are not assigned to anybody. */
-  player?: number | 'none'
+  /** A user id, or "none" for cards without an owner. */
+  owner?: number | 'none'
   /** Free text matched against the names (all languages), set code, set name and external id. */
   q?: string
   /** Card type, e.g. "Normal Monster" (`attributes.type`). */
@@ -41,11 +41,11 @@ export function buildCardWhere(filters: CardFilters): Prisma.CardWhereInput {
   if (filters.status) {
     conditions.push({ status: filters.status })
   }
-  if (filters.player === 'none') {
-    conditions.push({ assignedPlayerId: null })
+  if (filters.owner === 'none') {
+    conditions.push({ ownerUserId: null })
   }
-  else if (typeof filters.player === 'number') {
-    conditions.push({ assignedPlayerId: filters.player })
+  else if (typeof filters.owner === 'number') {
+    conditions.push({ ownerUserId: filters.owner })
   }
 
   const q = filters.q?.trim()

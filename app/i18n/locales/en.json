@@ -4,9 +4,11 @@
   },
   "nav": {
     "overview": "Overview",
-    "players": "Players",
     "addCard": "Add card",
-    "language": "Language"
+    "language": "Language",
+    "users": "Users",
+    "account": "Change password",
+    "logout": "Log out"
   },
   "common": {
     "save": "Save",
@@ -35,9 +37,6 @@
     "totalValue": "{value} total value",
     "statusFilter": "Filter by status",
     "allStatus": "All statuses",
-    "playerFilter": "Filter by player",
-    "allPlayers": "All players",
-    "unassigned": "Not assigned",
     "emptyTitle": "No cards yet",
     "emptyText": "Add your first card – it is imported from the card database automatically.",
     "noResults": "No cards match these filters.",
@@ -79,7 +78,10 @@
       "descending": "Sorted descending",
       "hp": "HP"
     },
-    "allGames": "All games"
+    "allGames": "All games",
+    "ownerFilter": "Filter by owner",
+    "allOwners": "All owners",
+    "noOwner": "No owner"
   },
   "card": {
     "noImage": "Image",
@@ -90,7 +92,7 @@
     "sections": {
       "basics": "Basics",
       "attributes": "Attributes ({game})",
-      "status": "Status & assignment",
+      "status": "Status & owner",
       "prices": "Price history"
     },
     "fields": {
@@ -105,10 +107,11 @@
       "statusDate": "Date",
       "statusPerson": "Person",
       "statusPersonPlaceholder": "Name of the person",
-      "player": "Assigned to",
       "purchaseDate": "Purchase date",
       "variant": "Variant",
-      "cardId": "Card ID"
+      "cardId": "Card ID",
+      "owner": "Owner",
+      "ownerHint": "Handing the card over to another user: afterwards only that user can change it."
     },
     "attributes": {
       "atk": "ATK",
@@ -145,11 +148,15 @@
     },
     "refresh": {
       "button": "Update from API",
-      "hint": "Fetch texts, attributes and prices again. Set code, edition, status and assignment stay unchanged.",
+      "hint": "Fetch texts, attributes and prices again. Set code, edition, status and owner stay unchanged.",
       "done": "Data updated"
     },
     "lastFetched": "Data last fetched from the API on {date}",
-    "basicsHintVariant": "Names, texts and data come from the card database. Only the variant of your card (e.g. Reverse Holo or 1st Edition) can be adjusted."
+    "basicsHintVariant": "Names, texts and data come from the card database. Only the variant of your card (e.g. Reverse Holo or 1st Edition) can be adjusted.",
+    "readOnly": {
+      "owned": "This card belongs to {owner}. You can look at it, but only {owner} can change it.",
+      "noOwner": "This card has no owner and cannot be changed. The owner has to be set in the database."
+    }
   },
   "add": {
     "title": "Add card",
@@ -165,7 +172,6 @@
     "changeChoice": "Choose another card",
     "printing": "Printing (set / rarity)",
     "noPrinting": "No specific printing",
-    "player": "Assigned to",
     "purchaseDate": "Purchase date (optional)",
     "submit": "Add to collection",
     "added": "Card added",
@@ -203,28 +209,14 @@
       "numberMissing": "This set has no card with the number {number}.",
       "found": "Card found by set and number",
       "use": "Use this card"
-    }
-  },
-  "players": {
-    "title": "Players",
-    "intro": "People cards can be assigned to.",
-    "name": "Name",
-    "contact": "Contact (optional)",
-    "add": "Add player",
-    "cards": "no cards | {n} card | {n} cards",
-    "empty": "No players yet.",
-    "deleteTitle": "Delete player?",
-    "deleteText": "“{name}” is deleted. Assigned cards are kept and become unassigned.",
-    "created": "Player added",
-    "deleted": "Player deleted"
+    },
+    "ownerNote": "The card is added to your collection ({name}). Only you can change it afterwards."
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
     "validation_error": "The input is invalid.",
     "card_not_found": "The card was not found.",
-    "player_not_found": "The player was not found.",
     "image_not_found": "The image was not found.",
-    "player_exists": "A player with this name already exists.",
     "upstream_card_not_found": "The card was not found in the card database.",
     "upstream_rate_limited": "The card database is busy. Please try again later.",
     "upstream_unreachable": "The card database is not reachable.",
@@ -239,7 +231,19 @@
     "no_external_id": "This card is not linked to the card database.",
     "printing_required": "Please choose the variant of the card.",
     "invalid_variant": "This variant does not exist for the card.",
-    "field_not_editable": "This field cannot be changed for this card."
+    "field_not_editable": "This field cannot be changed for this card.",
+    "unauthenticated": "Please log in.",
+    "invalid_credentials": "Wrong user name or password.",
+    "too_many_attempts": "Too many failed attempts. Please try again in a few minutes.",
+    "password_change_required": "Please choose a new password first.",
+    "not_card_owner": "Only the owner can change this card.",
+    "card_has_no_owner": "This card has no owner and cannot be changed.",
+    "current_password_wrong": "The current password is wrong.",
+    "password_too_short": "The new password is too short (at least {min} characters).",
+    "password_too_long": "The new password is too long.",
+    "password_initial": "The new password must not be the initial password.",
+    "password_unchanged": "The new password must differ from the current one.",
+    "user_not_found": "The user was not found."
   },
   "variant": {
     "normal": "Normal",
@@ -310,5 +314,32 @@
       "effect": "Effect"
     },
     "noDetails": "There are no further card details for this language."
+  },
+  "users": {
+    "title": "Users",
+    "intro": "Everybody can see all cards, but only change their own.",
+    "you": "you",
+    "cards": "no cards | {n} card | {n} cards",
+    "empty": "No users yet."
+  },
+  "login": {
+    "title": "Log in",
+    "name": "User name",
+    "password": "Password",
+    "submit": "Log in",
+    "hint": "First login? The initial password is \"cardkeeper\"; you choose your own right afterwards."
+  },
+  "account": {
+    "title": "Change password",
+    "chooseTitle": "Choose a new password",
+    "hint": "At least {min} characters. Other browsers are logged out when you change it.",
+    "forcedHint": "You are using the initial password. Choose your own (at least {min} characters, not \"cardkeeper\") to continue.",
+    "initial": "Initial password",
+    "current": "Current password",
+    "new": "New password",
+    "repeat": "Repeat new password",
+    "submit": "Save password",
+    "mismatch": "The two new passwords are not the same.",
+    "changed": "Password changed"
   }
 }

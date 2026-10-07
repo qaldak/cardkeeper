@@ -4,9 +4,11 @@
   },
   "nav": {
     "overview": "Übersicht",
-    "players": "Spieler",
     "addCard": "Karte hinzufügen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "users": "Benutzer",
+    "account": "Passwort ändern",
+    "logout": "Abmelden"
   },
   "common": {
     "save": "Speichern",
@@ -35,9 +37,6 @@
     "totalValue": "{value} Gesamtwert",
     "statusFilter": "Status filtern",
     "allStatus": "Alle Status",
-    "playerFilter": "Spieler filtern",
-    "allPlayers": "Alle Spieler",
-    "unassigned": "Nicht zugewiesen",
     "emptyTitle": "Noch keine Karten",
     "emptyText": "Füge deine erste Karte hinzu – sie wird automatisch aus der Kartendatenbank übernommen.",
     "noResults": "Keine Karten für diese Filter gefunden.",
@@ -79,7 +78,10 @@
       "descending": "Absteigend sortiert",
       "hp": "KP"
     },
-    "allGames": "Alle Spiele"
+    "allGames": "Alle Spiele",
+    "ownerFilter": "Nach Besitzer filtern",
+    "allOwners": "Alle Besitzer",
+    "noOwner": "Ohne Besitzer"
   },
   "card": {
     "noImage": "Bild",
@@ -90,7 +92,7 @@
     "sections": {
       "basics": "Grunddaten",
       "attributes": "Attribute ({game})",
-      "status": "Status & Zuweisung",
+      "status": "Status & Besitzer",
       "prices": "Preisverlauf"
     },
     "fields": {
@@ -105,10 +107,11 @@
       "statusDate": "Datum",
       "statusPerson": "Person",
       "statusPersonPlaceholder": "Name der Person",
-      "player": "Zugewiesen an",
       "purchaseDate": "Kaufdatum",
       "variant": "Variante",
-      "cardId": "Karten-ID"
+      "cardId": "Karten-ID",
+      "owner": "Besitzer",
+      "ownerHint": "Karte an einen anderen Benutzer übergeben: danach kann nur noch dieser sie ändern."
     },
     "attributes": {
       "atk": "ATK",
@@ -145,11 +148,15 @@
     },
     "refresh": {
       "button": "Von API aktualisieren",
-      "hint": "Texte, Attribute und Preise neu abrufen. Set-Code, Edition, Status und Zuweisung bleiben unverändert.",
+      "hint": "Texte, Attribute und Preise neu abrufen. Set-Code, Edition, Status und Besitzer bleiben unverändert.",
       "done": "Daten aktualisiert"
     },
     "lastFetched": "Daten zuletzt von der API abgerufen am {date}",
-    "basicsHintVariant": "Namen, Texte und Daten stammen aus der Kartendatenbank. Nur die Variante deiner Karte (z. B. Reverse Holo oder 1st Edition) lässt sich anpassen."
+    "basicsHintVariant": "Namen, Texte und Daten stammen aus der Kartendatenbank. Nur die Variante deiner Karte (z. B. Reverse Holo oder 1st Edition) lässt sich anpassen.",
+    "readOnly": {
+      "owned": "Diese Karte gehört {owner}. Du kannst sie ansehen, ändern kann sie aber nur {owner}.",
+      "noOwner": "Diese Karte hat keinen Besitzer und kann nicht geändert werden. Der Besitzer muss in der Datenbank gesetzt werden."
+    }
   },
   "add": {
     "title": "Karte hinzufügen",
@@ -165,7 +172,6 @@
     "changeChoice": "Andere Karte wählen",
     "printing": "Ausgabe (Set / Seltenheit)",
     "noPrinting": "Keine bestimmte Ausgabe",
-    "player": "Zugewiesen an",
     "purchaseDate": "Kaufdatum (optional)",
     "submit": "Zur Sammlung hinzufügen",
     "added": "Karte hinzugefügt",
@@ -203,28 +209,14 @@
       "numberMissing": "Dieses Set hat keine Karte mit der Nummer {number}.",
       "found": "Karte nach Set und Nummer gefunden",
       "use": "Diese Karte verwenden"
-    }
-  },
-  "players": {
-    "title": "Spieler",
-    "intro": "Personen, denen Karten zugewiesen werden können.",
-    "name": "Name",
-    "contact": "Kontakt (optional)",
-    "add": "Spieler hinzufügen",
-    "cards": "keine Karten | {n} Karte | {n} Karten",
-    "empty": "Noch keine Spieler.",
-    "deleteTitle": "Spieler löschen?",
-    "deleteText": "„{name}“ wird gelöscht. Zugewiesene Karten bleiben erhalten und sind danach nicht mehr zugewiesen.",
-    "created": "Spieler hinzugefügt",
-    "deleted": "Spieler gelöscht"
+    },
+    "ownerNote": "Die Karte wird deiner Sammlung ({name}) hinzugefügt. Nur du kannst sie danach ändern."
   },
   "errors": {
     "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "validation_error": "Die Eingabe ist ungültig.",
     "card_not_found": "Die Karte wurde nicht gefunden.",
-    "player_not_found": "Der Spieler wurde nicht gefunden.",
     "image_not_found": "Das Bild wurde nicht gefunden.",
-    "player_exists": "Ein Spieler mit diesem Namen existiert bereits.",
     "upstream_card_not_found": "Die Karte wurde in der Kartendatenbank nicht gefunden.",
     "upstream_rate_limited": "Die Kartendatenbank ist ausgelastet. Bitte später erneut versuchen.",
     "upstream_unreachable": "Die Kartendatenbank ist nicht erreichbar.",
@@ -239,7 +231,19 @@
     "no_external_id": "Diese Karte ist nicht mit der Kartendatenbank verknüpft.",
     "printing_required": "Bitte wähle die Variante der Karte.",
     "invalid_variant": "Diese Variante gibt es für die Karte nicht.",
-    "field_not_editable": "Dieses Feld kann bei dieser Karte nicht geändert werden."
+    "field_not_editable": "Dieses Feld kann bei dieser Karte nicht geändert werden.",
+    "unauthenticated": "Bitte anmelden.",
+    "invalid_credentials": "Benutzername oder Passwort falsch.",
+    "too_many_attempts": "Zu viele Fehlversuche. Bitte in einigen Minuten erneut versuchen.",
+    "password_change_required": "Bitte wähle zuerst ein neues Passwort.",
+    "not_card_owner": "Nur der Besitzer kann diese Karte ändern.",
+    "card_has_no_owner": "Diese Karte hat keinen Besitzer und kann nicht geändert werden.",
+    "current_password_wrong": "Das aktuelle Passwort ist falsch.",
+    "password_too_short": "Das neue Passwort ist zu kurz (mindestens {min} Zeichen).",
+    "password_too_long": "Das neue Passwort ist zu lang.",
+    "password_initial": "Das neue Passwort darf nicht das Initialpasswort sein.",
+    "password_unchanged": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
+    "user_not_found": "Der Benutzer wurde nicht gefunden."
   },
   "variant": {
     "normal": "Normal",
@@ -310,5 +314,32 @@
       "effect": "Effekt"
     },
     "noDetails": "Für diese Sprache sind keine weiteren Kartendetails vorhanden."
+  },
+  "users": {
+    "title": "Benutzer",
+    "intro": "Alle sehen alle Karten, ändern können aber nur die eigenen.",
+    "you": "du",
+    "cards": "keine Karten | {n} Karte | {n} Karten",
+    "empty": "Noch keine Benutzer."
+  },
+  "login": {
+    "title": "Anmelden",
+    "name": "Benutzername",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "hint": "Erste Anmeldung? Das Initialpasswort lautet „cardkeeper“; gleich danach wählst du dein eigenes."
+  },
+  "account": {
+    "title": "Passwort ändern",
+    "chooseTitle": "Neues Passwort wählen",
+    "hint": "Mindestens {min} Zeichen. Andere Browser werden bei einer Änderung abgemeldet.",
+    "forcedHint": "Du verwendest noch das Initialpasswort. Wähle ein eigenes (mindestens {min} Zeichen, nicht „cardkeeper“), um fortzufahren.",
+    "initial": "Initialpasswort",
+    "current": "Aktuelles Passwort",
+    "new": "Neues Passwort",
+    "repeat": "Neues Passwort wiederholen",
+    "submit": "Passwort speichern",
+    "mismatch": "Die beiden neuen Passwörter stimmen nicht überein.",
+    "changed": "Passwort geändert"
   }
 }

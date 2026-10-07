@@ -33,14 +33,17 @@ model Game {
   @@map("games")
 }
 
-model Player {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  contact   String?
-  createdAt DateTime @default(now()) @map("created_at")
-  cards     Card[]
+// A person who can log in and who owns cards. Users are created from the USERS list at startup; a NULL password
+// hash means "initial password, must be changed at the first login" (also the way to reset a password).
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  contact      String?
+  passwordHash String?  @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  cards        Card[]
 
-  @@map("players")
+  @@map("users")
 }
 
 // One row represents one physical card (copy) of the collection.
@@ -52,7 +55,8 @@ model Card {
   name                   String
   // Language independent values, taken from the English API response (type, race, attribute, ATK, DEF, level, ...).
   gameSpecificAttributes Json       @default("{}") @map("game_specific_attributes")
-  assignedPlayerId       Int?       @map("assigned_player_id")
+  // The user who owns the card and is the only one who may change it. Null only for cards that predate the logins.
+  ownerUserId            Int?       @map("owner_user_id")
   status                 CardStatus @default(ACTIVE)
   purchaseDate           DateTime?  @map("purchase_date") @db.Date
   createdAt              DateTime   @default(now()) @map("created_at")
@@ -63,7 +67,7 @@ model Card {
   lastModifiedBy         String?    @map("last_modified_by")
 
   game           Game              @relation(fields: [gameId], references: [id])
-  assignedPlayer Player?           @relation(fields: [assignedPlayerId], references: [id], onDelete: SetNull)
+  owner          User?             @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
   translations   CardTranslation[]
   sets           CardSet[]
   priceHistory   PriceHistory[]
@@ -72,7 +76,7 @@ model Card {
   images         CardImage[]
 
   @@index([gameId, status])
-  @@index([assignedPlayerId])
+  @@index([ownerUserId])
   @@index([externalId])
   @@map("cards")
 }

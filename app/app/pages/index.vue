@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CardListResponseDto, FacetsDto, GameDto, PlayerDto } from '#shared/types/api'
+import type { CardListResponseDto, FacetsDto, GameDto, UserDto } from '#shared/types/api'
 import { defaultDirection, isCardSort, isSortDirection, sortsForGame } from '#shared/utils/sorting'
 import { ALL_GAMES, overviewGame, OVERVIEW_GAME_COOKIE } from '#shared/utils/last-game'
 import { CARD_STATUSES, isCardStatus } from '#shared/utils/status'
@@ -13,7 +13,7 @@ const router = useRouter()
 useHead({ title: () => t('nav.overview') })
 
 const { data: games } = await useFetch<GameDto[]>('/api/games')
-const { data: players } = await useFetch<PlayerDto[]>('/api/players')
+const { data: users } = await useFetch<UserDto[]>('/api/users')
 
 const one = (value: unknown) => (typeof value === 'string' && value !== '' ? value : undefined)
 // Accepts query strings and the numbers a number input emits; anything else means "no limit".
@@ -32,7 +32,7 @@ const status = computed(() => {
   const value = one(route.query.status)
   return isCardStatus(value) ? value : undefined
 })
-const player = computed(() => one(route.query.player))
+const owner = computed(() => one(route.query.owner))
 const q = computed(() => one(route.query.q))
 const page = computed(() => Math.max(1, Number(one(route.query.page)) || 1))
 
@@ -64,7 +64,7 @@ const direction = computed(() => {
 const apiQuery = computed(() => ({
   game: game.value,
   status: status.value,
-  player: player.value,
+  owner: owner.value,
   q: q.value,
   cardType: cardType.value,
   race: race.value,
@@ -105,10 +105,10 @@ const statusItems = computed(() => [
   { label: t('overview.allStatus'), value: ALL },
   ...CARD_STATUSES.map(value => ({ label: t(`status.${value}`), value })),
 ])
-const playerItems = computed(() => [
-  { label: t('overview.allPlayers'), value: ALL },
-  { label: t('overview.unassigned'), value: 'none' },
-  ...(players.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })),
+const ownerItems = computed(() => [
+  { label: t('overview.allOwners'), value: ALL },
+  { label: t('overview.noOwner'), value: 'none' },
+  ...(users.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })),
 ])
 const facetItems = (allLabel: string, values: string[] | undefined, translate: (value: string) => string = value => value) => [
   { label: allLabel, value: ALL },
@@ -163,7 +163,7 @@ const summaryText = computed(() => {
 
 const pageCount = computed(() => Math.max(1, Math.ceil((data.value?.summary.count ?? 0) / (data.value?.pageSize ?? 48))))
 const hasFilters = computed(() => Boolean(
-  status.value || player.value || q.value || cardType.value || race.value || attribute.value || category.value
+  status.value || owner.value || q.value || cardType.value || race.value || attribute.value || category.value
   || pokemonType.value || stage.value || variant.value || rarity.value
   || levelMin.value !== undefined || levelMax.value !== undefined || hpMin.value !== undefined || hpMax.value !== undefined,
 ))
@@ -237,11 +237,11 @@ function resetFilters() {
         @update:model-value="(value: string) => setFilter('status', value)"
       />
       <USelect
-        :model-value="filterValue(player)"
-        :items="playerItems"
-        :aria-label="t('overview.playerFilter')"
+        :model-value="filterValue(owner)"
+        :items="ownerItems"
+        :aria-label="t('overview.ownerFilter')"
         class="w-44"
-        @update:model-value="(value: string) => setFilter('player', value)"
+        @update:model-value="(value: string) => setFilter('owner', value)"
       />
 
       <template v-if="game === 'ygo'">

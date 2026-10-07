@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CardDetailDto, CardImageDto, PlayerDto } from '#shared/types/api'
+import type { CardDetailDto, CardImageDto, UserDto } from '#shared/types/api'
 import { POKEMON_VARIANTS, type PokemonDetails } from '#shared/types/pokemon'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
@@ -18,9 +18,12 @@ const { data: card, error } = await useFetch<CardDetailDto>(`/api/cards/${id}`)
 if (error.value || !card.value) {
   throw createError({ statusCode: error.value?.statusCode ?? 404, fatal: true })
 }
-const { data: players } = await useFetch<PlayerDto[]>('/api/players')
+const { data: users } = await useFetch<UserDto[]>('/api/users')
 
-const NONE = 'none'
+// Everybody sees every card, but only the owner changes it (the server enforces this, the form only reflects it).
+const { user: me } = useAuth()
+const canEdit = computed(() => card.value!.owner !== null && card.value!.owner.id === me.value?.id)
+
 const today = () => new Date().toISOString().slice(0, 10)
 
 // --- Language of the shown texts --------------------------------------------------------------
@@ -52,7 +55,7 @@ interface FormState {
   status: CardStatusValue
   statusDate: string
   statusPerson: string
-  player: string
+  owner: string
   purchaseDate: string
 }
 
@@ -64,7 +67,7 @@ function toForm(source: CardDetailDto): FormState {
     status: source.status,
     statusDate: source.statusDate ?? '',
     statusPerson: source.statusPerson ?? '',
-    player: source.assignedPlayerId === null ? NONE : String(source.assignedPlayerId),
+    owner: source.owner ? String(source.owner.id) : '',
     purchaseDate: source.purchaseDate ?? '',
   }
 }
@@ -101,10 +104,7 @@ watch(() => form.status, (status) => {
 })
 
 const statusItems = computed(() => CARD_STATUSES.map(value => ({ label: t(`status.${value}`), value })))
-const playerItems = computed(() => [
-  { label: t('common.none'), value: NONE },
-  ...(players.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })),
-])
+const ownerItems = computed(() => (users.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })))
 
 const nullIfBlank = (value: string) => (value.trim() === '' ? null : value.trim())
 
@@ -134,8 +134,8 @@ function buildPatch(current: CardDetailDto): Record<string, unknown> {
     patch.statusPerson = showPerson.value ? nullIfBlank(form.statusPerson) : null
   }
 
-  if (form.player !== original.player) {
-    patch.assignedPlayerId = form.player === NONE ? null : Number(form.player)
+  if (form.owner !== original.owner && form.owner !== '') {
+    patch.ownerId = Number(form.owner)
   }
   if (form.purchaseDate !== original.purchaseDate) {
     patch.purchaseDate = form.purchaseDate || null
@@ -170,7 +170,7 @@ const refreshing = ref(false)
 async function refreshFromApi() {
   refreshing.value = true
   try {
-    // Set code, edition, status and assignment are not touched, so the form stays as it is.
+    // Set code, edition, status and owner are not touched, so the form stays as it is.
     card.value = await $fetch<CardDetailDto>(`/api/cards/${id}/refresh`, { method: 'POST' })
     toast.add({ title: t('card.refresh.done'), color: 'success' })
   }
@@ -314,7 +314,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
           </button>
         </div>
         <UButton
-          v-if="card.externalId"
+          v-if="card.externalId && canEdit"
           type="button"
           color="primary"
           variant="outline"
@@ -328,6 +328,10 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
         </UButton>
       </div>
     </div>
+
+    <p v-if="!canEdit" class="mb-5 rounded-lg bg-elevated px-3.5 py-2.5 text-sm text-muted" data-test="read-only">
+      {{ card.owner ? t('card.readOnly.owned', { owner: card.owner.name }) : t('card.readOnly.noOwner') }}
+    </p>
 
     <form class="flex flex-wrap gap-8" @submit.prevent="save">
       <!-- Images -->
@@ -354,6 +358,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             <img :src="`/api/images/${image.id}`" alt="" class="size-full object-cover">
           </button>
           <label
+            v-if="canEdit"
             for="imgUpload"
             class="flex size-14 cursor-pointer items-center justify-center rounded-lg border border-dashed border-accented bg-default text-muted"
           >
@@ -363,14 +368,15 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
 
         <div class="flex flex-wrap gap-2">
           <label
+            v-if="canEdit"
             for="imgUpload"
             class="inline-block cursor-pointer rounded-lg border border-primary px-3.5 py-2 text-[13px] font-medium text-primary"
           >
             {{ t('card.image.upload') }}
           </label>
-          <input id="imgUpload" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="uploadImage">
+          <input v-if="canEdit" id="imgUpload" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" @change="uploadImage">
           <UButton
-            v-if="selectedImage && !selectedImage.isPrimary"
+            v-if="canEdit && selectedImage && !selectedImage.isPrimary"
             size="sm"
             color="neutral"
             variant="outline"
@@ -379,7 +385,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             {{ t('card.image.makePrimary') }}
           </UButton>
           <UButton
-            v-if="selectedImage?.source === 'MANUAL'"
+            v-if="canEdit && selectedImage?.source === 'MANUAL'"
             size="sm"
             color="error"
             variant="ghost"
@@ -410,13 +416,13 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
                   v-model="form.setCode"
                   maxlength="40"
                   class="w-full"
-                  :readonly="!gameConfig.setCodeEditable"
-                  :ui="gameConfig.setCodeEditable ? undefined : readonlyUi"
+                  :readonly="!gameConfig.setCodeEditable || !canEdit"
+                  :ui="gameConfig.setCodeEditable && canEdit ? undefined : readonlyUi"
                 />
               </UFormField>
               <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
-                <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" class="w-full" />
-                <UInput v-else v-model="form.edition" maxlength="80" class="w-full" />
+                <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" :disabled="!canEdit" class="w-full" />
+                <UInput v-else v-model="form.edition" maxlength="80" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
               </UFormField>
               <UFormField :label="t('card.fields.setName')">
                 <UInput :model-value="setNameShown" readonly class="w-full" :ui="readonlyUi" />
@@ -468,24 +474,25 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
           </h2>
           <div class="flex max-w-xs flex-col gap-3.5">
             <UFormField :label="t('card.fields.status')">
-              <USelect v-model="form.status" :items="statusItems" class="w-full" />
+              <USelect v-model="form.status" :items="statusItems" :disabled="!canEdit" class="w-full" />
             </UFormField>
             <UFormField v-if="showDate" :label="t('card.fields.statusDate')">
-              <UInput v-model="form.statusDate" type="date" class="w-full" />
+              <UInput v-model="form.statusDate" type="date" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
             </UFormField>
             <UFormField v-if="showPerson" :label="t('card.fields.statusPerson')">
-              <UInput v-model="form.statusPerson" :placeholder="t('card.fields.statusPersonPlaceholder')" maxlength="120" class="w-full" />
+              <UInput v-model="form.statusPerson" :placeholder="t('card.fields.statusPersonPlaceholder')" maxlength="120" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
             </UFormField>
-            <UFormField :label="t('card.fields.player')">
-              <USelect v-model="form.player" :items="playerItems" class="w-full" />
+            <UFormField :label="t('card.fields.owner')" :hint="canEdit ? t('card.fields.ownerHint') : undefined">
+              <USelect v-if="canEdit" v-model="form.owner" :items="ownerItems" class="w-full" />
+              <UInput v-else :model-value="card.owner?.name ?? ''" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
             <UFormField :label="t('card.fields.purchaseDate')">
-              <UInput v-model="form.purchaseDate" type="date" class="w-full" />
+              <UInput v-model="form.purchaseDate" type="date" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
             </UFormField>
           </div>
         </section>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div v-if="canEdit" class="flex flex-wrap items-center gap-3">
           <UButton type="submit" :loading="saving">
             {{ t('common.save') }}
           </UButton>

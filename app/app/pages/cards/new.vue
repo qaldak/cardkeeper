@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CardDetailDto, GameDto, LookupCandidateDto, PlayerDto } from '#shared/types/api'
+import type { CardDetailDto, GameDto, LookupCandidateDto } from '#shared/types/api'
 import type { PokemonAttributes } from '#shared/types/pokemon'
 import { formatAttributeValue } from '#shared/utils/game-fields'
 import { getGameConfig } from '#shared/utils/game-config'
@@ -14,7 +14,7 @@ const labels = useGameLabels()
 useHead({ title: () => t('add.title') })
 
 const { data: games } = await useFetch<GameDto[]>('/api/games')
-const { data: players } = await useFetch<PlayerDto[]>('/api/players')
+const { user: me } = useAuth()
 
 const NONE = 'none'
 
@@ -35,7 +35,6 @@ const searchError = ref('')
 const chosen = ref<LookupCandidateDto | null>(null)
 const choosing = ref<string | null>(null)
 const printing = ref(NONE)
-const playerId = ref(NONE)
 const purchaseDate = ref('')
 const submitting = ref(false)
 
@@ -48,10 +47,6 @@ watch(gameSlug, (slug) => {
 })
 
 const gameItems = computed(() => (games.value ?? []).map(entry => ({ label: entry.displayName, value: entry.slug })))
-const playerItems = computed(() => [
-  { label: t('common.none'), value: NONE },
-  ...(players.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })),
-])
 
 // Yu-Gi-Oh!: set, code and rarity. Pokémon: the card is fixed, the choice is the variant of the physical card.
 const printingLabel = (set: LookupCandidateDto['sets'][number]) => isPokemon.value
@@ -114,7 +109,6 @@ async function submit() {
         game: gameSlug.value,
         externalId: chosen.value.externalId,
         set: set ? { setCode: set.setCode, rarity: set.rarity, edition: set.edition } : undefined,
-        playerId: playerId.value === NONE ? null : Number(playerId.value),
         purchaseDate: purchaseDate.value || null,
       },
     })
@@ -277,9 +271,9 @@ const MAX_RESULTS = 50
       <UFormField :label="isPokemon ? t('add.variant') : t('add.printing')" :hint="config.printingRequired ? t('add.variantRequired') : undefined">
         <USelectMenu v-model="printing" :items="printingItems" value-key="value" class="w-full" />
       </UFormField>
-      <UFormField :label="t('add.player')">
-        <USelect v-model="playerId" :items="playerItems" class="w-full" />
-      </UFormField>
+      <p class="text-sm text-muted" data-test="owner-note">
+        {{ t('add.ownerNote', { name: me?.name ?? '' }) }}
+      </p>
       <UFormField :label="t('add.purchaseDate')">
         <UInput v-model="purchaseDate" type="date" class="w-full" />
       </UFormField>

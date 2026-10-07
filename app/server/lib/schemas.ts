@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { CARD_SORTS } from '../../shared/utils/sorting'
 import { CARD_STATUSES } from '../../shared/utils/status'
+import { PASSWORD_MAX_LENGTH } from '../../shared/utils/users'
 
 const dateOnly = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD')
 const optionalText = (max: number) => z.string().trim().max(max).nullable().optional()
@@ -8,7 +9,7 @@ const optionalText = (max: number) => z.string().trim().max(max).nullable().opti
 export const listQuerySchema = z.object({
   game: z.string().trim().min(1).max(40).optional(),
   status: z.enum(CARD_STATUSES).optional(),
-  player: z.union([z.literal('none'), z.coerce.number().int().positive()]).optional(),
+  owner: z.union([z.literal('none'), z.coerce.number().int().positive()]).optional(),
   q: z.string().trim().max(100).optional(),
   cardType: z.string().trim().min(1).max(80).optional(),
   race: z.string().trim().min(1).max(80).optional(),
@@ -53,7 +54,6 @@ export const createCardSchema = z.object({
     // Pokémon: the variant of the card (normal, reverse, holo, ...).
     edition: z.string().trim().max(80).nullable().optional(),
   }).optional(),
-  playerId: z.number().int().positive().nullable().optional(),
   purchaseDate: dateOnly.nullable().optional(),
 })
 
@@ -64,16 +64,23 @@ export const updateCardSchema = z.object({
     setCode: z.string().trim().min(1).max(40).optional(),
     edition: optionalText(80),
   }).strict().optional(),
-  assignedPlayerId: z.number().int().positive().nullable().optional(),
+  // Handing the card over to another user; a card always has an owner, so it cannot be cleared.
+  ownerId: z.number().int().positive().optional(),
   purchaseDate: dateOnly.nullable().optional(),
   status: z.enum(CARD_STATUSES).optional(),
   statusDate: dateOnly.nullable().optional(),
   statusPerson: optionalText(120),
 }).strict()
 
-export const playerSchema = z.object({
-  name: z.string().trim().min(1).max(80),
-  contact: optionalText(200),
+export const loginSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  password: z.string().min(1).max(PASSWORD_MAX_LENGTH),
+})
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(PASSWORD_MAX_LENGTH),
+  // The rules (length, not the initial password) are checked by the service, which answers with a specific error.
+  newPassword: z.string().max(PASSWORD_MAX_LENGTH + 1),
 })
 
 export const idParamSchema = z.coerce.number().int().positive()
@@ -81,4 +88,5 @@ export const idParamSchema = z.coerce.number().int().positive()
 export type ListQuery = z.infer<typeof listQuerySchema>
 export type CreateCardInput = z.infer<typeof createCardSchema>
 export type UpdateCardInput = z.infer<typeof updateCardSchema>
-export type PlayerInput = z.infer<typeof playerSchema>
+export type LoginInput = z.infer<typeof loginSchema>
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>

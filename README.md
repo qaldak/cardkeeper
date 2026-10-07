@@ -14,15 +14,15 @@ Everything runs in containers: there is nothing to install on the host except Do
   browser in a cookie, so adding several Pokémon cards in a row needs no switching), the overview shows one game or all
   games (all games on the first visit, afterwards the last choice of that browser), and each game has its own filters (Yu-Gi-Oh!: card type, type, attribute, rarity, level range; Pokémon: category,
   type, stage, rarity, variant, HP range) and sort orders (level for Yu-Gi-Oh!, HP for Pokémon)
-- Collection overview with filters for status, player, card type, monster type, attribute, rarity and a level range
+- Collection overview with filters for status, owner, card type, monster type, attribute, rarity and a level range
   (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
   sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come
   last); total value of the active cards
 - Card detail page: texts in German and English with a language switch (German first, a language the card does not
   have is disabled), the set code and edition can be corrected (e.g. German or Japanese prints, applies to all
   languages), manual image upload, status handling (active, sold, traded, gifted, lost) with date and counterpart,
-  assignment to players, price history
-- "Update from API" refreshes texts, attributes and prices of a card; set code, edition, status, assignment,
+  the owner (who can hand the card over to another user), price history
+- "Update from API" refreshes texts, attributes and prices of a card; set code, edition, status, owner,
   purchase date and images are never touched
 - "Add card" lookup by name or passcode against the card database, including the exact printing (set and rarity). There
   is no language to choose: the search looks for German first and falls back to English, and both languages are
@@ -35,8 +35,7 @@ Everything runs in containers: there is nothing to install on the host except Do
 - User interface in German and English
 - Semantic releases, multi-arch (amd64 + arm64) Docker images, automated dependency updates
 
-Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): scheduled price refresh,
-PDF/CSV/Markdown export, an `/admin` area and a login. See [Roadmap](#roadmap).
+Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): scheduled price refresh and PDF/CSV/Markdown export. See [Roadmap](#roadmap).
 
 ## Quick start
 
@@ -72,37 +71,52 @@ All settings are environment variables in `.env`:
 | `APP_BIND_ADDRESS` | `127.0.0.1` | Address the port is bound to; keep it on localhost when a reverse proxy runs on the same host |
 | `PRICE_SOURCE` | `cardmarket` | Marketplace for list prices and totals: `cardmarket`, `tcgplayer`, `ebay`, `amazon`, `coolstuffinc` |
 | `MAX_UPLOAD_MB` | `5` | Maximum size of a manually uploaded image |
-| `AUTH_USER_HEADER` | `x-remote-user` | Request header with the user name set by the reverse proxy (used as `changed_by`) |
+| `SESSION_SECRET` | – (required) | At least 32 random characters (`openssl rand -hex 32`) that seal the login cookies; the app refuses to start with less. Changing it logs everybody out |
+| `USERS` | – (required) | Comma separated user names, e.g. `anna,max`; missing users are created at startup (see [Users and passwords](#users-and-passwords)) |
+| `CONTAINER_PREFIX` | `cardkeeper` | Prefix of the container names (`cardkeeper_app`, `cardkeeper_db`) |
 | `APP_IMAGE` | `ghcr.io/qaldak/cardkeeper:latest` | Image to run, e.g. to pin a version |
 
 The database role is created by [`db/init/10-create-app-role.sh`](db/init/10-create-app-role.sh) when the data directory is
 initialized for the first time. Changing the passwords later does not alter an existing database.
 
-### Reverse proxy and access control
+### Users and passwords
 
-The app has no login of its own; it is meant to run in a home network or behind a VPN. It trusts the header named by
-`AUTH_USER_HEADER` for the audit log. Therefore never expose the app port directly to untrusted networks, and let the
-reverse proxy set (not pass through) the header. Example for nginx:
+The app has its own login. Everybody who is logged in sees all cards, but a card can only be changed (data, status,
+images, "Update from API", deleting) by its **owner**; the person who adds a card is its owner, and the owner can hand it
+over to another user, after which only that user can change it.
 
-```nginx
-server {
-    listen 443 ssl;
-    server_name ygo.example.home;
+- **Creating users:** list the names in `USERS` in the `.env` file and restart. Missing users are created with the
+  initial password `cardkeeper`; at the first login they have to choose their own (at least 8 characters, not
+  `cardkeeper`). There is no admin role in the app. Removing a name from `USERS` deletes nothing: the account, its
+  password and its cards stay, so the list can be changed freely. Passwords are stored as scrypt hashes.
+- **Resetting a password:** the operator sets the hash back to `NULL`; the user then logs in with `cardkeeper` again and
+  has to choose a new password. Every login that was made with the old password ends.
 
-    client_max_body_size 6m;   # a bit more than MAX_UPLOAD_MB
+  ```bash
+  docker compose exec db psql -U postgres -d cardkeeper -c "UPDATE users SET password_hash = NULL WHERE name = 'anna';"
+  ```
 
-    location / {
-        auth_basic           "cardkeeper";
-        auth_basic_user_file /etc/nginx/cardkeeper.htpasswd;
+- **Cards without an owner:** cards that were not assigned to a player before the logins existed have no owner. They can
+  be seen by everybody, but nobody can change them until an owner is set:
 
-        proxy_pass         http://127.0.0.1:3000;
-        proxy_set_header   Host              $host;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
-        proxy_set_header   X-Remote-User     $remote_user;
-    }
-}
-```
+  ```bash
+  docker compose exec db psql -U postgres -d cardkeeper -c "UPDATE cards SET owner_user_id = (SELECT id FROM users WHERE name = 'anna') WHERE owner_user_id IS NULL;"
+  ```
+
+- **Safeguards:** a user name is blocked for 15 minutes after 10 failed logins (the initial password is public, so it
+  could otherwise be guessed for every name); a login lasts 30 days; changing or resetting a password logs the other
+  browsers out. Removing a user in the database leaves their cards without an owner.
+
+Upgrading from a version without logins: add `SESSION_SECRET` and `USERS` to the `.env` file (the stack does not start
+without them). The existing players become users with the initial password and keep their cards; add everybody else to
+`USERS`. The reverse proxy no longer has to authenticate anybody.
+
+### Reverse proxy
+
+The app does its own login, so a reverse proxy only has to forward the requests (and terminate TLS). Two settings matter:
+nginx rejects uploads over 1 MB by default, so set `client_max_body_size` a little above `MAX_UPLOAD_MB` (default 5), and
+pass `X-Forwarded-Proto $scheme` so that the login cookie is marked `secure` for https. Keep the port on localhost
+(`APP_BIND_ADDRESS=127.0.0.1`) when the proxy runs on the same host.
 
 ### Backup
 
@@ -212,7 +226,7 @@ app/                      Nuxt web app (UI + API routes), one Docker image
   app/                    Vue pages, components, composables (Nuxt UI, Tailwind)
   i18n/locales/           German and English translations
   server/api/             Thin HTTP handlers
-  server/services/        Business logic (cards, images, players), framework independent
+  server/services/        Business logic (cards, images, users), framework independent
   server/tcg/             Adapter interface, registry and the Yu-Gi-Oh! adapter
   server/lib/             Pure helpers (config, status rules, filters, image files, ...)
   shared/                 Types and rules shared by server and UI
@@ -228,7 +242,7 @@ docker-compose.dev.yml    Development and test overlay
 
 ### Data model
 
-`games`, `cards` (one row per physical card), `card_sets`, `price_history`, `status_history`, `players`, `api_snapshots`
+`games`, `cards` (one row per physical card), `card_sets`, `price_history`, `status_history`, `users`, `api_snapshots`
 (immutable raw API responses), `card_images` (files live on the `card-images` volume, the table stores relative paths),
 `audit_log`. Game specific values (ATK/DEF/level, HP/types/stage, ...) are JSONB in `cards.game_specific_attributes`,
 so a new game does not need a schema change.
@@ -326,8 +340,6 @@ No schema change and no change in the core services is required.
 
 - Scheduler container for periodic price refresh (`node-cron`)
 - Export as PDF, CSV and Markdown
-- `/admin` area (games, players) behind HTTP basic auth and audit log view
-- Decision on a login (currently none; access control is the network and the reverse proxy)
 - Pokémon: a list price that depends on the variant (holo and reverse holo have their own prices), paging through the search
   results, more filters (set, illustrator, regulation mark)
 

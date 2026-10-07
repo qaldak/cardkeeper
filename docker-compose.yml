@@ -46,7 +46,10 @@ services:
       DATABASE_URL: postgresql://${APP_DB_USER:-cardkeeper}:${APP_DB_PASSWORD}@db:5432/${APP_DB_NAME:-cardkeeper}
       PRICE_SOURCE: ${PRICE_SOURCE:-cardmarket}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-5}
-      AUTH_USER_HEADER: ${AUTH_USER_HEADER:-x-remote-user}
+      # Seals the login cookies; without it nobody could log in, and with a guessable one anybody could forge a login.
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env (openssl rand -hex 32)}
+      # Users that are created at startup if they do not exist yet, e.g. USERS=anna,max
+      USERS: ${USERS:?Set USERS in .env, e.g. USERS=anna,max}
       NODE_OPTIONS: --max-old-space-size=256
     volumes:
       - card-images:/data/card-images

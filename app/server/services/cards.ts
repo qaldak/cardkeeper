@@ -2,6 +2,7 @@ import { Prisma, type PrismaClient } from '../generated/prisma/client'
 import type { CardDetailDto, CardListResponseDto, FacetsDto, LookupCandidateDto } from '../../shared/types/api'
 import { getGameConfig } from '../../shared/utils/game-config'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
+import { assertOwner, type Actor } from '../lib/actor'
 import type { AppConfig } from '../lib/config'
 import { buildCardWhere, type CardFilters } from '../lib/card-filters'
 import { sortRows, type SortRow } from '../lib/card-sort'
@@ -55,11 +56,12 @@ export function createCardService(deps: CardServiceDeps) {
     })
   }
 
-  async function requirePlayer(playerId: number) {
-    const player = await db.player.findUnique({ where: { id: playerId }, select: { id: true } })
-    if (!player) {
-      throw notFound('player_not_found', 'Player not found')
+  async function requireUser(userId: number) {
+    const user = await db.user.findUnique({ where: { id: userId }, select: { id: true, name: true } })
+    if (!user) {
+      throw notFound('user_not_found', 'User not found')
     }
+    return user
   }
 
   /** Downloads the card in every stored language (German, English) and merges the answers. */
@@ -80,7 +82,7 @@ export function createCardService(deps: CardServiceDeps) {
   }
 
   /** Downloads the API image of a card. Failures are logged and never block the calling operation. */
-  async function attachApiImage(cardId: number, image: CommonCardImage | undefined, adapterHosts: readonly string[], actor: string) {
+  async function attachApiImage(cardId: number, image: CommonCardImage | undefined, adapterHosts: readonly string[], actor: Actor) {
     if (!image) {
       return
     }
@@ -97,7 +99,7 @@ export function createCardService(deps: CardServiceDeps) {
       const filePath = await saveImage(config.imageDir, cardId, bytes, type)
       const hasPrimary = await db.cardImage.count({ where: { cardId, isPrimary: true } })
       await db.cardImage.create({
-        data: { cardId, filePath, source: 'API', isPrimary: hasPrimary === 0, uploadedBy: actor },
+        data: { cardId, filePath, source: 'API', isPrimary: hasPrimary === 0, uploadedBy: actor.name },
       })
     }
     catch (error) {
@@ -288,7 +290,7 @@ export function createCardService(deps: CardServiceDeps) {
       return candidateOf(adapter, merged)
     },
 
-    async create(input: CreateCardInput, actor: string): Promise<CardDetailDto> {
+    async create(input: CreateCardInput, actor: Actor): Promise<CardDetailDto> {
       const adapter = registry.require(input.game)
       const merged = await fetchMerged(adapter, input.externalId)
       if (!merged) {
@@ -308,10 +310,6 @@ export function createCardService(deps: CardServiceDeps) {
       else if (getGameConfig(input.game).printingRequired) {
         throw badRequest('printing_required', 'A printing (variant) must be chosen for this game')
       }
-      if (input.playerId) {
-        await requirePlayer(input.playerId)
-      }
-
       const game = await ensureGame(input.game)
       const timestamp = now()
 
@@ -322,10 +320,11 @@ export function createCardService(deps: CardServiceDeps) {
             externalId: merged.externalId,
             name: merged.name,
             gameSpecificAttributes: merged.attributes as Json,
-            assignedPlayerId: input.playerId ?? null,
+            // A user only adds cards for themselves.
+            ownerUserId: actor.id,
             purchaseDate: input.purchaseDate ? parseDateOnly(input.purchaseDate) : null,
             lastFetchedAt: timestamp,
-            lastModifiedBy: actor,
+            lastModifiedBy: actor.name,
             translations: {
               create: merged.translations.map(entry => ({
                 language: entry.language,
@@ -346,11 +345,11 @@ export function createCardService(deps: CardServiceDeps) {
                 fetchedAt: timestamp,
               })),
             },
-            statusHistory: { create: { status: 'ACTIVE', date: utcToday(timestamp), changedBy: actor } },
+            statusHistory: { create: { status: 'ACTIVE', date: utcToday(timestamp), changedBy: actor.name } },
           },
         })
         await tx.auditLog.create({
-          data: { entity: 'card', entityId: created.id, field: 'created', newValue: created.name, changedBy: actor },
+          data: { entity: 'card', entityId: created.id, field: 'created', newValue: created.name, changedBy: actor.name },
         })
         return created
       })
@@ -363,11 +362,12 @@ export function createCardService(deps: CardServiceDeps) {
      * Changes the printing (set code, edition) and the user's own data (status, assignment,
      * purchase date). Everything that comes from the card API can only be changed by refreshing.
      */
-    async update(id: number, patch: UpdateCardInput, actor: string): Promise<CardDetailDto> {
+    async update(id: number, patch: UpdateCardInput, actor: Actor): Promise<CardDetailDto> {
       const card = await db.card.findUnique({
         where: { id },
         include: {
           game: { select: { slug: true } },
+          owner: { select: { name: true } },
           sets: { orderBy: { id: 'asc' }, take: 1 },
           statusHistory: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 1 },
         },
@@ -375,10 +375,11 @@ export function createCardService(deps: CardServiceDeps) {
       if (!card) {
         throw notFound('card_not_found', 'Card not found')
       }
+      assertOwner(card, actor)
       const gameConfig = getGameConfig(card.game.slug)
 
       const audit: FieldChange[] = []
-      const data: Prisma.CardUpdateInput = { lastModifiedBy: actor }
+      const data: Prisma.CardUpdateInput = { lastModifiedBy: actor.name }
       const track = (field: string, oldValue: unknown, newValue: unknown) => {
         if (stringify(oldValue) === stringify(newValue)) {
           return false
@@ -387,14 +388,11 @@ export function createCardService(deps: CardServiceDeps) {
         return true
       }
 
-      if (patch.assignedPlayerId !== undefined) {
-        if (patch.assignedPlayerId !== null) {
-          await requirePlayer(patch.assignedPlayerId)
-        }
-        if (track('assignedPlayerId', card.assignedPlayerId, patch.assignedPlayerId)) {
-          data.assignedPlayer = patch.assignedPlayerId === null
-            ? { disconnect: true }
-            : { connect: { id: patch.assignedPlayerId } }
+      // Handing the card over: from then on only the new owner may change it.
+      if (patch.ownerId !== undefined) {
+        const newOwner = await requireUser(patch.ownerId)
+        if (track('owner', card.owner?.name ?? null, newOwner.name)) {
+          data.owner = { connect: { id: newOwner.id } }
         }
       }
 
@@ -454,7 +452,7 @@ export function createCardService(deps: CardServiceDeps) {
         track('status', card.status, change.status)
         data.status = change.status
         historyAction = () => db.statusHistory.create({
-          data: { cardId: id, status: change.status, date: change.date, personText: change.person, changedBy: actor },
+          data: { cardId: id, status: change.status, date: change.date, personText: change.person, changedBy: actor.name },
         })
       }
       else if (card.status !== 'ACTIVE' && latestHistory && (patch.statusDate !== undefined || patch.statusPerson !== undefined)) {
@@ -470,7 +468,7 @@ export function createCardService(deps: CardServiceDeps) {
           track('statusPerson', latestHistory.personText, change.person)
           historyAction = () => db.statusHistory.update({
             where: { id: latestHistory.id },
-            data: { date: change.date, personText: change.person, changedBy: actor },
+            data: { date: change.date, personText: change.person, changedBy: actor.name },
           })
         }
       }
@@ -487,7 +485,7 @@ export function createCardService(deps: CardServiceDeps) {
               field: change.field,
               oldValue: stringify(change.oldValue),
               newValue: stringify(change.newValue),
-              changedBy: actor,
+              changedBy: actor.name,
             })),
           }),
         ])
@@ -500,14 +498,15 @@ export function createCardService(deps: CardServiceDeps) {
      * attributes and prices. The printing (set code, edition), status, assignment, purchase date
      * and images are the user's data and stay untouched.
      */
-    async refresh(id: number, actor: string): Promise<CardDetailDto> {
+    async refresh(id: number, actor: Actor): Promise<CardDetailDto> {
       const card = await db.card.findUnique({
         where: { id },
-        select: { id: true, name: true, externalId: true, game: { select: { slug: true } } },
+        select: { id: true, name: true, externalId: true, ownerUserId: true, game: { select: { slug: true } } },
       })
       if (!card) {
         throw notFound('card_not_found', 'Card not found')
       }
+      assertOwner(card, actor)
       if (!card.externalId) {
         throw badRequest('no_external_id', 'This card is not linked to a card database')
       }
@@ -542,7 +541,7 @@ export function createCardService(deps: CardServiceDeps) {
             name: primaryName(stored, card.name),
             gameSpecificAttributes: merged.attributes as Json,
             lastFetchedAt: timestamp,
-            lastModifiedBy: actor,
+            lastModifiedBy: actor.name,
           },
         })
         await tx.priceHistory.createMany({
@@ -557,7 +556,7 @@ export function createCardService(deps: CardServiceDeps) {
           })),
         })
         await tx.auditLog.create({
-          data: { entity: 'card', entityId: id, field: 'refreshed', newValue: timestamp.toISOString(), changedBy: actor },
+          data: { entity: 'card', entityId: id, field: 'refreshed', newValue: timestamp.toISOString(), changedBy: actor.name },
         })
       })
 
@@ -569,15 +568,16 @@ export function createCardService(deps: CardServiceDeps) {
       return get(id)
     },
 
-    async remove(id: number, actor: string): Promise<void> {
-      const card = await db.card.findUnique({ where: { id }, select: { id: true, name: true } })
+    async remove(id: number, actor: Actor): Promise<void> {
+      const card = await db.card.findUnique({ where: { id }, select: { id: true, name: true, ownerUserId: true } })
       if (!card) {
         throw notFound('card_not_found', 'Card not found')
       }
+      assertOwner(card, actor)
       await db.$transaction([
         db.card.delete({ where: { id } }),
         db.auditLog.create({
-          data: { entity: 'card', entityId: id, field: 'deleted', oldValue: card.name, changedBy: actor },
+          data: { entity: 'card', entityId: id, field: 'deleted', oldValue: card.name, changedBy: actor.name },
         }),
       ])
       await removeCardImageDir(config.imageDir, id)

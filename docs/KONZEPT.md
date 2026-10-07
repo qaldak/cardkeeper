@@ -54,11 +54,11 @@ Alles läuft über Docker Compose, keine Installation auf dem Client nötig.
 | Tabelle | Zweck | Wichtige Felder |
 | --- | --- | --- |
 | games | Kartenspiele (ygo, pokemon, mtg, …) | id, slug, display\_name |
-| cards | zentrale Kartendaten | id, game\_id (FK), external\_id, name, description, image\_url, game\_specific\_attributes (JSONB), manual\_overrides (JSONB), assigned\_player\_id (FK), status, purchase\_date, created\_at, last\_fetched\_at, last\_modified\_at, last\_modified\_by |
+| cards | zentrale Kartendaten | id, game\_id (FK), external\_id, name, description, image\_url, game\_specific\_attributes (JSONB), manual\_overrides (JSONB), owner\_user\_id (FK), status, purchase\_date, created\_at, last\_fetched\_at, last\_modified\_at, last\_modified\_by |
 | card\_sets | 1:n zu cards | card\_id (FK), set\_code, set\_name, rarity |
 | price\_history | n:1 zu cards, Zeitreihe | card\_id (FK), source, price, currency, fetched\_at |
 | status\_history | n:1 zu cards | card\_id (FK), status, date, person\_text, changed\_by |
-| players | Personen, denen Karten zugewiesen werden | id, name, contact |
+| users | Benutzer mit Login (vormals players); Besitzer von Karten | id, name, contact, password\_hash (NULL = Initialpasswort) |
 | api\_snapshots | unveränderliche Roh-API-Antworten | card\_id (FK), fetched\_at, raw\_json |
 | audit\_log | generisches Änderungsprotokoll | entity, entity\_id, field, old\_value, new\_value, changed\_by, changed\_at |
 | card\_images | n:1 zu cards, mehrere Bilder pro Karte möglich | id, card\_id (FK), file\_path, source (api\|manual), is\_primary, uploaded\_at, uploaded\_by |
@@ -84,7 +84,7 @@ Ein Adapter-Registry wählt den passenden Adapter anhand von `cards.game_id`. De
 - Secrets (DB-Passwort, API-Keys falls nötig) in `.env` auf dem Pi, nicht im Git-Repo
 - Least-Privilege-DB-User für die App (kein Superuser)
 - Regelmäßiges `pg_dump`-Backup via Cron, Ablage an einem zweiten Ort (NAS/externe Platte)
-- Admin-Funktionen (games, players anlegen) laufen über einen eigenen Pfad /admin, den nginx mit HTTP Basic Auth schützt – kein eigenes Login/User-Konzept in der App nötig. nginx reicht den authentifizierten Benutzernamen per Header weiter, den die App für changed\_by im Audit-Log nutzt. "Spieler"-Datensätze (siehe Datenmodell) bleiben davon unabhängig.
+- Anmeldung (ab 0.5): eigenes Login mit Session-Cookie (users, scrypt-Hash, Initialpasswort `cardkeeper` mit erzwungener Änderung); Karten gehören dem Benutzer, der sie erfasst hat, und nur dieser darf sie ändern. Benutzer werden über `USERS` in der `.env` angelegt, Passwort-Reset per SQL (`password_hash = NULL`). Die frühere Idee eines `/admin`-Pfads mit nginx-Basic-Auth ist damit ersetzt.
 
 ## Deployment
 

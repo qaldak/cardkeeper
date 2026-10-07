@@ -3,12 +3,21 @@ const { t, locale, locales, setLocale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const config = useRuntimeConfig()
+const auth = useAuth()
+
+// While the initial password is still set, nothing but the password change is available.
+const restricted = computed(() => auth.user.value?.mustChangePassword === true)
+
+async function logout() {
+  await auth.logout()
+  await navigateTo('/login')
+}
 
 const isOverview = computed(() => route.path === '/')
 
 const navItems = computed(() => [
   { to: '/', label: t('nav.overview') },
-  { to: '/players', label: t('nav.players') },
+  { to: '/users', label: t('nav.users') },
 ])
 
 const localeItems = computed(() =>
@@ -44,7 +53,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
         {{ t('app.title') }}
       </NuxtLink>
 
-      <nav class="flex flex-wrap items-center gap-6">
+      <nav v-if="!restricted" class="flex flex-wrap items-center gap-6">
         <NuxtLink
           v-for="item in navItems"
           :key="item.to"
@@ -59,7 +68,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
 
       <div class="flex flex-wrap items-center gap-3">
         <UInput
-          v-if="isOverview"
+          v-if="isOverview && !restricted"
           v-model="search"
           type="search"
           icon="i-lucide-search"
@@ -67,7 +76,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
           :aria-label="t('overview.searchLabel')"
           class="w-[280px]"
         />
-        <UButton to="/cards/new" icon="i-lucide-plus">
+        <UButton v-if="!restricted" to="/cards/new" icon="i-lucide-plus">
           {{ t('nav.addCard') }}
         </UButton>
         <USelect
@@ -78,6 +87,13 @@ onBeforeUnmount(() => clearTimeout(searchTimer))
           class="w-32"
           @update:model-value="(value: string) => setLocale(value as 'de' | 'en')"
         />
+        <div v-if="auth.user.value" class="flex items-center gap-2 text-sm" data-test="user-menu">
+          <NuxtLink v-if="!restricted" to="/account" class="text-muted hover:text-primary-600" :title="t('nav.account')">
+            {{ auth.user.value.name }}
+          </NuxtLink>
+          <span v-else class="text-muted">{{ auth.user.value.name }}</span>
+          <UButton size="sm" color="neutral" variant="outline" icon="i-lucide-log-out" :aria-label="t('nav.logout')" :title="t('nav.logout')" data-test="logout" @click="logout" />
+        </div>
       </div>
     </header>
 

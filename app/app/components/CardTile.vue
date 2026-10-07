@@ -33,7 +33,7 @@ const subtitle = computed(() =>
       <span class="text-xs text-muted">{{ subtitle || t('common.none') }}</span>
       <div class="mt-1 flex items-center justify-between">
         <StatusBadge :status="card.status" />
-        <span class="text-[11px] text-dimmed">{{ card.player?.name ?? t('common.none') }}</span>
+        <span class="text-[11px] text-dimmed">{{ card.owner?.name ?? t('common.none') }}</span>
       </div>
     </div>
   </NuxtLink>
