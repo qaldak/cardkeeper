@@ -273,7 +273,7 @@ The data model is explicit and typed in [`shared/types/pokemon.ts`](app/shared/t
   loaded from `assets.tcgdex.net` (only in the result list, the card image itself is downloaded and stored locally).
 
 - **Finding a card by set and number**: a Pokémon card has no set code, only a set symbol and a number such as `040/088`.
-  When adding a card, "By set and number" lets you pick the card database language (German, English or Japanese), type the
+  When adding a card, "By set and number" lets you pick the card database language (German by default, or English or Japanese), type the
   number as printed and pick the set by its name or logo (the set symbol is not shown: TCGdex does not serve it for every set). The part after the slash is the *printed* size of the set
   (TCGdex `cardCount.official`, which can be smaller than the real number of cards because of secret rares), and it narrows
   the set list down. Several sets can have the same size, so check the set name. The number is matched

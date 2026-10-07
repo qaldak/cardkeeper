@@ -12,7 +12,9 @@ const { t } = useI18n()
 const apiError = useApiError()
 
 const languages = getGameConfig('pokemon').languages
-const language = ref<string>(languages.includes('en') ? 'en' : languages[0]!)
+// German is preselected: it is the language of the cards in this collection and of the names shown afterwards. A set that was
+// never released in German may be missing in that list; switch to English or Japanese for it.
+const language = ref<string>(languages.includes('de') ? 'de' : languages[0]!)
 const numberInput = ref('')
 const setFilter = ref('')
 
