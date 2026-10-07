@@ -1,6 +1,7 @@
 import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
 import { notFound } from '../../../lib/errors'
+import { inlineDisposition } from '../../../lib/image-files'
 
 // Serves a stored card image. An image id never changes its content, so it can be cached forever.
 export default handle(async (event) => {
@@ -11,6 +12,7 @@ export default handle(async (event) => {
   }
   setResponseHeaders(event, {
     'content-type': file.mime,
+    'content-disposition': inlineDisposition(file.fileName),
     'content-length': info.size,
     'cache-control': 'private, max-age=31536000, immutable',
     'x-content-type-options': 'nosniff',

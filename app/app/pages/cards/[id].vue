@@ -192,6 +192,23 @@ const selectedImage = computed<CardImageDto | undefined>(() =>
 
 const zoomOpen = ref(false)
 
+const imagePosition = computed(() => images.value.findIndex(image => image.id === selectedImage.value?.id) + 1)
+
+// Left and right arrow key switch the image while the dialog is open.
+function onZoomKey(event: KeyboardEvent) {
+  if (!zoomOpen.value || images.value.length < 2) {
+    return
+  }
+  if (event.key === 'ArrowLeft') {
+    stepImage(-1)
+  }
+  else if (event.key === 'ArrowRight') {
+    stepImage(1)
+  }
+}
+onMounted(() => window.addEventListener('keydown', onZoomKey))
+onBeforeUnmount(() => window.removeEventListener('keydown', onZoomKey))
+
 function stepImage(delta: number) {
   const list = images.value
   const index = list.findIndex(image => image.id === selectedImage.value?.id)
@@ -538,21 +555,50 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
       </div>
     </form>
 
-    <!-- The stored image in its full size; with several images the arrows go through them. -->
-    <UModal v-model:open="zoomOpen" :title="shownName" :ui="{ content: 'max-w-4xl' }">
+    <!-- The stored image in its full size. A click on the image closes the dialog; with several images the wide areas
+         beside the image (and the arrow keys) switch between them. -->
+    <UModal v-model:open="zoomOpen" :title="shownName" :ui="{ content: 'max-w-5xl' }">
       <template #body>
-        <div class="relative flex items-center justify-center">
-          <img
-            v-if="selectedImage"
-            :src="`/api/images/${selectedImage.id}`"
-            :alt="shownName"
-            class="max-h-[78vh] w-auto max-w-full rounded-lg object-contain"
-            data-test="zoom-image"
+        <div class="flex items-stretch gap-1">
+          <button
+            v-if="images.length > 1"
+            type="button"
+            class="flex w-14 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-elevated hover:text-highlighted focus-visible:outline-2 focus-visible:outline-primary sm:w-24"
+            :aria-label="t('card.image.previous')"
+            data-test="zoom-prev"
+            @click="stepImage(-1)"
           >
-          <template v-if="images.length > 1">
-            <UButton color="neutral" variant="subtle" icon="i-lucide-chevron-left" class="absolute left-0" :aria-label="t('card.image.previous')" @click="stepImage(-1)" />
-            <UButton color="neutral" variant="subtle" icon="i-lucide-chevron-right" class="absolute right-0" :aria-label="t('card.image.next')" @click="stepImage(1)" />
-          </template>
+            <UIcon name="i-lucide-chevron-left" class="size-9" />
+          </button>
+          <div class="flex min-w-0 flex-1 items-center justify-center">
+            <img
+              v-if="selectedImage"
+              :src="`/api/images/${selectedImage.id}`"
+              :alt="shownName"
+              :title="t('card.image.closeHint')"
+              class="max-h-[calc(100dvh-16rem)] w-auto max-w-full cursor-zoom-out rounded-lg object-contain"
+              data-test="zoom-image"
+              @click="zoomOpen = false"
+            >
+          </div>
+          <button
+            v-if="images.length > 1"
+            type="button"
+            class="flex w-14 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-elevated hover:text-highlighted focus-visible:outline-2 focus-visible:outline-primary sm:w-24"
+            :aria-label="t('card.image.next')"
+            data-test="zoom-next"
+            @click="stepImage(1)"
+          >
+            <UIcon name="i-lucide-chevron-right" class="size-9" />
+          </button>
+        </div>
+      </template>
+      <template #footer>
+        <div class="flex w-full items-center justify-between gap-3">
+          <span class="text-sm text-muted" data-test="zoom-position">{{ images.length > 1 ? `${imagePosition} / ${images.length}` : '' }}</span>
+          <UButton v-if="selectedImage" :href="`/api/images/${selectedImage.id}`" external download color="neutral" variant="outline" icon="i-lucide-download" data-test="zoom-download">
+            {{ t('card.image.download') }}
+          </UButton>
         </div>
       </template>
     </UModal>

@@ -4,6 +4,8 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   detectImageType,
+  downloadFileName,
+  inlineDisposition,
   mimeFromExtension,
   removeCardImageDir,
   removeImageFile,
@@ -70,5 +72,39 @@ describe('image storage', () => {
   it('ignores missing files when removing', async () => {
     await expect(removeImageFile(dir, '9/missing.png')).resolves.toBeUndefined()
     await expect(removeCardImageDir(dir, 9)).resolves.toBeUndefined()
+  })
+})
+
+describe('download file name', () => {
+  it('is the card name with the extension of the stored file', () => {
+    expect(downloadFileName('Dunkler Magier', '12/3.webp')).toBe('Dunkler Magier.webp')
+    expect(downloadFileName('Hippoterus', '1/api-9.PNG')).toBe('Hippoterus.png')
+  })
+
+  it('replaces characters that are not allowed in file names', () => {
+    expect(downloadFileName('A/B: "C"?', '1/1.png')).toBe('A_B_ _C__.png')
+    expect(downloadFileName('..\\evil', '1/1.png')).toBe('.._evil.png')
+  })
+
+  it('keeps it short and never empty', () => {
+    expect(downloadFileName('x'.repeat(200), '1/1.png')).toBe(`${'x'.repeat(80)}.png`)
+    expect(downloadFileName('   ', '1/1.jpg')).toBe('card.jpg')
+  })
+})
+
+describe('inlineDisposition', () => {
+  it('shows the image inline and names it', () => {
+    expect(inlineDisposition('Wiesenior.webp')).toBe(`inline; filename="Wiesenior.webp"; filename*=UTF-8''Wiesenior.webp`)
+  })
+
+  it('has an ASCII fallback and the exact name for modern browsers', () => {
+    expect(inlineDisposition('Blauäugiger Drache.png')).toBe(`inline; filename="Blau_ugiger Drache.png"; filename*=UTF-8''Blau%C3%A4ugiger%20Drache.png`)
+    expect(inlineDisposition('ピカチュウ.webp')).toContain(`filename*=UTF-8''%E3%83%94`)
+  })
+
+  it('cannot be broken out of by quotes in the name', () => {
+    const header = inlineDisposition('a"; evil=1.png')
+    expect(header.split('"').length).toBe(3)
+    expect(header).toContain(`filename*=UTF-8''a%22%3B%20evil%3D1.png`)
   })
 })

@@ -130,7 +130,9 @@
       "primaryChanged": "Primary image changed",
       "zoom": "Enlarge image",
       "previous": "Previous image",
-      "next": "Next image"
+      "next": "Next image",
+      "closeHint": "Click to close",
+      "download": "Download"
     },
     "prices": {
       "empty": "No prices yet.",

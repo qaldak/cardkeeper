@@ -68,6 +68,7 @@ describe.skipIf(!TEST_DATABASE_URL)('image service', () => {
     const image = await h.services.images.addManual(card.id, PNG_BYTES, h.anna)
     const file = await h.services.images.getFile(image.id)
     expect(file.mime).toBe('image/png')
+    expect(file.fileName).toBe('Dunkler Magier.png')
     expect(existsSync(file.path)).toBe(true)
     await expect(h.services.images.getFile(999)).rejects.toMatchObject({ status: 404 })
   })

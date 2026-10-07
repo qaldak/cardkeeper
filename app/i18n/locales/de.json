@@ -130,7 +130,9 @@
       "primaryChanged": "Hauptbild geändert",
       "zoom": "Bild vergrössern",
       "previous": "Vorheriges Bild",
-      "next": "Nächstes Bild"
+      "next": "Nächstes Bild",
+      "closeHint": "Zum Schliessen klicken",
+      "download": "Herunterladen"
     },
     "prices": {
       "empty": "Noch keine Preise vorhanden.",
