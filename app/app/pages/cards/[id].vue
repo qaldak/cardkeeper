@@ -303,7 +303,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             type="button"
             class="rounded-full border px-3.5 py-1.5 text-sm uppercase disabled:cursor-not-allowed disabled:opacity-40"
             :class="language === code
-              ? 'border-primary bg-primary font-medium text-white'
+              ? 'border-primary bg-primary font-medium text-inverted'
               : 'border-default bg-default text-muted hover:text-default'"
             :aria-pressed="language === code"
             :disabled="!availableLanguages.includes(code)"
@@ -336,7 +336,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
     <form class="flex flex-wrap gap-8" @submit.prevent="save">
       <!-- Images -->
       <div class="flex max-w-[300px] flex-[1_1_280px] flex-col gap-4">
-        <div class="flex h-[380px] items-center justify-center overflow-hidden rounded-xl bg-primary-50 text-sm text-primary">
+        <div class="flex h-[380px] items-center justify-center overflow-hidden rounded-xl bg-(--app-art) text-sm text-primary">
           <img
             v-if="selectedImage"
             :src="`/api/images/${selectedImage.id}`"
@@ -351,7 +351,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             v-for="image in images"
             :key="image.id"
             type="button"
-            class="size-14 overflow-hidden rounded-lg border bg-primary-50"
+            class="size-14 overflow-hidden rounded-lg border bg-(--app-art)"
             :class="image.id === selectedImage?.id ? 'border-primary ring-2 ring-primary' : 'border-default'"
             @click="selectedImageId = image.id"
           >
@@ -482,7 +482,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             <UFormField v-if="showPerson" :label="t('card.fields.statusPerson')">
               <UInput v-model="form.statusPerson" :placeholder="t('card.fields.statusPersonPlaceholder')" maxlength="120" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
             </UFormField>
-            <UFormField :label="t('card.fields.owner')" :hint="canEdit ? t('card.fields.ownerHint') : undefined">
+            <UFormField :label="t('card.fields.owner')" :description="canEdit ? t('card.fields.ownerHint') : undefined">
               <USelect v-if="canEdit" v-model="form.owner" :items="ownerItems" class="w-full" />
               <UInput v-else :model-value="card.owner?.name ?? ''" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>

@@ -7,7 +7,8 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   // The UI mockups are light only.
-  colorMode: { preference: 'light', fallback: 'light' },
+  // Follows the device (light or dark); light when the device does not say. The choice of the header switch is remembered in the browser.
+  colorMode: { preference: 'system', fallback: 'light' },
 
   runtimeConfig: {
     public: {

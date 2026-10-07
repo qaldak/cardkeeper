@@ -24,6 +24,34 @@
   --color-brand-950: #08142e;
 }
 
+/* Colors that Nuxt UI has no token for: the page, the placeholder of a missing image, the status badges. */
+:root {
+  color-scheme: light;
+  --app-page: #f6f8fb;
+  --app-art: #eaf1fd;
+  --app-ok-bg: #e6f4ea;
+  --app-ok-fg: #1f7a3d;
+  --app-neutral-bg: #eef1f5;
+  --app-neutral-fg: #51606f;
+  --app-lost-bg: #fbeae7;
+  --app-lost-fg: #ad4634;
+}
+
+.dark {
+  color-scheme: dark;
+  --app-page: #0b1120;
+  --app-art: #16233f;
+  --app-ok-bg: #123524;
+  --app-ok-fg: #5fd48c;
+  --app-neutral-bg: #1e293b;
+  --app-neutral-fg: #a8b5c8;
+  --app-lost-bg: #3a1b17;
+  --app-lost-fg: #f2a193;
+  /* A little lighter than Nuxt UI's defaults, so borders and weak texts stay readable on the dark surface. */
+  --ui-border: #273449;
+  --ui-text-dimmed: #7c8ba1;
+}
+
 body {
-  background-color: #f6f8fb;
+  background-color: var(--app-page);
 }

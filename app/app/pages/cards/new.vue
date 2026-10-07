@@ -169,7 +169,7 @@ const MAX_RESULTS = 50
           :key="entry"
           type="button"
           class="rounded-full border px-3.5 py-1.5 text-sm"
-          :class="mode === entry ? 'border-primary bg-primary font-medium text-white' : 'border-default bg-default text-muted hover:text-default'"
+          :class="mode === entry ? 'border-primary bg-primary font-medium text-inverted' : 'border-default bg-default text-muted hover:text-default'"
           :aria-pressed="mode === entry"
           :data-test="`mode-${entry}`"
           @click="mode = entry"
@@ -218,7 +218,7 @@ const MAX_RESULTS = 50
                 :alt="candidate.name"
                 loading="lazy"
                 referrerpolicy="no-referrer"
-                class="h-16 w-12 shrink-0 rounded bg-primary-50 object-cover"
+                class="h-16 w-12 shrink-0 rounded bg-(--app-art) object-cover"
               >
               <div class="min-w-0 flex-1">
                 <p class="font-medium">
@@ -250,7 +250,7 @@ const MAX_RESULTS = 50
           :src="chosen.thumbnailUrl"
           :alt="chosen.name"
           referrerpolicy="no-referrer"
-          class="h-24 w-[70px] shrink-0 rounded bg-primary-50 object-cover"
+          class="h-24 w-[70px] shrink-0 rounded bg-(--app-art) object-cover"
         >
         <div>
           <p class="text-xs text-muted">

@@ -14,6 +14,8 @@ Everything runs in containers: there is nothing to install on the host except Do
   browser in a cookie, so adding several Pokémon cards in a row needs no switching), the overview shows one game or all
   games (all games on the first visit, afterwards the last choice of that browser), and each game has its own filters (Yu-Gi-Oh!: card type, type, attribute, rarity, level range; Pokémon: category,
   type, stage, rarity, variant, HP range) and sort orders (level for Yu-Gi-Oh!, HP for Pokémon)
+- Light and dark appearance: follows the device by default (light if the device says nothing); a switch in the header
+  chooses light, dark or system and is remembered in the browser
 - Collection overview with filters for status, owner, card type, monster type, attribute, rarity and a level range
   (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
   sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come

@@ -341,5 +341,11 @@
     "submit": "Passwort speichern",
     "mismatch": "Die beiden neuen Passwörter stimmen nicht überein.",
     "changed": "Passwort geändert"
+  },
+  "theme": {
+    "label": "Darstellung",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System (folgt dem Gerät)"
   }
 }

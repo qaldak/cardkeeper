@@ -341,5 +341,11 @@
     "submit": "Save password",
     "mismatch": "The two new passwords are not the same.",
     "changed": "Password changed"
+  },
+  "theme": {
+    "label": "Appearance",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System (follows the device)"
   }
 }

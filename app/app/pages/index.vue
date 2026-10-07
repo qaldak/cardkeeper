@@ -205,7 +205,7 @@ function resetFilters() {
         type="button"
         class="rounded-full border px-4 py-2 text-sm"
         :class="game === undefined
-          ? 'border-primary bg-primary font-medium text-white'
+          ? 'border-primary bg-primary font-medium text-inverted'
           : 'border-default bg-default text-muted hover:text-default'"
         @click="setGame(undefined)"
       >
@@ -217,7 +217,7 @@ function resetFilters() {
         type="button"
         class="rounded-full border px-4 py-2 text-sm"
         :class="game === entry.slug
-          ? 'border-primary bg-primary font-medium text-white'
+          ? 'border-primary bg-primary font-medium text-inverted'
           : 'border-default bg-default text-muted hover:text-default'"
         @click="setGame(entry.slug)"
       >
@@ -225,7 +225,7 @@ function resetFilters() {
       </button>
     </div>
     <div v-else-if="games?.[0]" class="mb-3 flex flex-wrap gap-2">
-      <span class="rounded-full bg-primary px-4 py-2 text-sm font-medium text-white">{{ games[0].displayName }}</span>
+      <span class="rounded-full bg-primary px-4 py-2 text-sm font-medium text-inverted">{{ games[0].displayName }}</span>
     </div>
 
     <div class="mb-6 flex flex-wrap items-center gap-2">
