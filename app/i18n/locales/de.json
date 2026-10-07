@@ -215,7 +215,13 @@
       "found": "Karte nach Set und Nummer gefunden",
       "use": "Diese Karte verwenden"
     },
-    "ownerNote": "Die Karte wird deiner Sammlung ({name}) hinzugefügt. Nur du kannst sie danach ändern."
+    "ownerNote": "Die Karte wird deiner Sammlung ({name}) hinzugefügt. Nur du kannst sie danach ändern.",
+    "edition": {
+      "label": "Edition",
+      "hint": "Auf der Karte aufgedruckte Edition wählen oder offen lassen.",
+      "needsPrinting": "Zuerst eine Ausgabe wählen, die Edition gehört dazu.",
+      "other": "Eine andere Edition kann auf der Kartenseite eingetragen werden."
+    }
   },
   "errors": {
     "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
@@ -352,5 +358,10 @@
     "light": "Hell",
     "dark": "Dunkel",
     "system": "System (folgt dem Gerät)"
+  },
+  "edition": {
+    "first": "1. Auflage",
+    "unlimited": "Unlimitierte Auflage",
+    "limited": "Limitierte Auflage"
   }
 }

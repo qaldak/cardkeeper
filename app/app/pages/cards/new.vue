@@ -35,6 +35,8 @@ const searchError = ref('')
 const chosen = ref<LookupCandidateDto | null>(null)
 const choosing = ref<string | null>(null)
 const printing = ref(NONE)
+// Yu-Gi-Oh!: the edition of the printing, chosen with one click (the card database does not know it).
+const edition = ref<string | null>(null)
 const purchaseDate = ref('')
 const submitting = ref(false)
 
@@ -87,6 +89,7 @@ async function choose(externalId: string) {
       query: { game: gameSlug.value },
     })
     printing.value = config.value.printingRequired && chosen.value.sets.length > 0 ? '0' : NONE
+    edition.value = null
   }
   catch (error) {
     toast.add({ title: apiError(error), color: 'error' })
@@ -108,7 +111,7 @@ async function submit() {
       body: {
         game: gameSlug.value,
         externalId: chosen.value.externalId,
-        set: set ? { setCode: set.setCode, rarity: set.rarity, edition: set.edition } : undefined,
+        set: set ? { setCode: set.setCode, rarity: set.rarity, edition: config.value.editions.length > 0 ? edition.value : set.edition } : undefined,
         purchaseDate: purchaseDate.value || null,
       },
     })
@@ -270,6 +273,13 @@ const MAX_RESULTS = 50
 
       <UFormField :label="isPokemon ? t('add.variant') : t('add.printing')" :hint="config.printingRequired ? t('add.variantRequired') : undefined">
         <USelectMenu v-model="printing" :items="printingItems" value-key="value" class="w-full" />
+      </UFormField>
+      <UFormField
+        v-if="config.editions.length > 0"
+        :label="t('add.edition.label')"
+        :description="printing === NONE ? t('add.edition.needsPrinting') : t('add.edition.hint')"
+      >
+        <EditionChips v-model="edition" :choices="config.editions" :disabled="printing === NONE" />
       </UFormField>
       <p class="text-sm text-muted" data-test="owner-note">
         {{ t('add.ownerNote', { name: me?.name ?? '' }) }}

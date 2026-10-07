@@ -92,7 +92,7 @@ const variantItems = computed<{ label: string, value: string }[]>(() => {
     .map(key => ({ label: labels.variant(key), value: key }))
 })
 const editionText = (edition: string | null | undefined) =>
-  gameConfig.value.editionKind === 'variant' ? labels.variant(edition) : (edition ?? '')
+  gameConfig.value.editionKind === 'variant' ? labels.variant(edition) : labels.edition(edition)
 const showDate = computed(() => statusNeedsDate(form.status))
 const showPerson = computed(() => statusNeedsPerson(form.status))
 
@@ -449,6 +449,13 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
               <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
                 <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" :disabled="!canEdit" class="w-full" />
                 <UInput v-else v-model="form.edition" maxlength="80" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
+                <EditionChips
+                  v-if="canEdit && gameConfig.editions.length > 0"
+                  :model-value="form.edition || null"
+                  :choices="gameConfig.editions"
+                  class="mt-2"
+                  @update:model-value="(value: string | null) => (form.edition = value ?? '')"
+                />
               </UFormField>
               <UFormField :label="t('card.fields.setName')">
                 <UInput :model-value="setNameShown" readonly class="w-full" :ui="readonlyUi" />

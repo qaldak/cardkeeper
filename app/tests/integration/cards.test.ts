@@ -91,6 +91,24 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect(card.images).toEqual([])
     })
 
+    it('stores the edition that was chosen for a Yu-Gi-Oh! printing, which the card database does not know', async () => {
+      const card = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '1st Edition' } })
+      expect(card.sets).toEqual([expect.objectContaining({ setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '1st Edition' })])
+    })
+
+    it('accepts any text as the edition of a Yu-Gi-Oh! card and treats a blank one as none', async () => {
+      const special = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '  Special Edition ' } })
+      expect(special.sets[0]!.edition).toBe('Special Edition')
+      const blank = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '  ' } })
+      expect(blank.sets[0]!.edition).toBeNull()
+      const none = await addDarkMagician()
+      expect(none.sets[0]!.edition).toBeNull()
+    })
+
+    it('still needs the set code and rarity to be one of the card, whatever the edition', async () => {
+      await expect(addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Common', edition: '1st Edition' } })).rejects.toMatchObject({ code: 'invalid_set' })
+    })
+
     it('rejects an unknown card, game and printing', async () => {
       await expect(h.services.cards.create({ game: 'ygo', externalId: '999' }, h.anna)).rejects.toMatchObject({ status: 404, code: 'upstream_card_not_found' })
       await expect(h.services.cards.create({ game: 'mtg', externalId: '1' }, h.anna)).rejects.toMatchObject({ status: 400, code: 'unknown_game' })

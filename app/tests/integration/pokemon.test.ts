@@ -58,6 +58,11 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       expect(existsSync(join(h.config.imageDir, stored.filePath))).toBe(true)
     })
 
+    it('only accepts the variants the Pokémon card exists in, not any text', async () => {
+      await expect(add(FURRET, 'holo', 'Uncommon')).rejects.toMatchObject({ code: 'invalid_set' })
+      await expect(add(FURRET, '1st Edition', 'Uncommon')).rejects.toMatchObject({ code: 'invalid_set' })
+    })
+
     it('requests every stored language and registers the game', async () => {
       await addFurret()
       expect([...h.tcgdex.requestedLanguages].sort()).toEqual(['de', 'en', 'ja'])

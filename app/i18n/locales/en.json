@@ -215,7 +215,13 @@
       "found": "Card found by set and number",
       "use": "Use this card"
     },
-    "ownerNote": "The card is added to your collection ({name}). Only you can change it afterwards."
+    "ownerNote": "The card is added to your collection ({name}). Only you can change it afterwards.",
+    "edition": {
+      "label": "Edition",
+      "hint": "Choose the edition printed on your card, or leave it open.",
+      "needsPrinting": "Choose a printing first, the edition belongs to it.",
+      "other": "Another edition can be typed on the card page."
+    }
   },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
@@ -352,5 +358,10 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System (follows the device)"
+  },
+  "edition": {
+    "first": "1st Edition",
+    "unlimited": "Unlimited",
+    "limited": "Limited Edition"
   }
 }
