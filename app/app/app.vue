@@ -1,9 +1,10 @@
 <script setup lang="ts">
-const { t, locale } = useI18n()
+const { locale } = useI18n()
 
 useHead({
   htmlAttrs: { lang: locale },
-  titleTemplate: title => (title ? `${title} · ${t('app.title')}` : t('app.title')),
+  // "Cardkeeper - Übersicht": the name of the app comes first, so that the tabs of several pages can be told apart by their end.
+  titleTemplate: title => (title ? `Cardkeeper - ${title}` : 'Cardkeeper'),
 })
 </script>
 
