@@ -127,7 +127,10 @@
       "makePrimary": "Als Hauptbild",
       "delete": "Bild löschen",
       "deleted": "Bild gelöscht",
-      "primaryChanged": "Hauptbild geändert"
+      "primaryChanged": "Hauptbild geändert",
+      "zoom": "Bild vergrössern",
+      "previous": "Vorheriges Bild",
+      "next": "Nächstes Bild"
     },
     "prices": {
       "empty": "Noch keine Preise vorhanden.",
