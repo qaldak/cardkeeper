@@ -107,6 +107,7 @@ model CardSet {
   setCode String  @map("set_code")
   setName String? @map("set_name")
   rarity  String?
+  // Yu-Gi-Oh!: a preset key (FIRST_EDITION, UNLIMITED, LIMITED_EDITION) or free text; Pokémon: the variant key.
   edition String?
   card    Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
 

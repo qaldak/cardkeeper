@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CardDetailDto, CardImageDto, UserDto } from '#shared/types/api'
 import { POKEMON_VARIANTS, type PokemonDetails } from '#shared/types/pokemon'
+import { isEditionKey } from '#shared/utils/editions'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
 import { preferredLanguage } from '#shared/utils/languages'
@@ -91,6 +92,14 @@ const variantItems = computed<{ label: string, value: string }[]>(() => {
     .filter(key => available[key] === true || key === form.edition)
     .map(key => ({ label: labels.variant(key), value: key }))
 })
+// Yu-Gi-Oh!: the printed editions (stored as keys, shown translated). Unlimited is not printed: no edition, which the
+// clear button of the list sets. A stored text that is none of them (older data) is listed as well, so that it stays
+// visible and is not lost by saving.
+const editionItems = computed(() => {
+  const items = gameConfig.value.editions.map(key => ({ label: labels.edition(key), value: key }))
+  const current = form.edition.trim()
+  return current && !isEditionKey(current) ? [...items, { label: current, value: current }] : items
+})
 const editionText = (edition: string | null | undefined) =>
   gameConfig.value.editionKind === 'variant' ? labels.variant(edition) : labels.edition(edition)
 const showDate = computed(() => statusNeedsDate(form.status))
@@ -105,6 +114,16 @@ watch(() => form.status, (status) => {
 
 const statusItems = computed(() => CARD_STATUSES.map(value => ({ label: t(`status.${value}`), value })))
 const ownerItems = computed(() => (users.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })))
+
+// A set code is always written in capitals ("LOB-005"). The typed letters are converted in the field itself, keeping
+// the cursor where it is, so that a letter in the middle of the code does not throw the cursor to the end.
+function upperCaseSetCode(event: Event) {
+  const input = event.target as HTMLInputElement
+  const { selectionStart, selectionEnd } = input
+  input.value = input.value.toUpperCase()
+  input.setSelectionRange(selectionStart, selectionEnd)
+  form.setCode = input.value
+}
 
 const nullIfBlank = (value: string) => (value.trim() === '' ? null : value.trim())
 
@@ -444,18 +463,27 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
                   class="w-full"
                   :readonly="!gameConfig.setCodeEditable || !canEdit"
                   :ui="gameConfig.setCodeEditable && canEdit ? undefined : readonlyUi"
+                  data-test="set-code"
+                  @input="upperCaseSetCode"
                 />
               </UFormField>
               <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
                 <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" :disabled="!canEdit" class="w-full" />
-                <UInput v-else v-model="form.edition" maxlength="80" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
-                <EditionChips
-                  v-if="canEdit && gameConfig.editions.length > 0"
-                  :model-value="form.edition || null"
-                  :choices="gameConfig.editions"
-                  class="mt-2"
-                  @update:model-value="(value: string | null) => (form.edition = value ?? '')"
+                <!-- A preset is shown translated but stored as its key; a typed text (create item) is stored as typed. -->
+                <USelectMenu
+                  v-else-if="canEdit && gameConfig.editions.length > 0"
+                  :model-value="form.edition || undefined"
+                  :items="editionItems"
+                  value-key="value"
+                  :search-input="false"
+                  :placeholder="t('card.editionNone')"
+                  clear
+                  class="w-full"
+                  data-test="edition-input"
+                  @update:model-value="(value?: string | null) => (form.edition = value ?? '')"
                 />
+                <UInput v-else-if="canEdit" v-model="form.edition" maxlength="80" class="w-full" />
+                <UInput v-else :model-value="editionText(form.edition)" readonly :ui="readonlyUi" class="w-full" />
               </UFormField>
               <UFormField :label="t('card.fields.setName')">
                 <UInput :model-value="setNameShown" readonly class="w-full" :ui="readonlyUi" />

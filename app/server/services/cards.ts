@@ -1,11 +1,13 @@
 import { Prisma, type PrismaClient } from '../generated/prisma/client'
 import type { CardDetailDto, CardListResponseDto, FacetsDto, LookupCandidateDto } from '../../shared/types/api'
+import { EDITION_KEYS } from '../../shared/utils/editions'
 import { getGameConfig } from '../../shared/utils/game-config'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import { assertOwner, type Actor } from '../lib/actor'
 import type { AppConfig } from '../lib/config'
 import { buildCardWhere, type CardFilters } from '../lib/card-filters'
 import { sortRows, type SortRow } from '../lib/card-sort'
+import type { UnknownEdition } from '../lib/editions'
 import { formatDateOnly, parseDateOnly, utcToday } from '../lib/dates'
 import { badRequest, notFound } from '../lib/errors'
 import { detectImageType, removeCardImageDir, saveImage } from '../lib/image-files'
@@ -261,6 +263,26 @@ export function createCardService(deps: CardServiceDeps) {
     },
 
     /** Searches the card database: German first, English if German finds nothing. */
+    /**
+     * The editions of games that offer a choice of editions (Yu-Gi-Oh!) that are none of the known keys, e.g. a text
+     * from before the keys existed. They are reported at startup, never changed.
+     */
+    async unknownEditions(): Promise<UnknownEdition[]> {
+      const slugs = registry.list().map(adapter => adapter.slug).filter(slug => getGameConfig(slug).editions.length > 0)
+      if (slugs.length === 0) {
+        return []
+      }
+      const rows = await db.$queryRaw<{ game: string, edition: string, count: number }[]>`
+        SELECT g.slug AS game, s.edition AS edition, count(*)::int AS count
+        FROM card_sets s JOIN cards c ON c.id = s.card_id JOIN games g ON g.id = c.game_id
+        WHERE g.slug IN (${Prisma.join(slugs)})
+          AND s.edition IS NOT NULL AND btrim(s.edition) <> ''
+          AND s.edition NOT IN (${Prisma.join(EDITION_KEYS)})
+        GROUP BY g.slug, s.edition
+        ORDER BY g.slug, s.edition`
+      return rows
+    },
+
     async lookup(gameSlug: string, query: string): Promise<LookupCandidateDto[]> {
       const adapter = registry.require(gameSlug)
       for (const language of adapter.storedLanguages) {
