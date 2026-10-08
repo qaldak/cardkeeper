@@ -92,14 +92,11 @@ const variantItems = computed<{ label: string, value: string }[]>(() => {
     .filter(key => available[key] === true || key === form.edition)
     .map(key => ({ label: labels.variant(key), value: key }))
 })
-// Yu-Gi-Oh!: the printed editions (stored as keys, shown translated) and "no imprint". A stored text that is none of
-// them (older data) is listed as well, so that it stays visible and is not lost by saving.
-const NO_EDITION = '__none__'
+// Yu-Gi-Oh!: the printed editions (stored as keys, shown translated). Unlimited is not printed: no edition, which the
+// clear button of the list sets. A stored text that is none of them (older data) is listed as well, so that it stays
+// visible and is not lost by saving.
 const editionItems = computed(() => {
-  const items = [
-    { label: t('edition.none'), value: NO_EDITION },
-    ...gameConfig.value.editions.map(key => ({ label: labels.edition(key), value: key })),
-  ]
+  const items = gameConfig.value.editions.map(key => ({ label: labels.edition(key), value: key }))
   const current = form.edition.trim()
   return current && !isEditionKey(current) ? [...items, { label: current, value: current }] : items
 })
@@ -461,14 +458,17 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
               <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
                 <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" :disabled="!canEdit" class="w-full" />
                 <!-- A preset is shown translated but stored as its key; a typed text (create item) is stored as typed. -->
-                <!-- The printed editions as a list; "no imprint" (Unlimited) is the empty value. -->
-                <USelect
+                <USelectMenu
                   v-else-if="canEdit && gameConfig.editions.length > 0"
-                  :model-value="form.edition || NO_EDITION"
+                  :model-value="form.edition || undefined"
                   :items="editionItems"
+                  value-key="value"
+                  :search-input="false"
+                  :placeholder="t('card.editionNone')"
+                  clear
                   class="w-full"
                   data-test="edition-input"
-                  @update:model-value="(value: string) => (form.edition = value === NO_EDITION ? '' : value)"
+                  @update:model-value="(value?: string | null) => (form.edition = value ?? '')"
                 />
                 <UInput v-else-if="canEdit" v-model="form.edition" maxlength="80" class="w-full" />
                 <UInput v-else :model-value="editionText(form.edition)" readonly :ui="readonlyUi" class="w-full" />

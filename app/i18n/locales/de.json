@@ -84,6 +84,7 @@
     "noOwner": "Ohne Besitzer"
   },
   "card": {
+    "editionNone": "Keine Edition",
     "noImage": "Bild",
     "origin": {
       "api": "aus API übernommen",
@@ -360,7 +361,6 @@
   },
   "edition": {
     "FIRST_EDITION": "1. Auflage",
-    "LIMITED_EDITION": "Limitierte Auflage",
-    "none": "Ohne Aufdruck (Unlimited)"
+    "LIMITED_EDITION": "Limitierte Auflage"
   }
 }
