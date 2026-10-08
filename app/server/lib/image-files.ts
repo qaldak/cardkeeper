@@ -55,6 +55,24 @@ export function inlineDisposition(fileName: string): string {
   return `inline; filename="${ascii}"; filename*=UTF-8''${encoded}`
 }
 
+/**
+ * The ETag of a stored image: its file name without the extension. Every stored file has its own random name, so the
+ * tag changes whenever a different image is stored under the same id (e.g. a database that was set up again).
+ */
+export function imageEtag(filePath: string): string {
+  const name = filePath.split(/[\\/]/).pop() ?? ''
+  const dot = name.lastIndexOf('.')
+  return `"${dot > 0 ? name.slice(0, dot) : name}"`
+}
+
+/** Whether an `If-None-Match` header (a list of tags, weak ones included, or `*`) names this ETag. */
+export function etagMatches(header: string | undefined, etag: string): boolean {
+  if (!header) {
+    return false
+  }
+  return header.split(',').map(tag => tag.trim().replace(/^W\//, '')).some(tag => tag === '*' || tag === etag)
+}
+
 /** Resolves a stored relative path inside the image directory and rejects anything that escapes it. */
 export function resolveImagePath(imageDir: string, relativePath: string): string {
   const root = resolve(imageDir)

@@ -5,6 +5,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   detectImageType,
   downloadFileName,
+  etagMatches,
+  imageEtag,
   inlineDisposition,
   mimeFromExtension,
   removeCardImageDir,
@@ -106,5 +108,24 @@ describe('inlineDisposition', () => {
     const header = inlineDisposition('a"; evil=1.png')
     expect(header.split('"').length).toBe(3)
     expect(header).toContain(`filename*=UTF-8''a%22%3B%20evil%3D1.png`)
+  })
+})
+
+describe('image ETag', () => {
+  it('is the file name without the extension, so another file under the same image id gets another tag', () => {
+    expect(imageEtag('12/0b9a3f1e-7c1d-4f7e-9a55-1f2f6a8c7d10.webp')).toBe('"0b9a3f1e-7c1d-4f7e-9a55-1f2f6a8c7d10"')
+    expect(imageEtag('/data/card-images/1/aaa.png')).not.toBe(imageEtag('/data/card-images/1/bbb.png'))
+    expect(imageEtag('C:\\images\\1\\abc.jpg')).toBe('"abc"')
+  })
+
+  it('matches the tag in If-None-Match: a single tag, a list, a weak tag or *', () => {
+    const etag = '"abc"'
+    expect(etagMatches('"abc"', etag)).toBe(true)
+    expect(etagMatches('"x", "abc"', etag)).toBe(true)
+    expect(etagMatches('W/"abc"', etag)).toBe(true)
+    expect(etagMatches('*', etag)).toBe(true)
+    expect(etagMatches('"other"', etag)).toBe(false)
+    expect(etagMatches(undefined, etag)).toBe(false)
+    expect(etagMatches('', etag)).toBe(false)
   })
 })

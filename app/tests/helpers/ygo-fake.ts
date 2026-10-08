@@ -87,6 +87,8 @@ export interface FakeYgoServer {
   apiCalls: () => number
   /** Languages requested so far, in order. */
   requestedLanguages: string[]
+  /** Images requested from the image host so far. */
+  requestedImages: string[]
   failImages: boolean
   /**
    * Simulates an API that answers a German request for an untranslated card with the English card
@@ -104,10 +106,12 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
     failImages: false,
     germanFallsBackToEnglish: false,
     requestedLanguages: [],
+    requestedImages: [],
     apiCalls: () => calls,
     fetchFn: (async (input: URL | RequestInfo) => {
       const url = new URL(input instanceof Request ? input.url : String(input))
       if (url.hostname === 'images.ygoprodeck.com') {
+        server.requestedImages.push(url.pathname)
         return server.failImages
           ? new Response('not found', { status: 404 })
           : new Response(PNG_BYTES as BodyInit, { status: 200, headers: { 'content-type': 'image/png' } })
