@@ -16,8 +16,8 @@ describe('game configuration', () => {
     expect(getGameConfig('mtg')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [] })
   })
 
-  it('offers the preset editions for Yu-Gi-Oh! only, as stable keys', () => {
-    expect(YGO_EDITIONS).toEqual(['FIRST_EDITION', 'UNLIMITED', 'LIMITED_EDITION'])
+  it('offers the printed editions for Yu-Gi-Oh! only, as stable keys', () => {
+    expect(YGO_EDITIONS).toEqual(['FIRST_EDITION', 'LIMITED_EDITION'])
     expect(getGameConfig('pokemon').editions).toEqual([])
   })
 

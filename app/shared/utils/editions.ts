@@ -1,9 +1,10 @@
 /**
- * The editions of a Yu-Gi-Oh! card that nearly every card has. `card_sets.edition` stores the key, never the
- * label, so the label can follow the language (`edition.<KEY>` in the locale files, like `status.<KEY>`).
- * Every other edition is free text and is stored and shown exactly as typed.
+ * The editions that are printed on a Yu-Gi-Oh! card, left of the set code. `card_sets.edition` stores the key, never
+ * the label, so the label can follow the language (`edition.<KEY>` in the locale files, like `status.<KEY>`).
+ * "Unlimited" is not printed on the card: it is the card without an edition, stored as NULL.
+ * Any other text (older data, the API) is shown exactly as stored.
  */
-export const EDITION_KEYS = ['FIRST_EDITION', 'UNLIMITED', 'LIMITED_EDITION'] as const
+export const EDITION_KEYS = ['FIRST_EDITION', 'LIMITED_EDITION'] as const
 
 export type EditionKey = (typeof EDITION_KEYS)[number]
 

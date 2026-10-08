@@ -84,8 +84,6 @@
     "noOwner": "No owner"
   },
   "card": {
-    "editionCreate": "Create “{label}”",
-    "editionPlaceholder": "Choose or type an edition…",
     "noImage": "Image",
     "origin": {
       "api": "imported from API",
@@ -220,9 +218,8 @@
     "ownerNote": "The card is added to your collection ({name}). Only you can change it afterwards.",
     "edition": {
       "label": "Edition",
-      "hint": "Choose the edition printed on your card, or leave it open.",
-      "needsPrinting": "Choose a printing first, the edition belongs to it.",
-      "other": "Another edition can be typed on the card page."
+      "hint": "The edition printed on the card. If nothing is printed, choose nothing: that is Unlimited.",
+      "needsPrinting": "Choose a printing first, the edition belongs to it."
     }
   },
   "errors": {
@@ -363,7 +360,7 @@
   },
   "edition": {
     "FIRST_EDITION": "1st Edition",
-    "UNLIMITED": "Unlimited",
-    "LIMITED_EDITION": "Limited Edition"
+    "LIMITED_EDITION": "Limited Edition",
+    "none": "No imprint (Unlimited)"
   }
 }

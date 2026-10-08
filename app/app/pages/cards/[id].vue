@@ -7,7 +7,7 @@ import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fie
 import { preferredLanguage } from '#shared/utils/languages'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const toast = useToast()
 const apiError = useApiError()
@@ -92,19 +92,17 @@ const variantItems = computed<{ label: string, value: string }[]>(() => {
     .filter(key => available[key] === true || key === form.edition)
     .map(key => ({ label: labels.variant(key), value: key }))
 })
-// Yu-Gi-Oh!: the preset editions (stored as keys, shown translated) plus the current free text, so that it stays selectable.
+// Yu-Gi-Oh!: the printed editions (stored as keys, shown translated) and "no imprint". A stored text that is none of
+// them (older data) is listed as well, so that it stays visible and is not lost by saving.
+const NO_EDITION = '__none__'
 const editionItems = computed(() => {
-  const items = gameConfig.value.editions.map(key => ({ label: labels.edition(key), value: key }))
+  const items = [
+    { label: t('edition.none'), value: NO_EDITION },
+    ...gameConfig.value.editions.map(key => ({ label: labels.edition(key), value: key })),
+  ]
   const current = form.edition.trim()
   return current && !isEditionKey(current) ? [...items, { label: current, value: current }] : items
 })
-// Typed text that matches no preset: stored exactly as entered, in both languages, never mapped to a key.
-function createEdition(text: string) {
-  const typed = text.trim().slice(0, 80)
-  if (typed) {
-    form.edition = typed
-  }
-}
 const editionText = (edition: string | null | undefined) =>
   gameConfig.value.editionKind === 'variant' ? labels.variant(edition) : labels.edition(edition)
 const showDate = computed(() => statusNeedsDate(form.status))
@@ -463,27 +461,15 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
               <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
                 <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" :disabled="!canEdit" class="w-full" />
                 <!-- A preset is shown translated but stored as its key; a typed text (create item) is stored as typed. -->
-                <!-- keyed by the language: the shown label of the selected key is only read again on a new mount -->
-                <UInputMenu
+                <!-- The printed editions as a list; "no imprint" (Unlimited) is the empty value. -->
+                <USelect
                   v-else-if="canEdit && gameConfig.editions.length > 0"
-                  :key="locale"
-                  :model-value="form.edition || undefined"
+                  :model-value="form.edition || NO_EDITION"
                   :items="editionItems"
-                  value-key="value"
-                  create-item
-                  :placeholder="t('card.editionPlaceholder')"
-                  open-on-click
-                  open-on-focus
-                  clear
                   class="w-full"
                   data-test="edition-input"
-                  @update:model-value="(value?: string | null) => (form.edition = value ?? '')"
-                  @create="createEdition"
-                >
-                  <template #create-item-label="{ item }">
-                    <span class="font-medium text-primary">+ {{ t('card.editionCreate', { label: item }) }}</span>
-                  </template>
-                </UInputMenu>
+                  @update:model-value="(value: string) => (form.edition = value === NO_EDITION ? '' : value)"
+                />
                 <UInput v-else-if="canEdit" v-model="form.edition" maxlength="80" class="w-full" />
                 <UInput v-else :model-value="editionText(form.edition)" readonly :ui="readonlyUi" class="w-full" />
               </UFormField>

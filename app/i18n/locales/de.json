@@ -84,8 +84,6 @@
     "noOwner": "Ohne Besitzer"
   },
   "card": {
-    "editionCreate": "Erstelle „{label}“",
-    "editionPlaceholder": "Edition wählen oder eingeben…",
     "noImage": "Bild",
     "origin": {
       "api": "aus API übernommen",
@@ -220,9 +218,8 @@
     "ownerNote": "Die Karte wird deiner Sammlung ({name}) hinzugefügt. Nur du kannst sie danach ändern.",
     "edition": {
       "label": "Edition",
-      "hint": "Auf der Karte aufgedruckte Edition wählen oder offen lassen.",
-      "needsPrinting": "Zuerst eine Ausgabe wählen, die Edition gehört dazu.",
-      "other": "Eine andere Edition kann auf der Kartenseite eingetragen werden."
+      "hint": "Die Edition, die auf der Karte aufgedruckt ist. Steht nichts darauf, nichts wählen: das ist Unlimited.",
+      "needsPrinting": "Zuerst eine Ausgabe wählen, die Edition gehört dazu."
     }
   },
   "errors": {
@@ -363,7 +360,7 @@
   },
   "edition": {
     "FIRST_EDITION": "1. Auflage",
-    "UNLIMITED": "Unlimitierte Auflage",
-    "LIMITED_EDITION": "Limitierte Auflage"
+    "LIMITED_EDITION": "Limitierte Auflage",
+    "none": "Ohne Aufdruck (Unlimited)"
   }
 }

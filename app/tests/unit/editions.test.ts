@@ -10,18 +10,18 @@ const translator = (messages: Messages) => (key: string) =>
 
 describe('edition labels', () => {
   it('knows the three preset keys', () => {
-    expect(EDITION_KEYS).toEqual(['FIRST_EDITION', 'UNLIMITED', 'LIMITED_EDITION'])
-    expect(isEditionKey('UNLIMITED')).toBe(true)
+    expect(EDITION_KEYS).toEqual(['FIRST_EDITION', 'LIMITED_EDITION'])
+    expect(isEditionKey('LIMITED_EDITION')).toBe(true)
+    // Unlimited is not printed on the card: it is no edition but the lack of one.
+    expect(isEditionKey('UNLIMITED')).toBe(false)
     expect(isEditionKey('Unlimited')).toBe(false)
     expect(isEditionKey(null)).toBe(false)
   })
 
   it('translates a known key into the language of the locale', () => {
     expect(editionLabel('FIRST_EDITION', translator(de))).toBe('1. Auflage')
-    expect(editionLabel('UNLIMITED', translator(de))).toBe('Unlimitierte Auflage')
     expect(editionLabel('LIMITED_EDITION', translator(de))).toBe('Limitierte Auflage')
     expect(editionLabel('FIRST_EDITION', translator(en))).toBe('1st Edition')
-    expect(editionLabel('UNLIMITED', translator(en))).toBe('Unlimited')
     expect(editionLabel('LIMITED_EDITION', translator(en))).toBe('Limited Edition')
   })
 
@@ -41,6 +41,7 @@ describe('edition labels', () => {
       expect(label('1. Auflage')).toBe('1. Auflage')
       expect(label('first_edition')).toBe('first_edition')
       expect(label('constructor')).toBe('constructor')
+      expect(label('UNLIMITED')).toBe('UNLIMITED')
     }
   })
 

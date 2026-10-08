@@ -35,7 +35,8 @@ const searchError = ref('')
 const chosen = ref<LookupCandidateDto | null>(null)
 const choosing = ref<string | null>(null)
 const printing = ref(NONE)
-// Yu-Gi-Oh!: the edition of the printing, chosen with one click (the card database does not know it).
+// Yu-Gi-Oh!: the edition printed on the card (a key such as FIRST_EDITION), chosen with one click. None chosen means
+// Unlimited, which is not printed. The card database does not know the edition.
 const edition = ref<string | null>(null)
 const purchaseDate = ref('')
 const submitting = ref(false)
