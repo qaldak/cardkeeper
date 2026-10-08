@@ -38,6 +38,8 @@ export interface FakeTcgdexServer {
   cards: Map<string, FakePokemonCard>
   requestedLanguages: string[]
   requestedUrls: string[]
+  /** Images requested from the image host so far. */
+  requestedImages: string[]
   failImages: boolean
   /** Simulates an API that answers a German request for an untranslated card with the English card. */
   germanFallsBackToEnglish: boolean
@@ -53,11 +55,13 @@ export function createFakeTcgdexServer(initial: FakePokemonCard[]): FakeTcgdexSe
     cards,
     requestedLanguages: [],
     requestedUrls: [],
+    requestedImages: [],
     failImages: false,
     germanFallsBackToEnglish: false,
     fetchFn: (async (input: URL | RequestInfo) => {
       const url = new URL(input instanceof Request ? input.url : String(input))
       if (url.hostname === 'assets.tcgdex.net') {
+        server.requestedImages.push(url.pathname)
         return server.failImages
           ? new Response('not found', { status: 404 })
           : new Response(PNG_BYTES as BodyInit, { status: 200, headers: { 'content-type': 'image/webp' } })
