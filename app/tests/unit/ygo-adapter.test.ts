@@ -88,6 +88,88 @@ describe('YGO adapter: mapping', () => {
   })
 })
 
+describe('YGO adapter: Link monsters and unexpected values', () => {
+  const adapter = adapterWith(vi.fn() as unknown as typeof fetch)
+
+  it('maps the answer of the real API for a Link monster (def is null)', () => {
+    const real = JSON.parse(readFileSync(new URL('../fixtures/ygo-link-monster.json', import.meta.url), 'utf8')) as { data: unknown[] }
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const card = adapter.mapToCommonSchema(real.data[0])
+    expect(card).toMatchObject({ externalId: '24361622', name: 'Hieratic Seal of the Heavenly Spheres' })
+    expect(card.attributes).toMatchObject({ type: 'Link Monster', atk: 0, linkval: 2, linkmarkers: ['Bottom-Left', 'Bottom-Right'], archetype: 'Hieratic' })
+    expect(card.attributes).not.toHaveProperty('def')
+    expect(card.sets.map(set => set.setCode)).toEqual(['RA02-EN039', 'RA02-EN039', 'BLCR-EN090', 'DUPO-EN027', 'SDWD-EN040'])
+    expect(card.images[0]!.url).toBe('https://images.ygoprodeck.com/images/cards/24361622.jpg')
+    expect(card.prices.map(price => price.source)).toEqual(['cardmarket', 'tcgplayer', 'ebay', 'amazon', 'coolstuffinc'])
+    // null is "not there": nothing to report.
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+  const link = {
+    id: 24361622,
+    name: 'Link Spider',
+    type: 'Link Monster',
+    frameType: 'link',
+    desc: 'A link monster.',
+    race: 'Cyberse',
+    attribute: 'EARTH',
+    atk: 1000,
+    linkval: 1,
+    linkmarkers: ['Bottom'],
+    typeline: ['Cyberse', 'Link', 'Normal'],
+    card_sets: [{ set_name: 'Starter Deck: Link Strike', set_code: 'SDLS-EN043', set_rarity: 'Common' }],
+    card_images: [{ id: 24361622, image_url: 'https://images.ygoprodeck.com/images/cards/24361622.jpg', image_url_small: 'https://images.ygoprodeck.com/images/cards_small/24361622.jpg' }],
+    card_prices: [{ cardmarket_price: '0.50' }],
+  }
+
+  it('maps a Link monster: link rating and markers, no level and no DEF', () => {
+    const card = adapter.mapToCommonSchema(link)
+    expect(card.attributes).toMatchObject({ type: 'Link Monster', frameType: 'link', atk: 1000, linkval: 1, linkmarkers: ['Bottom'] })
+    expect(card.attributes).not.toHaveProperty('def')
+    expect(card.attributes).not.toHaveProperty('level')
+    expect(card.sets).toHaveLength(1)
+  })
+
+  it('accepts null for the fields a Link monster does not have', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const card = adapter.mapToCommonSchema({ ...link, def: null, level: null, scale: null, archetype: null })
+    expect(card.attributes).toMatchObject({ atk: 1000, linkval: 1 })
+    expect(card.attributes).not.toHaveProperty('def')
+    expect(card.attributes).not.toHaveProperty('level')
+    // null is "not there", nothing to report.
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
+  it('leaves out a field with an unexpected value instead of rejecting the card, and logs it once', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const odd = { ...link, id: 777, atk: '?', linkval: { value: 1 }, card_sets: [{ set_name: 'No code' }, ...link.card_sets] }
+    const card = adapter.mapToCommonSchema(odd)
+    expect(card.name).toBe('Link Spider')
+    expect(card.attributes).not.toHaveProperty('atk')
+    expect(card.attributes).not.toHaveProperty('linkval')
+    expect(card.attributes).toMatchObject({ linkmarkers: ['Bottom'] })
+    expect(card.sets).toEqual([{ setCode: 'SDLS-EN043', setName: 'Starter Deck: Link Strike', rarity: 'Common' }])
+    expect(card.raw).toBe(odd)
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(String(warn.mock.calls[0]![0])).toContain('Card 777')
+    expect(String(warn.mock.calls[0]![0])).toContain('atk="?"')
+    expect(String(warn.mock.calls[0]![0])).toContain('linkval={"value":1}')
+    adapter.mapToCommonSchema(odd)
+    expect(warn).toHaveBeenCalledTimes(1)
+    warn.mockRestore()
+  })
+
+  it('still finds the other cards when one card of a search is unusable', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const search = adapterWith(vi.fn().mockResolvedValue(json({ data: [link, { name: 'no id' }, { id: 5, name: 'Other' }] })))
+    expect((await search.searchCards('link')).map(card => card.name)).toEqual(['Link Spider', 'Other'])
+    const onlyBroken = adapterWith(vi.fn().mockResolvedValue(json({ data: [{ name: 'no id' }] })))
+    await expect(onlyBroken.searchCards('x')).rejects.toMatchObject({ status: 502, code: 'upstream_invalid_response' })
+    warn.mockRestore()
+  })
+})
+
 describe('YGO adapter: requests', () => {
   it('fetches a card by passcode', async () => {
     const fetchFn = vi.fn().mockResolvedValue(json(fixture))

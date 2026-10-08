@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { HttpError } from '../../server/lib/errors'
-import { BLUE_EYES, DARK_MAGICIAN, ENGLISH_ONLY } from '../helpers/ygo-fake'
+import { BLUE_EYES, DARK_MAGICIAN, ENGLISH_ONLY, LINK_MONSTER } from '../helpers/ygo-fake'
 import { TEST_DATABASE_URL, useHarness } from './helpers'
 
 describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
@@ -83,6 +83,16 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
     it('creates a card without a specific printing', async () => {
       const card = await h.services.cards.create({ game: 'ygo', externalId: String(BLUE_EYES.id) }, h.anna)
       expect(card.sets).toEqual([])
+    })
+
+    it('finds and adds a Link monster, which has no level and no DEF', async () => {
+      const found = await h.services.cards.lookup('ygo', 'Link')
+      expect(found.map(card => card.name)).toEqual(['Link-Spinne'])
+      const card = await h.services.cards.create({ game: 'ygo', externalId: String(LINK_MONSTER.id) }, h.anna)
+      expect(card.name).toBe('Link-Spinne')
+      expect(card.attributes).toMatchObject({ type: 'Link Monster', atk: 1000, linkval: 1, linkmarkers: ['Bottom'] })
+      expect(card.attributes).not.toHaveProperty('def')
+      expect(card.attributes).not.toHaveProperty('level')
     })
 
     it('does not block creation when the image download fails', async () => {
