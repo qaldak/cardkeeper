@@ -1,3 +1,9 @@
+## [0.10.2](https://github.com/qaldak/cardkeeper/compare/v0.10.1...v0.10.2) (2026-10-08)
+
+### Bug Fixes
+
+* do not refuse a Yu-Gi-Oh! card or a whole search for one unexpected field ([5d229e8](https://github.com/qaldak/cardkeeper/commit/5d229e8e7f5c91cffc1f51fd7d00e84b16fc7ea2))
+
 ## [0.10.1](https://github.com/qaldak/cardkeeper/compare/v0.10.0...v0.10.1) (2026-10-08)
 
 ### Bug Fixes
