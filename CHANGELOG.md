@@ -1,3 +1,9 @@
+## [0.10.1](https://github.com/qaldak/cardkeeper/compare/v0.10.0...v0.10.1) (2026-10-08)
+
+### Bug Fixes
+
+* show the right card image after the database was set up again ([ec5e414](https://github.com/qaldak/cardkeeper/commit/ec5e4145dccb9ed60b8bb3e2e7db8ed06fa3743d))
+
 ## [0.10.0](https://github.com/qaldak/cardkeeper/compare/v0.9.0...v0.10.0) (2026-10-08)
 
 ### Features
