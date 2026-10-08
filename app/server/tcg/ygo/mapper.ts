@@ -1,7 +1,7 @@
 import { HttpError } from '../../lib/errors'
 import { parsePrice } from '../../lib/money'
 import type { CommonCard, CommonCardPrice } from '../types'
-import { ygoCardSchema } from './schema'
+import { parseYgoCard } from './schema'
 
 // Marketplace price fields of the API and the currency each one is quoted in.
 const PRICE_SOURCES = [
@@ -12,13 +12,33 @@ const PRICE_SOURCES = [
   { field: 'coolstuffinc_price', source: 'coolstuffinc', currency: 'USD' },
 ] as const
 
-/** Maps one YGOPRODeck card to the common card schema. Throws a 502 if the payload is malformed. */
+// A card whose fields were ignored is reported once per card and field, not at every lookup.
+const reported = new Set<string>()
+
+function reportIgnored(card: { id: number, name: string }, ignored: string[]) {
+  const fresh = ignored.filter(entry => !reported.has(`${card.id}:${entry}`))
+  if (fresh.length === 0) {
+    return
+  }
+  if (reported.size > 1000) {
+    reported.clear()
+  }
+  fresh.forEach(entry => reported.add(`${card.id}:${entry}`))
+  console.warn(`[ygo] Card ${card.id} "${card.name}": ignored unexpected values from YGOPRODeck: ${fresh.join(', ')}`)
+}
+
+/**
+ * Maps one YGOPRODeck card to the common card schema. Throws a 502 if the card has no id or name; fields with an
+ * unexpected value are left out and logged.
+ */
 export function mapYgoCard(raw: unknown, language: string): CommonCard {
-  const parsed = ygoCardSchema.safeParse(raw)
-  if (!parsed.success) {
+  const parsed = parseYgoCard(raw)
+  if (!parsed) {
+    console.warn(`[ygo] A card without id or name from YGOPRODeck was rejected: ${JSON.stringify(raw)?.slice(0, 200)}`)
     throw new HttpError(502, 'upstream_invalid_response', 'Unexpected card data from YGOPRODeck')
   }
-  const card = parsed.data
+  const card = parsed.card
+  reportIgnored(card, parsed.ignored)
 
   const attributes = Object.fromEntries(Object.entries({
     passcode: String(card.id),

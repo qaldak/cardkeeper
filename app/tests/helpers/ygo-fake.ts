@@ -14,6 +14,8 @@ export interface FakeYgoCard {
   sets?: { set_name: string, set_code: string, set_rarity: string }[]
   /** Printings in the German response, if they differ from the English ones. */
   setsDe?: { set_name: string, set_code: string, set_rarity: string }[]
+  /** Fields of the raw API card that replace the generated ones (`undefined` removes one). */
+  raw?: Record<string, unknown>
 }
 
 export const DARK_MAGICIAN: FakeYgoCard = {
@@ -49,6 +51,19 @@ export const BLUE_EYES: FakeYgoCard = {
   sets: [{ set_name: 'Legend of Blue Eyes White Dragon', set_code: 'LOB-001', set_rarity: 'Ultra Rare' }],
 }
 
+/** A Link monster: no level and no DEF, but a link rating and link markers. */
+export const LINK_MONSTER: FakeYgoCard = {
+  id: 24361622,
+  name: 'Link Spider',
+  nameDe: 'Link-Spinne',
+  type: 'Link Monster',
+  race: 'Cyberse',
+  attribute: 'EARTH',
+  prices: { cardmarket_price: '0.50', tcgplayer_price: '0.40', ebay_price: '0', amazon_price: '0', coolstuffinc_price: '0' },
+  sets: [{ set_name: 'Starter Deck: Link Strike', set_code: 'SDLS-EN043', set_rarity: 'Common' }],
+  raw: { frameType: 'link', atk: 1000, def: undefined, level: undefined, linkval: 1, linkmarkers: ['Bottom'], typeline: ['Cyberse', 'Link', 'Normal'] },
+}
+
 /** A card that exists in English only. */
 export const ENGLISH_ONLY: FakeYgoCard = {
   id: 11111111,
@@ -77,6 +92,7 @@ export function toRawCard(card: FakeYgoCard, language = 'en') {
       image_url_small: `https://images.ygoprodeck.com/images/cards_small/${card.id}.jpg`,
     }],
     card_prices: [card.prices ?? {}],
+    ...card.raw,
   }
 }
 

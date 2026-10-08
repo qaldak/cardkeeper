@@ -323,6 +323,9 @@ No schema change and no change in the core services is required.
   lookup or refresh and downloads each image once. Images are only downloaded from the hosts an adapter declares.
 - The adapter follows the documented API v7 response shape. Its tests use a hand-written fixture of that shape, not
   recorded live data, so check a real lookup after the first deployment.
+- A field of a YGOPRODeck card with an unexpected value (e.g. a Link monster's missing level or DEF delivered as
+  `null`) is left out and logged once as `[ygo] Card <id> "<name>": ignored unexpected values ...`; only a card without
+  id or name is refused. One unusable card does not break a search for the others.
 - The API reports every error as HTTP 400 with `{ "error": "<message>" }`. Only "No card matching …" means an empty
   result; any other error text is passed on in the 502 message and the cause of network failures is kept in the logs.
 - TCGdex (`https://api.tcgdex.net/v2/<language>/cards`) needs no key. The adapter follows the documented card shape and

@@ -109,8 +109,22 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
       }
       // A numeric query is a passcode, everything else is a fuzzy name search.
       const params: Record<string, string> = /^\d{3,12}$/.test(trimmed) ? { id: trimmed } : { fname: trimmed }
-      const results = await query(params, lang)
-      return results.slice(0, MAX_SEARCH_RESULTS).map((raw): CommonCard => mapYgoCard(raw, lang))
+      const results = (await query(params, lang)).slice(0, MAX_SEARCH_RESULTS)
+      // One unusable card does not spoil the search for all the others (it is logged by the mapper).
+      const cards: CommonCard[] = []
+      let failure: unknown
+      for (const raw of results) {
+        try {
+          cards.push(mapYgoCard(raw, lang))
+        }
+        catch (error) {
+          failure ??= error
+        }
+      }
+      if (cards.length === 0 && failure) {
+        throw failure
+      }
+      return cards
     },
 
     mapToCommonSchema(raw, language) {
