@@ -1,3 +1,17 @@
+## [0.10.0](https://github.com/qaldak/cardkeeper/compare/v0.9.0...v0.10.0) (2026-10-08)
+
+### Features
+
+* first edition prefix migration, log of unknown editions, capital set codes ([d5fd504](https://github.com/qaldak/cardkeeper/commit/d5fd504e522e08ba3cc5392daea2e515229260de))
+* migrate the German first edition spelling to its key as well ([a59bd40](https://github.com/qaldak/cardkeeper/commit/a59bd40293225030f954a130df23bb832481fa2c))
+* only the printed editions, Unlimited is the empty edition ([4a7dd42](https://github.com/qaldak/cardkeeper/commit/4a7dd4271094da19eaf8855f9de3c3ef38834241))
+* placeholder and clearer create row for the edition dropdown ([0e80576](https://github.com/qaldak/cardkeeper/commit/0e80576abff31a1af4dd0c48280ac80f8e12abaa))
+* store the preset Yu-Gi-Oh! editions as translatable keys ([6469588](https://github.com/qaldak/cardkeeper/commit/6469588177fc62277a8089466cc7c4de1cec664f))
+
+### Bug Fixes
+
+* no entry for the empty edition in the dropdown ([7f572aa](https://github.com/qaldak/cardkeeper/commit/7f572aad502e624a172e09486b2d3543c31e7c95))
+
 ## [0.9.0](https://github.com/qaldak/cardkeeper/compare/v0.8.2...v0.9.0) (2026-10-07)
 
 ### Features
