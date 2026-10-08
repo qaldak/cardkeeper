@@ -115,6 +115,16 @@ watch(() => form.status, (status) => {
 const statusItems = computed(() => CARD_STATUSES.map(value => ({ label: t(`status.${value}`), value })))
 const ownerItems = computed(() => (users.value ?? []).map(entry => ({ label: entry.name, value: String(entry.id) })))
 
+// A set code is always written in capitals ("LOB-005"). The typed letters are converted in the field itself, keeping
+// the cursor where it is, so that a letter in the middle of the code does not throw the cursor to the end.
+function upperCaseSetCode(event: Event) {
+  const input = event.target as HTMLInputElement
+  const { selectionStart, selectionEnd } = input
+  input.value = input.value.toUpperCase()
+  input.setSelectionRange(selectionStart, selectionEnd)
+  form.setCode = input.value
+}
+
 const nullIfBlank = (value: string) => (value.trim() === '' ? null : value.trim())
 
 /** Builds the PATCH body with only the fields that differ from the stored card. */
@@ -453,6 +463,8 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
                   class="w-full"
                   :readonly="!gameConfig.setCodeEditable || !canEdit"
                   :ui="gameConfig.setCodeEditable && canEdit ? undefined : readonlyUi"
+                  data-test="set-code"
+                  @input="upperCaseSetCode"
                 />
               </UFormField>
               <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">

@@ -6,6 +6,7 @@ import { TEST_DATABASE_URL, useHarness } from './helpers'
 const migration = (name: string) => readFileSync(join(__dirname, `../../prisma/migrations/${name}/migration.sql`), 'utf8')
 const EDITION_KEYS = migration('20261007130000_edition_keys')
 const UNLIMITED_IS_EMPTY = migration('20261008100000_unlimited_is_empty')
+const FIRST_EDITION_PREFIX = migration('20261008120000_first_edition_prefix')
 
 // Old literal → expected value after both migrations. `null` stays null.
 const ROWS: [string | null, string | null][] = [
@@ -39,8 +40,8 @@ describe.skipIf(!TEST_DATABASE_URL)('edition migrations', () => {
 
   const editions = async () => (await h.db.cardSet.findMany({ orderBy: { id: 'asc' } })).map(set => set.edition)
 
-  async function seed(values: (string | null)[]) {
-    const game = await h.db.game.create({ data: { slug: 'ygo', displayName: 'Yu-Gi-Oh!' } })
+  async function seed(values: (string | null)[], slug = 'ygo') {
+    const game = await h.db.game.create({ data: { slug, displayName: slug } })
     const card = await h.db.card.create({ data: { gameId: game.id, name: 'Dunkler Magier' } })
     for (const edition of values) {
       await h.db.cardSet.create({ data: { cardId: card.id, setCode: 'LOB-005', edition } })
@@ -50,6 +51,7 @@ describe.skipIf(!TEST_DATABASE_URL)('edition migrations', () => {
   const run = async () => {
     await h.db.$executeRawUnsafe(EDITION_KEYS)
     await h.db.$executeRawUnsafe(UNLIMITED_IS_EMPTY)
+    await h.db.$executeRawUnsafe(FIRST_EDITION_PREFIX)
   }
 
   it('turns the printed editions into their keys, makes Unlimited empty and leaves every other value alone', async () => {
@@ -69,5 +71,20 @@ describe.skipIf(!TEST_DATABASE_URL)('edition migrations', () => {
     await seed(['UNLIMITED', 'FIRST_EDITION', 'LIMITED_EDITION', 'Special Edition', null])
     await h.db.$executeRawUnsafe(UNLIMITED_IS_EMPTY)
     expect(await editions()).toEqual([null, 'FIRST_EDITION', 'LIMITED_EDITION', 'Special Edition', null])
+  })
+
+  it('makes everything that starts with "1st" or "1." the first edition and leaves the rest', async () => {
+    await seed(['1st', '1st Ed.', ' 1ST edition', '1. Auflage', '1.Auflage', '1. Edition 2002', '1x', '11', 'Special Edition', 'Limitierte Auflage', 'LIMITED_EDITION', null, ''])
+    await h.db.$executeRawUnsafe(FIRST_EDITION_PREFIX)
+    expect(await editions()).toEqual([
+      'FIRST_EDITION', 'FIRST_EDITION', 'FIRST_EDITION', 'FIRST_EDITION', 'FIRST_EDITION', 'FIRST_EDITION',
+      '1x', '11', 'Special Edition', 'Limitierte Auflage', 'LIMITED_EDITION', null, '',
+    ])
+  })
+
+  it('does not touch the editions of another game', async () => {
+    await seed(['1st thing', 'firstEdition'], 'pokemon')
+    await h.db.$executeRawUnsafe(FIRST_EDITION_PREFIX)
+    expect(await editions()).toEqual(['1st thing', 'firstEdition'])
   })
 })

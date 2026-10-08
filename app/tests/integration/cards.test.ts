@@ -96,6 +96,19 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect(card.sets).toEqual([expect.objectContaining({ setCode: 'LOB-005', rarity: 'Ultra Rare', edition: 'FIRST_EDITION' })])
     })
 
+    it('lists the editions that are none of the known keys, for Yu-Gi-Oh! only', async () => {
+      await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: 'FIRST_EDITION' } })
+      await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: 'Special Edition' } })
+      await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: 'Special Edition' } })
+      await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: "Collector's" } })
+      await addDarkMagician()
+      await h.services.cards.create({ game: 'pokemon', externalId: 'swsh3-136', set: { setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' } }, h.anna)
+      expect(await h.services.cards.unknownEditions()).toEqual([
+        { game: 'ygo', edition: "Collector's", count: 1 },
+        { game: 'ygo', edition: 'Special Edition', count: 2 },
+      ])
+    })
+
     it('accepts any text as the edition of a Yu-Gi-Oh! card and treats a blank one as none', async () => {
       const special = await addDarkMagician({ set: { setCode: 'LOB-005', rarity: 'Ultra Rare', edition: '  Special Edition ' } })
       expect(special.sets[0]!.edition).toBe('Special Edition')

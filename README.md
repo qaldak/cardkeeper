@@ -21,7 +21,7 @@ Everything runs in containers: there is nothing to install on the host except Do
   sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come
   last); total value of the active cards
 - Card detail page: texts in German and English with a language switch (German first, a language the card does not
-  have is disabled), the set code and edition can be corrected (e.g. German or Japanese prints, applies to all
+  have is disabled), the set code (always capitals) and edition can be corrected (e.g. German or Japanese prints, applies to all
   languages), manual image upload, click on the image to see it enlarged (a click on the enlarged image closes it, wide areas beside it and the arrow keys go through several images, a button downloads it; "Save image as" in the right-click menu works as well and suggests the card name), status handling (active, sold, traded, gifted, lost) with date and counterpart,
   the owner (who can hand the card over to another user), price history
 - "Update from API" refreshes texts, attributes and prices of a card; set code, edition, status, owner,
@@ -263,7 +263,9 @@ Differences from the original concept:
   card data and apply to all languages. `cards.user_modified_at` records the last change made by a user.
 - `card_sets.edition` holds the edition of a Yu-Gi-Oh! card, which the API does not provide. The editions printed on
   the card are stored as the keys `FIRST_EDITION` and `LIMITED_EDITION` and translated when shown (`edition.<KEY>` in
-  the locale files, like `status.<KEY>`); "Unlimited" is not printed, so it is NULL. A new edition is one more key in
+  the locale files, like `status.<KEY>`); "Unlimited" is not printed, so it is NULL. Older values that start with `1st` or `1.` became
+  `FIRST_EDITION` by a migration; any other value is left as it is and listed in the log of the app container at every
+  start (`[editions] ...`, with an `UPDATE` to copy), so that it can be fixed with SQL. A new edition is one more key in
   `shared/utils/editions.ts` and its labels. For Pokémon the column holds the variant key of the physical card
   (`normal`, `reverse`, ... translated through `variant.<key>`, see below).
 - `card_translations.details` (JSONB) holds further language dependent data of a card: for Pokémon the attack and
