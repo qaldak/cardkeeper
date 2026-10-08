@@ -90,6 +90,21 @@ describe('YGO adapter: mapping', () => {
 
 describe('YGO adapter: Link monsters and unexpected values', () => {
   const adapter = adapterWith(vi.fn() as unknown as typeof fetch)
+
+  it('maps the answer of the real API for a Link monster (def is null)', () => {
+    const real = JSON.parse(readFileSync(new URL('../fixtures/ygo-link-monster.json', import.meta.url), 'utf8')) as { data: unknown[] }
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const card = adapter.mapToCommonSchema(real.data[0])
+    expect(card).toMatchObject({ externalId: '24361622', name: 'Hieratic Seal of the Heavenly Spheres' })
+    expect(card.attributes).toMatchObject({ type: 'Link Monster', atk: 0, linkval: 2, linkmarkers: ['Bottom-Left', 'Bottom-Right'], archetype: 'Hieratic' })
+    expect(card.attributes).not.toHaveProperty('def')
+    expect(card.sets.map(set => set.setCode)).toEqual(['RA02-EN039', 'RA02-EN039', 'BLCR-EN090', 'DUPO-EN027', 'SDWD-EN040'])
+    expect(card.images[0]!.url).toBe('https://images.ygoprodeck.com/images/cards/24361622.jpg')
+    expect(card.prices.map(price => price.source)).toEqual(['cardmarket', 'tcgplayer', 'ebay', 'amazon', 'coolstuffinc'])
+    // null is "not there": nothing to report.
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
   const link = {
     id: 24361622,
     name: 'Link Spider',
