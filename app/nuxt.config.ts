@@ -6,6 +6,18 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@nuxtjs/i18n', '@nuxt/eslint'],
   css: ['~/assets/css/main.css'],
 
+  // The icons of the browser tab and of the home screen are in public/ (no login needed, the login page shows them too).
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', href: '/favicon.ico', sizes: 'any' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+      ],
+    },
+  },
+
   // The UI mockups are light only.
   // Follows the device (light or dark); light when the device does not say. The choice of the header switch is remembered in the browser.
   colorMode: { preference: 'system', fallback: 'light' },
