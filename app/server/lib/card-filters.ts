@@ -1,4 +1,5 @@
 import type { Prisma } from '../generated/prisma/client'
+import { eszettVariants } from '../../shared/utils/eszett'
 import type { CardStatusValue } from '../../shared/utils/status'
 
 export interface CardFilters {
@@ -50,13 +51,20 @@ export function buildCardWhere(filters: CardFilters): Prisma.CardWhereInput {
 
   const q = filters.q?.trim()
   if (q) {
+    // "weisser" also finds "weißer" and the other way round: every spelling is looked for in the texts.
+    const spellings = eszettVariants(q)
+    const contains = (text: string) => ({ contains: text, mode: 'insensitive' as const })
     conditions.push({
       OR: [
-        { name: { contains: q, mode: 'insensitive' } },
-        { translations: { some: { name: { contains: q, mode: 'insensitive' } } } },
+        ...spellings.flatMap((text): Prisma.CardWhereInput[] => [
+          { name: contains(text) },
+          { translations: { some: { name: contains(text) } } },
+        ]),
         { externalId: q },
-        { sets: { some: { setCode: { contains: q, mode: 'insensitive' } } } },
-        { sets: { some: { setName: { contains: q, mode: 'insensitive' } } } },
+        ...spellings.flatMap((text): Prisma.CardWhereInput[] => [
+          { sets: { some: { setCode: contains(text) } } },
+          { sets: { some: { setName: contains(text) } } },
+        ]),
       ],
     })
   }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { GameSetDto, SetCardDto } from '#shared/types/api'
+import { foldEszett } from '#shared/utils/eszett'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatPrintedNumber, normalizeCardNumberInput, parseCardNumber, sameCardNumber } from '#shared/utils/pokemon-number'
 
@@ -55,10 +56,11 @@ watch(language, loadSets, { immediate: true })
 // The printed size of the set ("088") narrows the sets down; the typed text narrows them by name or id.
 const visibleSets = computed(() => {
   const total = parsed.value?.total ?? null
-  const text = setFilter.value.trim().toLowerCase()
+  // "ss" and "ß" are the same here: "weisser" finds "Weißer ...".
+  const text = foldEszett(setFilter.value.trim())
   return sets.value.filter(set =>
     (total === null || set.official === total)
-    && (!text || set.name.toLowerCase().includes(text) || set.id.toLowerCase().includes(text)))
+    && (!text || foldEszett(set.name).includes(text) || set.id.toLowerCase().includes(text)))
 })
 
 async function chooseSet(set: GameSetDto) {

@@ -95,6 +95,33 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect(card.attributes).not.toHaveProperty('level')
     })
 
+    it('finds a name with ß when it is typed with ss (and the other way round)', async () => {
+      // "Blauäugiger weißer Drache" is the German name of BLUE_EYES.
+      for (const typed of ['weisser', 'Weisser Drache', 'WEISSER', 'weißer', 'blauäugiger weisser']) {
+        expect((await h.services.cards.lookup('ygo', typed)).map(card => card.externalId), typed).toEqual([String(BLUE_EYES.id)])
+      }
+      expect(await h.services.cards.lookup('ygo', 'weisserx')).toEqual([])
+    })
+
+    it('finds your own cards with ß when the search is typed with ss', async () => {
+      await h.services.cards.create({ game: 'ygo', externalId: String(BLUE_EYES.id) }, h.anna)
+      await addDarkMagician()
+      for (const typed of ['weisser', 'WEISSER Drache', 'weißer']) {
+        const found = await h.services.cards.list({ q: typed }, { page: 1, pageSize: 48 })
+        expect(found.items.map(item => item.name), typed).toEqual(['Blauäugiger weißer Drache'])
+      }
+    })
+
+    it('does not send extra requests for a text without ss or ß, and lists a card once', async () => {
+      await h.services.cards.lookup('ygo', 'Dunkler')
+      expect(h.ygo.apiCalls()).toBe(1)
+      const before = h.ygo.apiCalls()
+      const found = await h.services.cards.lookup('ygo', 'weisser')
+      expect(found).toHaveLength(1)
+      // the typed spelling and the ß spelling, in the first language that has a match
+      expect(h.ygo.apiCalls() - before).toBeLessThanOrEqual(4)
+    })
+
     it('does not block creation when the image download fails', async () => {
       h.ygo.failImages = true
       const card = await addDarkMagician()

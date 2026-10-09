@@ -1,6 +1,7 @@
 import { Prisma, type PrismaClient } from '../generated/prisma/client'
 import type { CardDetailDto, CardListResponseDto, FacetsDto, LookupCandidateDto } from '../../shared/types/api'
 import { EDITION_KEYS } from '../../shared/utils/editions'
+import { eszettVariants } from '../../shared/utils/eszett'
 import { getGameConfig } from '../../shared/utils/game-config'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import { assertOwner, type Actor } from '../lib/actor'
@@ -81,6 +82,31 @@ export function createCardService(deps: CardServiceDeps) {
       throw notFound('card_not_found', 'Card not found')
     }
     return toDetail(card, config.priceSource)
+  }
+
+  /**
+   * Searches for the text as typed and with "ss" and "ß" exchanged ("weisser" also finds "weißer"), and returns the
+   * cards of all spellings once each, those of the typed one first. Only a failure of the typed spelling is an error:
+   * a spelling that fails is skipped, the typed one decides.
+   */
+  async function searchSpellings(adapter: CardAdapter, query: string, language: string): Promise<CommonCard[]> {
+    const spellings = eszettVariants(query.trim())
+    const answers = await Promise.allSettled(spellings.map(spelling => adapter.searchCards(spelling, language)))
+    const [typed, ...others] = answers
+    if (typed!.status === 'rejected') {
+      throw typed!.reason
+    }
+    const found = new Map<string, CommonCard>()
+    for (const answer of [typed!, ...others]) {
+      if (answer.status === 'fulfilled') {
+        for (const card of answer.value) {
+          if (!found.has(card.externalId)) {
+            found.set(card.externalId, card)
+          }
+        }
+      }
+    }
+    return [...found.values()]
   }
 
   /** Downloads the API image of a card. Failures are logged and never block the calling operation. */
@@ -286,7 +312,7 @@ export function createCardService(deps: CardServiceDeps) {
     async lookup(gameSlug: string, query: string): Promise<LookupCandidateDto[]> {
       const adapter = registry.require(gameSlug)
       for (const language of adapter.storedLanguages) {
-        const results = await adapter.searchCards(query, language)
+        const results = await searchSpellings(adapter, query, language)
         if (results.length > 0) {
           return results.map(card => ({
             externalId: card.externalId,

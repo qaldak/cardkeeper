@@ -1,3 +1,4 @@
+import { eszettVariants } from '../../../shared/utils/eszett'
 import { badRequest, HttpError } from '../../lib/errors'
 import type { CardAdapter, CommonCard } from '../types'
 import { mapYgoCard } from './mapper'
@@ -97,8 +98,14 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
 
     async fetchCardByName(name, language) {
       const lang = resolveLanguage(language)
-      const [first] = await query({ name }, lang)
-      return first === undefined ? null : mapYgoCard(first, lang)
+      // "weisser" for "weißer": the typed spelling first, then the others, until one exists.
+      for (const spelling of eszettVariants(name.trim())) {
+        const [first] = await query({ name: spelling }, lang)
+        if (first !== undefined) {
+          return mapYgoCard(first, lang)
+        }
+      }
+      return null
     },
 
     async searchCards(text, language) {
