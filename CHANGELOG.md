@@ -1,3 +1,17 @@
+## [0.11.0](https://github.com/qaldak/cardkeeper/compare/v0.10.2...v0.11.0) (2026-10-09)
+
+### Features
+
+* add the favicon and the home screen icon ([77cd7b0](https://github.com/qaldak/cardkeeper/commit/77cd7b007f0b46fd815f5369b57616861e5fd18d))
+
+### Bug Fixes
+
+* remove the white frame around the icon ([851eaa3](https://github.com/qaldak/cardkeeper/commit/851eaa352ca442fa420c2f4fcf5e8ac4abf439ac))
+
+### Maintenance
+
+* shrink favicon.ico to the sizes browsers use ([c7cc6ac](https://github.com/qaldak/cardkeeper/commit/c7cc6acaf6369c301d94c41295e50242681f6bfb))
+
 ## [0.10.2](https://github.com/qaldak/cardkeeper/compare/v0.10.1...v0.10.2) (2026-10-08)
 
 ### Bug Fixes
