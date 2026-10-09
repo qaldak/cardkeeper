@@ -5,6 +5,7 @@ import type { AdapterRegistry } from '../tcg/registry'
 import { createCardService } from './cards'
 import { createCatalogService } from './catalog'
 import { createImageService } from './images'
+import { createThumbnailService } from './thumbnails'
 import { createUserService } from './users'
 
 export interface ServiceDeps {
@@ -22,6 +23,7 @@ export function createServices(deps: ServiceDeps) {
     cards: createCardService(deps),
     catalog: createCatalogService(deps),
     images: createImageService(deps),
+    thumbnails: createThumbnailService(deps),
     users: createUserService(deps),
     games: (): GameDto[] => deps.registry.list().map(adapter => ({
       slug: adapter.slug,

@@ -216,14 +216,13 @@ const MAX_RESULTS = 50
           </h2>
           <ul class="divide-y divide-default overflow-hidden rounded-xl border border-default bg-default">
             <li v-for="candidate in results" :key="candidate.externalId" class="flex flex-wrap items-center gap-3 px-4 py-3">
-              <img
+              <RemoteImage
                 v-if="candidate.thumbnailUrl"
                 :src="candidate.thumbnailUrl"
                 :alt="candidate.name"
                 loading="lazy"
-                referrerpolicy="no-referrer"
                 class="h-16 w-12 shrink-0 rounded bg-(--app-art) object-cover"
-              >
+              />
               <div class="min-w-0 flex-1">
                 <p class="font-medium">
                   {{ candidate.name }}
@@ -249,13 +248,12 @@ const MAX_RESULTS = 50
 
     <form v-else class="flex max-w-xl flex-col gap-5" @submit.prevent="submit">
       <div class="flex gap-4 rounded-xl border border-default bg-default p-4">
-        <img
+        <RemoteImage
           v-if="chosen.thumbnailUrl"
           :src="chosen.thumbnailUrl"
           :alt="chosen.name"
-          referrerpolicy="no-referrer"
           class="h-24 w-[70px] shrink-0 rounded bg-(--app-art) object-cover"
-        >
+        />
         <div>
           <p class="text-xs text-muted">
             {{ t('add.chosen') }}

@@ -330,6 +330,10 @@ No schema change and no change in the core services is required.
 
 - The YGOPRODeck API is rate limited and asks not to hotlink images; the app makes one request per
   lookup or refresh and downloads each image once. Images are only downloaded from the hosts an adapter declares.
+- The "add card" lookup shows the small card image for Yu-Gi-Oh! as well. YGOPRODeck asks not to hotlink its images, so
+  the browser never loads them from there: the app downloads each small image once, the first time a card is shown, keeps
+  it in the image volume (`thumbnails/ygo/`) and serves its own copy (`/api/thumbnails/ygo/<passcode>`). At most four are
+  downloaded at once. TCGdex allows its images to be used directly, so Pokémon images are loaded from there.
 - The adapter follows the documented API v7 response shape. Its tests use a hand-written fixture of that shape, not
   recorded live data, so check a real lookup after the first deployment.
 - A field of a YGOPRODeck card with an unexpected value (e.g. a Link monster's missing level or DEF delivered as
