@@ -29,6 +29,8 @@ Everything runs in containers: there is nothing to install on the host except Do
 - "Add card" lookup by name or passcode against the card database, including the exact printing (set and rarity). There
   is no language to choose: the search looks for German first and falls back to English, and both languages are
   stored where available. For Yu-Gi-Oh! the edition printed on the card (1st Edition, Limited Edition, shown in the
+  The search also finds a name with "ß" when it is typed with "ss" ("weisser" finds "weißer"), as it is written in
+  Switzerland, and the other way round
   language of the interface) is a one-click choice next to the printing; nothing chosen means Unlimited, which is not
   printed on the card. On the card page the same choice is a dropdown
 - Card images are downloaded once and stored on a volume, never hotlinked
