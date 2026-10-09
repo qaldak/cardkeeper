@@ -201,6 +201,15 @@ describe('YGO adapter: requests', () => {
     expect(requestedUrl(fetchFn).searchParams.get('name')).toBe('Dark Magician')
   })
 
+  it('fetches by exact name with ss and ß exchanged when the typed spelling does not exist', async () => {
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce(json({ error: 'No card matching your query was found in the database.' }, 400))
+      .mockResolvedValueOnce(json(fixture))
+    const card = await adapterWith(fetchFn).fetchCardByName('Blauäugiger weisser Drache', 'de')
+    expect(card?.name).toBe('Dark Magician')
+    expect(fetchFn.mock.calls.map(call => (call[0] as URL).searchParams.get('name'))).toEqual(['Blauäugiger weisser Drache', 'Blauäugiger weißer Drache'])
+  })
+
   it('searches fuzzy by name and by passcode', async () => {
     const byName = vi.fn().mockResolvedValue(json(fixture))
     const results = await adapterWith(byName).searchCards('Dark Mag')

@@ -103,6 +103,15 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect(await h.services.cards.lookup('ygo', 'weisserx')).toEqual([])
     })
 
+    it('finds your own cards with ß when the search is typed with ss', async () => {
+      await h.services.cards.create({ game: 'ygo', externalId: String(BLUE_EYES.id) }, h.anna)
+      await addDarkMagician()
+      for (const typed of ['weisser', 'WEISSER Drache', 'weißer']) {
+        const found = await h.services.cards.list({ q: typed }, { page: 1, pageSize: 48 })
+        expect(found.items.map(item => item.name), typed).toEqual(['Blauäugiger weißer Drache'])
+      }
+    })
+
     it('does not send extra requests for a text without ss or ß, and lists a card once', async () => {
       await h.services.cards.lookup('ygo', 'Dunkler')
       expect(h.ygo.apiCalls()).toBe(1)

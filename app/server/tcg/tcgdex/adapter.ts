@@ -1,3 +1,4 @@
+import { eszettVariants } from '../../../shared/utils/eszett'
 import { badRequest, HttpError } from '../../lib/errors'
 import type { CardAdapter, CommonCard, GameSet, SetCard } from '../types'
 import { cardImages, mapTcgdexCard } from './mapper'
@@ -127,8 +128,14 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
 
     async fetchCardByName(name, language) {
       const lang = resolveLanguage(language)
-      const [first] = await searchBrief(name, lang, true)
-      return first ? fetchCardById(first.externalId, lang) : null
+      // "weisser" for "weißer": the typed spelling first, then the others, until one exists.
+      for (const spelling of eszettVariants(name.trim())) {
+        const [first] = await searchBrief(spelling, lang, true)
+        if (first) {
+          return fetchCardById(first.externalId, lang)
+        }
+      }
+      return null
     },
 
     async searchCards(text, language) {

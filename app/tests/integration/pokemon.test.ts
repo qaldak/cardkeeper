@@ -127,6 +127,19 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       expect(h.tcgdex.requestedLanguages).toEqual(['de', 'en'])
     })
 
+    it('finds a name with ß when it is typed with ss, in German and in English', async () => {
+      h.tcgdex.cards.set('swsh9-001', {
+        id: 'swsh9-001',
+        de: { id: 'swsh9-001', localId: '001', name: 'Weißer Dragoran', image: 'https://assets.tcgdex.net/de/swsh/swsh9/001' },
+        en: { id: 'swsh9-001', localId: '001', name: 'White Dragonite', image: 'https://assets.tcgdex.net/en/swsh/swsh9/001' },
+      })
+      for (const typed of ['weisser', 'Weisser Dragoran', 'WEISSER', 'weißer']) {
+        const results = await h.services.cards.lookup('pokemon', typed)
+        expect(results.map(card => [card.externalId, card.name, card.language]), typed).toEqual([['swsh9-001', 'Weißer Dragoran', 'de']])
+      }
+      expect(await h.services.cards.lookup('pokemon', 'weisserx')).toEqual([])
+    })
+
     it('finds a card by its id', async () => {
       const results = await h.services.cards.lookup('pokemon', FURRET)
       expect(results.map(card => card.externalId)).toEqual([FURRET])

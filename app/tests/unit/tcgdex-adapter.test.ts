@@ -216,6 +216,16 @@ describe('TCGdex adapter: requests', () => {
     expect(card?.externalId).toBe('swsh3-136')
   })
 
+  it('fetches by exact name with ss and ß exchanged when the typed spelling does not exist', async () => {
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce(json([]))
+      .mockResolvedValueOnce(json([{ id: 'swsh3-136', name: 'Weißer Wiesenior' }]))
+      .mockResolvedValueOnce(json(load('furret-de')))
+    const card = await adapterWith(fetchFn).fetchCardByName('Weisser Wiesenior', 'de')
+    expect(fetchFn.mock.calls.slice(0, 2).map(call => (call[0] as URL).searchParams.get('name'))).toEqual(['eq:Weisser Wiesenior', 'eq:Weißer Wiesenior'])
+    expect(card?.externalId).toBe('swsh3-136')
+  })
+
   it('maps upstream failures to stable error codes and keeps the details', async () => {
     const run = (response: Response | Error) => {
       const fetchFn = response instanceof Error ? vi.fn().mockRejectedValue(response) : vi.fn().mockResolvedValue(response)

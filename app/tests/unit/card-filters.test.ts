@@ -34,6 +34,14 @@ describe('buildCardWhere', () => {
     expect(buildCardWhere({ q: '   ' })).toEqual({})
   })
 
+  it('searches both spellings of ss and ß', () => {
+    const where = buildCardWhere({ q: 'weisser' }) as { AND: { OR: unknown[] }[] }
+    const names = where.AND[0]!.OR.filter(entry => 'name' in (entry as object)).map(entry => (entry as { name: { contains: string } }).name.contains)
+    expect(names).toEqual(['weisser', 'weißer'])
+    // The exact external id is not spelled differently.
+    expect(where.AND[0]!.OR.filter(entry => 'externalId' in (entry as object))).toEqual([{ externalId: 'weisser' }])
+  })
+
   it('filters by card type, monster type and attribute on the JSON attributes', () => {
     expect(buildCardWhere({ cardType: 'Normal Monster', race: 'Dragon', attribute: 'LIGHT' })).toEqual({
       AND: [
