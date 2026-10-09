@@ -1,3 +1,10 @@
+## [0.12.0](https://github.com/qaldak/cardkeeper/compare/v0.11.0...v0.12.0) (2026-10-09)
+
+### Features
+
+* find names with ß when they are typed with ss ([1d70016](https://github.com/qaldak/cardkeeper/commit/1d7001684a61b698670de7fb257237fad629646c))
+* ss/ß tolerance for every text search ([b72c03c](https://github.com/qaldak/cardkeeper/commit/b72c03c99a90bcaac61ae46b334ef7a9b2b8d887))
+
 ## [0.11.0](https://github.com/qaldak/cardkeeper/compare/v0.10.2...v0.11.0) (2026-10-09)
 
 ### Features
