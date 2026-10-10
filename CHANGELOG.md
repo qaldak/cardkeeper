@@ -1,3 +1,14 @@
+## [0.15.0](https://github.com/qaldak/cardkeeper/compare/v0.14.0...v0.15.0) (2026-10-10)
+
+### Features
+
+* add all cards of a Yu-Gi-Oh! set at once ([fdd820d](https://github.com/qaldak/cardkeeper/commit/fdd820d579f96a66551819d22cabc264b223658d))
+* show only the cards that need a choice when adding a set ([d13464c](https://github.com/qaldak/cardkeeper/commit/d13464ca5fcd4d330acf2a6ecd3a8e60238c1e4f))
+
+### Bug Fixes
+
+* show the steps of the set wizard as a progress list, not as buttons ([13a4c35](https://github.com/qaldak/cardkeeper/commit/13a4c351038b5b61abe232d7c35b707abb188eee))
+
 ## [0.14.0](https://github.com/qaldak/cardkeeper/compare/v0.13.0...v0.14.0) (2026-10-10)
 
 ### Features
