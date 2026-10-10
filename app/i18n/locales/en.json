@@ -168,7 +168,7 @@
     "title": "Add card",
     "game": "Game",
     "query": "Name or passcode",
-    "queryPlaceholder": "e.g. Dark Magician or 46986414",
+    "queryPlaceholder": "e.g. Dark Magician, 46986414 or LOB-EN005",
     "search": "Search",
     "results": "Results",
     "noResults": "No card found.",

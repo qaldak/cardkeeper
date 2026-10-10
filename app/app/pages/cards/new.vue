@@ -5,6 +5,7 @@ import { formatAttributeValue } from '#shared/utils/game-fields'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatPrintedNumber } from '#shared/utils/pokemon-number'
 import { initialGame, LAST_GAME_COOKIE } from '#shared/utils/last-game'
+import { isSetCode, setCodeSpellings } from '#shared/utils/set-code'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -90,6 +91,16 @@ async function choose(externalId: string) {
       query: { game: gameSlug.value },
     })
     printing.value = config.value.printingRequired && chosen.value.sets.length > 0 ? '0' : NONE
+    // Found by the set code of a print ("L5DD-DEA15", or its English "L5DD-ENA15"): that print is preselected.
+    if (!isPokemon.value && isSetCode(query.value)) {
+      const prints = chosen.value.sets
+      const index = setCodeSpellings(query.value)
+        .map(code => prints.findIndex(set => set.setCode.toUpperCase() === code))
+        .find(found => found >= 0)
+      if (index !== undefined) {
+        printing.value = String(index)
+      }
+    }
     edition.value = null
   }
   catch (error) {

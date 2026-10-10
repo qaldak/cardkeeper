@@ -105,3 +105,9 @@ export function parseYgoCard(raw: unknown): ParsedYgoCard | null {
 export const ygoResponseSchema = z.object({
   data: z.array(z.unknown()),
 })
+
+/** The answer of `cardsetsinfo.php` for a set code: the card of the print (its passcode and name). */
+export const setPrintSchema = z.object({
+  id: z.union([z.number().int(), z.string().regex(/^\d{1,12}$/)]),
+  name: z.string().optional(),
+})

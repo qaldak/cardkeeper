@@ -105,6 +105,8 @@ export interface FakeYgoServer {
   requestedLanguages: string[]
   /** Images requested from the image host so far. */
   requestedImages: string[]
+  /** Set codes asked for at `cardsetsinfo.php` so far, in order. */
+  requestedSetCodes: string[]
   failImages: boolean
   /**
    * Simulates an API that answers a German request for an untranslated card with the English card
@@ -123,6 +125,7 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
     germanFallsBackToEnglish: false,
     requestedLanguages: [],
     requestedImages: [],
+    requestedSetCodes: [],
     apiCalls: () => calls,
     fetchFn: (async (input: URL | RequestInfo) => {
       const url = new URL(input instanceof Request ? input.url : String(input))
@@ -133,6 +136,18 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
           : new Response(PNG_BYTES as BodyInit, { status: 200, headers: { 'content-type': 'image/png' } })
       }
       calls += 1
+      if (url.pathname.endsWith('/cardsetsinfo.php')) {
+        // Like the real API: only the (English) prints of the card, one answer per set code, HTTP 400 for an unknown one.
+        const setCode = url.searchParams.get('setcode') ?? ''
+        server.requestedSetCodes.push(setCode)
+        for (const card of cards.values()) {
+          const print = (card.sets ?? []).find(entry => entry.set_code.toLowerCase() === setCode.toLowerCase())
+          if (print) {
+            return new Response(JSON.stringify({ id: card.id, name: card.name, ...print, set_rarity_code: '(C)', set_price: '0' }), { status: 200 })
+          }
+        }
+        return new Response(JSON.stringify({ error: 'No card set found matching your query.' }), { status: 400 })
+      }
       const language = url.searchParams.get('language') ?? 'en'
       server.requestedLanguages.push(language)
       const german = language === 'de'
