@@ -1,3 +1,9 @@
+## [0.16.0](https://github.com/qaldak/cardkeeper/compare/v0.15.0...v0.16.0) (2026-10-10)
+
+### Features
+
+* add all cards of a Pokémon set at once ([0d9ce39](https://github.com/qaldak/cardkeeper/commit/0d9ce39147f0d03a7178556a1cb5dc969fe55257))
+
 ## [0.15.0](https://github.com/qaldak/cardkeeper/compare/v0.14.0...v0.15.0) (2026-10-10)
 
 ### Features
