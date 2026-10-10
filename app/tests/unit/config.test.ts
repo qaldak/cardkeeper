@@ -15,8 +15,16 @@ describe('loadConfig', () => {
       users: [],
       ygoBaseUrl: 'https://db.ygoprodeck.com/api/v7',
       tcgdexBaseUrl: 'https://api.tcgdex.net/v2',
+      exchangeRateBaseUrl: 'https://api.frankfurter.dev/v1',
+      displayCurrency: null,
       priceRefresh: { after: 7 * 24 * 3_600_000, batchSize: 300, batchEvery: 24 * 3_600_000, delayMs: 500 },
     })
+  })
+
+  it('reads the display currency in upper case, and rejects what is no currency code', () => {
+    expect(loadConfig(env({ DISPLAY_CURRENCY: ' chf ' })).displayCurrency).toBe('CHF')
+    expect(loadConfig(env({ DISPLAY_CURRENCY: '' })).displayCurrency).toBeNull()
+    expect(() => loadConfig(env({ DISPLAY_CURRENCY: 'Franken' }))).toThrow(/DISPLAY_CURRENCY/)
   })
 
   it('reads overrides from the environment', () => {

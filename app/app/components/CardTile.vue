@@ -5,8 +5,11 @@ const props = defineProps<{ card: CardListItemDto, showGame?: boolean }>()
 const { t } = useI18n()
 const { money } = useFormat()
 
+const shownPrice = (price: NonNullable<CardListItemDto['price']>) =>
+  price.converted ? money(price.converted.amount, price.converted.currency) : money(price.amount, price.currency)
+
 const subtitle = computed(() =>
-  [props.card.setCode, props.card.price ? money(props.card.price.amount, props.card.price.currency) : null]
+  [props.card.setCode, props.card.price ? shownPrice(props.card.price) : null]
     .filter(Boolean)
     .join(' · '),
 )

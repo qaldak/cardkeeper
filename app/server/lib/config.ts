@@ -14,6 +14,10 @@ export interface AppConfig {
   users: string[]
   ygoBaseUrl: string
   tcgdexBaseUrl: string
+  /** Exchange-rate service (Frankfurter, ECB reference rates). */
+  exchangeRateBaseUrl: string
+  /** Currency the prices are shown in as well (from DISPLAY_CURRENCY, e.g. "CHF"); `null` shows them in the currency of their source only. */
+  displayCurrency: string | null
   priceRefresh: PriceRefreshConfig
 }
 
@@ -41,6 +45,18 @@ function positiveNumber(value: string | undefined, fallback: number, name: strin
 }
 
 const MIN_SECRET_LENGTH = 32
+
+/** "chf" → "CHF"; empty means not set. */
+function currencyCode(value: string | undefined, name: string): string | null {
+  const code = value?.trim().toUpperCase() ?? ''
+  if (code === '') {
+    return null
+  }
+  if (!/^[A-Z]{3}$/.test(code)) {
+    throw new Error(`${name} must be a three-letter currency code such as CHF, got "${value}"`)
+  }
+  return code
+}
 
 // The card databases limit the requests (YGOPRODeck: 20 per second, and blocks for an hour above that): the pause between
 // two requests has a floor, and a tranche is not started more often than once an hour.
@@ -97,6 +113,8 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     users: parseUsers(env.USERS),
     ygoBaseUrl: env.YGOPRODECK_API_URL?.trim() || 'https://db.ygoprodeck.com/api/v7',
     tcgdexBaseUrl: env.TCGDEX_API_URL?.trim() || 'https://api.tcgdex.net/v2',
+    exchangeRateBaseUrl: env.EXCHANGE_RATE_API_URL?.trim() || 'https://api.frankfurter.dev/v1',
+    displayCurrency: currencyCode(env.DISPLAY_CURRENCY, 'DISPLAY_CURRENCY'),
     priceRefresh: priceRefresh(env),
   }
 }

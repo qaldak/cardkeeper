@@ -2,6 +2,7 @@ import type { Prisma } from '../generated/prisma/client'
 import type { CardDetailDto, CardListItemDto, PricePointDto } from '../../shared/types/api'
 import { sortByLanguagePreference } from '../../shared/utils/languages'
 import { formatDateOnly } from '../lib/dates'
+import type { Converter } from './rates'
 
 const toNumber = (value: { toString: () => string }): number => Number(value.toString())
 
@@ -34,8 +35,9 @@ export function detailInclude() {
 type ListCard = Prisma.CardGetPayload<{ include: ReturnType<typeof listInclude> }>
 type DetailCard = Prisma.CardGetPayload<{ include: ReturnType<typeof detailInclude> }>
 
-export function toListItem(card: ListCard): CardListItemDto {
+export function toListItem(card: ListCard, convert: Converter): CardListItemDto {
   const latest = card.priceHistory[0]
+  const amount = latest ? toNumber(latest.price) : 0
   return {
     id: card.id,
     name: card.name,
@@ -45,11 +47,11 @@ export function toListItem(card: ListCard): CardListItemDto {
     status: card.status,
     owner: card.owner,
     imageId: card.images[0]?.id ?? null,
-    price: latest ? { amount: toNumber(latest.price), currency: latest.currency, source: latest.source } : null,
+    price: latest ? { amount, currency: latest.currency, source: latest.source, converted: convert(amount, latest.currency) } : null,
   }
 }
 
-export function toDetail(card: DetailCard, priceSource: string): CardDetailDto {
+export function toDetail(card: DetailCard, priceSource: string, convert: Converter): CardDetailDto {
   const latestStatus = card.statusHistory[0]
   const showStatusInfo = card.status !== 'ACTIVE' && latestStatus?.status === card.status
 
@@ -83,6 +85,7 @@ export function toDetail(card: DetailCard, priceSource: string): CardDetailDto {
       source: point.source,
       price: toNumber(point.price),
       currency: point.currency,
+      converted: convert(toNumber(point.price), point.currency),
       fetchedAt: point.fetchedAt.toISOString(),
     })),
     primarySource: priceSource,

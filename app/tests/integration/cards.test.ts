@@ -651,4 +651,54 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       await expect(h.services.cards.get(card.id)).rejects.toMatchObject({ status: 404 })
     })
   })
+  describe('display currency', () => {
+    const NOW = () => new Date('2026-10-04T12:00:00Z')
+    const ratesFetch = (table: Record<string, number>, requests: string[] = []) => (async (input: URL | RequestInfo) => {
+      const url = new URL(String(input))
+      requests.push(url.search)
+      const rate = table[`${url.searchParams.get('base')}>${url.searchParams.get('symbols')}`]
+      return rate === undefined
+        ? new Response('{}', { status: 404 })
+        : new Response(JSON.stringify({ rates: { [url.searchParams.get('symbols')!]: rate } }), { status: 200 })
+    }) as typeof fetch
+    const all = { page: 1, pageSize: 48 }
+
+    it('shows list prices, totals and the price history in CHF with the received amount', async () => {
+      const magician = await addDarkMagician()
+      await h.services.cards.create({ game: 'ygo', externalId: String(BLUE_EYES.id), set: { setCode: 'LOB-001', rarity: 'Ultra Rare' } }, h.anna)
+      const requests: string[] = []
+      const services = h.servicesAt(NOW, undefined, undefined, { currency: 'CHF', fetchFn: ratesFetch({ 'EUR>CHF': 0.9, 'USD>CHF': 0.8 }, requests) })
+
+      const list = await services.cards.list({}, all)
+      const item = list.items.find(entry => entry.id === magician.id)!
+      expect(item.price).toEqual({ amount: 18, currency: 'EUR', source: 'cardmarket', converted: { amount: 16.2, currency: 'CHF' } })
+      // 18 + 42 EUR at 0.90.
+      expect(list.summary.totals).toEqual([{ currency: 'CHF', amount: 54 }])
+
+      const detail = await services.cards.get(magician.id)
+      expect(detail.priceHistory.find(point => point.source === 'cardmarket')).toMatchObject({
+        price: 18,
+        currency: 'EUR',
+        converted: { amount: 16.2, currency: 'CHF' },
+      })
+      expect(detail.priceHistory.find(point => point.source === 'tcgplayer')).toMatchObject({ price: 20, currency: 'USD', converted: { amount: 16, currency: 'CHF' } })
+      // Each pair is asked for once in total, however many pages and cards used it.
+      expect(requests.sort()).toEqual(['?base=EUR&symbols=CHF', '?base=USD&symbols=CHF'])
+    })
+
+    it('shows the received amount where no rate is known, and in the totals as an addition of its own', async () => {
+      await addDarkMagician()
+      const services = h.servicesAt(NOW, undefined, undefined, { currency: 'CHF', fetchFn: ratesFetch({}) })
+      const list = await services.cards.list({}, all)
+      expect(list.items[0]!.price).toMatchObject({ amount: 18, currency: 'EUR', converted: null })
+      expect(list.summary.totals).toEqual([{ currency: 'EUR', amount: 18 }])
+    })
+
+    it('does not convert without a display currency, or into the currency a price already has', async () => {
+      const magician = await addDarkMagician()
+      expect((await h.services.cards.list({}, all)).items[0]!.price).toMatchObject({ converted: null })
+      const services = h.servicesAt(NOW, undefined, undefined, { currency: 'EUR', fetchFn: ratesFetch({}) })
+      expect((await services.cards.get(magician.id)).priceHistory.find(point => point.source === 'cardmarket')).toMatchObject({ currency: 'EUR', converted: null })
+    })
+  })
 })

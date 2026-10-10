@@ -45,6 +45,7 @@ services:
     environment:
       DATABASE_URL: postgresql://${APP_DB_USER:-cardkeeper}:${APP_DB_PASSWORD}@db:5432/${APP_DB_NAME:-cardkeeper}
       PRICE_SOURCE: ${PRICE_SOURCE:-cardmarket}
+      DISPLAY_CURRENCY: ${DISPLAY_CURRENCY:-}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-5}
       # Scheduled price reload, see .env.example
       PRICE_REFRESH_AFTER: ${PRICE_REFRESH_AFTER:-1w}
