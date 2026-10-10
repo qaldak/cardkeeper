@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { parseDuration, parseOptionalDuration } from './duration'
 import { USERNAME_PATTERN } from '../../shared/utils/users'
 
 export interface AppConfig {
@@ -13,6 +14,19 @@ export interface AppConfig {
   users: string[]
   ygoBaseUrl: string
   tcgdexBaseUrl: string
+  priceRefresh: PriceRefreshConfig
+}
+
+/** The scheduled reload of the prices (from PRICE_REFRESH_*). */
+export interface PriceRefreshConfig {
+  /** How old the prices of a card may get before they are loaded again, in milliseconds; `null` switches the reload off. */
+  after: number | null
+  /** How many cards are reloaded in one go (one tranche). */
+  batchSize: number
+  /** The least time between two tranches, in milliseconds. */
+  batchEvery: number
+  /** The pause between two requests to a card database, in milliseconds. */
+  delayMs: number
 }
 
 function positiveNumber(value: string | undefined, fallback: number, name: string): number {
@@ -27,6 +41,28 @@ function positiveNumber(value: string | undefined, fallback: number, name: strin
 }
 
 const MIN_SECRET_LENGTH = 32
+
+// The card databases limit the requests (YGOPRODeck: 20 per second, and blocks for an hour above that): the pause between
+// two requests has a floor, and a tranche is not started more often than once an hour.
+const MIN_DELAY_MS = 100
+const MIN_BATCH_EVERY_MS = 3_600_000
+
+function priceRefresh(env: Record<string, string | undefined>): PriceRefreshConfig {
+  const delayMs = Math.round(positiveNumber(env.PRICE_REFRESH_DELAY_MS, 500, 'PRICE_REFRESH_DELAY_MS'))
+  if (delayMs < MIN_DELAY_MS) {
+    throw new Error(`PRICE_REFRESH_DELAY_MS must be at least ${MIN_DELAY_MS}: the card databases limit the requests per second`)
+  }
+  const batchEvery = parseDuration(env.PRICE_REFRESH_BATCH_EVERY?.trim() || '1d', 'PRICE_REFRESH_BATCH_EVERY')
+  if (batchEvery < MIN_BATCH_EVERY_MS) {
+    throw new Error('PRICE_REFRESH_BATCH_EVERY must be at least 1h')
+  }
+  return {
+    after: parseOptionalDuration(env.PRICE_REFRESH_AFTER, '1w', 'PRICE_REFRESH_AFTER'),
+    batchSize: Math.round(positiveNumber(env.PRICE_REFRESH_BATCH_SIZE, 100, 'PRICE_REFRESH_BATCH_SIZE')),
+    batchEvery,
+    delayMs,
+  }
+}
 
 /** "anna, max,sven" → ["anna", "max", "sven"]; a name that appears twice (in any case) is kept once. */
 function parseUsers(value: string | undefined): string[] {
@@ -61,5 +97,6 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     users: parseUsers(env.USERS),
     ygoBaseUrl: env.YGOPRODECK_API_URL?.trim() || 'https://db.ygoprodeck.com/api/v7',
     tcgdexBaseUrl: env.TCGDEX_API_URL?.trim() || 'https://api.tcgdex.net/v2',
+    priceRefresh: priceRefresh(env),
   }
 }

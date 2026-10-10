@@ -107,6 +107,10 @@ export interface FakeYgoServer {
   requestedImages: string[]
   /** Set codes asked for at `cardsetsinfo.php` so far, in order. */
   requestedSetCodes: string[]
+  /** The passcodes of every `cardinfo.php?id=` request so far (the API takes a list: "id=1,2,3"). */
+  requestedIds: string[][]
+  /** Answers every card request with HTTP 429, like the API above its rate limit. */
+  rateLimited: boolean
   failImages: boolean
   /**
    * Simulates an API that answers a German request for an untranslated card with the English card
@@ -126,6 +130,8 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
     requestedLanguages: [],
     requestedImages: [],
     requestedSetCodes: [],
+    requestedIds: [],
+    rateLimited: false,
     apiCalls: () => calls,
     fetchFn: (async (input: URL | RequestInfo) => {
       const url = new URL(input instanceof Request ? input.url : String(input))
@@ -136,6 +142,9 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
           : new Response(PNG_BYTES as BodyInit, { status: 200, headers: { 'content-type': 'image/png' } })
       }
       calls += 1
+      if (server.rateLimited) {
+        return new Response('Too many requests', { status: 429 })
+      }
       if (url.pathname.endsWith('/cardsetsinfo.php')) {
         // Like the real API: only the (English) prints of the card, one answer per set code, HTTP 400 for an unknown one.
         const setCode = url.searchParams.get('setcode') ?? ''
@@ -163,6 +172,10 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
       server.requestedLanguages.push(language)
       const german = language === 'de'
       const id = url.searchParams.get('id')
+      const ids = id?.split(',') ?? []
+      if (id) {
+        server.requestedIds.push(ids)
+      }
       const fname = url.searchParams.get('fname')?.toLowerCase()
       const cardset = url.searchParams.get('cardset')?.toLowerCase()
       const matches = [...cards.values()].filter((card) => {
@@ -173,7 +186,7 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
         if (cardset) {
           return (card.sets ?? []).some(print => print.set_name.toLowerCase() === cardset)
         }
-        return id ? String(card.id) === id : fname ? nameInLanguage.toLowerCase().includes(fname) : false
+        return id ? ids.includes(String(card.id)) : fname ? nameInLanguage.toLowerCase().includes(fname) : false
       })
       if (matches.length === 0) {
         return new Response(JSON.stringify({ error: 'No card matching your query was found in the database.' }), { status: 400 })

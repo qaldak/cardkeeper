@@ -44,6 +44,13 @@ export interface CardAdapter {
   readonly defaultLanguage: string
   /** Languages whose texts are downloaded and stored for every card, in order of preference. */
   readonly storedLanguages: readonly string[]
+  /**
+   * The current prices of cards, for the scheduled reload: at most `priceBatchSize` cards per call. A card the database
+   * does not know is left out of the answer. Throws when the database refuses (rate limit) or cannot be reached.
+   */
+  fetchPrices?(requests: readonly { externalId: string, language: string }[]): Promise<Map<string, CommonCardPrice[]>>
+  /** How many cards `fetchPrices` can ask for in one call. */
+  readonly priceBatchSize?: number
   /** Hosts card images may be downloaded from. */
   readonly imageHosts: readonly string[]
   /** Whether search results may show small images loaded straight from the image host. */

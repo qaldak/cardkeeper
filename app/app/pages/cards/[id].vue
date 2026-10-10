@@ -564,6 +564,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
         <div class="flex flex-col gap-0.5 text-xs text-dimmed">
           <span>{{ t('card.lastModified', { date: dateTime(card.lastModifiedAt), user: card.lastModifiedBy ?? t('common.none') }) }}</span>
           <span v-if="card.lastFetchedAt">{{ t('card.lastFetched', { date: dateTime(card.lastFetchedAt) }) }}</span>
+          <span v-if="card.pricesCheckedAt">{{ t('card.pricesChecked', { date: dateTime(card.pricesCheckedAt) }) }}</span>
         </div>
 
         <section>

@@ -1,6 +1,6 @@
 import { eszettVariants } from '../../../shared/utils/eszett'
 import { badRequest, HttpError } from '../../lib/errors'
-import type { CardAdapter, CommonCard, GameSet, SetCard, SetCardPrint } from '../types'
+import type { CardAdapter, CommonCard, CommonCardPrice, GameSet, SetCard, SetCardPrint } from '../types'
 import { cardImages, mapTcgdexCard } from './mapper'
 import { tcgdexBriefListSchema, tcgdexSetListSchema, tcgdexSetSchema } from './schema'
 
@@ -185,6 +185,20 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
       }
       await Promise.all(Array.from({ length: 4 }, worker))
       return prints
+    },
+
+    // TCGdex answers one card per request; the price does not depend on the language of the answer.
+    priceBatchSize: 1,
+
+    async fetchPrices(requests) {
+      const prices = new Map<string, CommonCardPrice[]>()
+      for (const request of requests) {
+        const card = await fetchCardById(request.externalId, request.language)
+        if (card) {
+          prices.set(request.externalId, card.prices)
+        }
+      }
+      return prices
     },
 
     async listSets(language) {

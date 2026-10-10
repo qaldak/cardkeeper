@@ -1,8 +1,8 @@
 import { eszettVariants } from '../../../shared/utils/eszett'
 import { isSetCode, normalizeSetCode, setCodeSpellings } from '../../../shared/utils/set-code'
 import { badRequest, HttpError } from '../../lib/errors'
-import type { CardAdapter, CommonCard, GameSet, SetCard } from '../types'
-import { mapYgoCard } from './mapper'
+import type { CardAdapter, CommonCard, CommonCardPrice, GameSet, SetCard } from '../types'
+import { mapYgoCard, ygoPrices } from './mapper'
 import { parseYgoCard, setInfoSchema, setPrintSchema, ygoResponseSchema } from './schema'
 
 export interface YgoAdapterOptions {
@@ -199,6 +199,24 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
         throw failure
       }
       return cards
+    },
+
+    // The API takes several passcodes in one request ("id=1,2,3"), so the scheduled reload needs few requests.
+    priceBatchSize: 20,
+
+    async fetchPrices(requests) {
+      const prices = new Map<string, CommonCardPrice[]>()
+      const ids = [...new Set(requests.map(request => request.externalId).filter(id => /^\d{1,12}$/.test(id)))]
+      if (ids.length === 0) {
+        return prices
+      }
+      for (const raw of await query({ id: ids.join(',') }, 'en')) {
+        const card = parseYgoCard(raw)?.card
+        if (card) {
+          prices.set(String(card.id), ygoPrices(card.card_prices))
+        }
+      }
+      return prices
     },
 
     async listSets() {

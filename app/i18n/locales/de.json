@@ -158,6 +158,7 @@
       "done": "Daten aktualisiert"
     },
     "lastFetched": "Daten zuletzt von der API abgerufen am {date}",
+    "pricesChecked": "Preise zuletzt geprüft am {date}",
     "basicsHintVariant": "Namen, Texte und Daten stammen aus der Kartendatenbank. Nur die Variante deiner Karte (z. B. Reverse Holo oder 1st Edition) lässt sich anpassen.",
     "readOnly": {
       "owned": "Diese Karte gehört {owner}. Du kannst sie ansehen, ändern kann sie aber nur {owner}.",

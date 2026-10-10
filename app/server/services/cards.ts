@@ -394,6 +394,7 @@ export function createCardService(deps: CardServiceDeps) {
             ownerUserId: actor.id,
             purchaseDate: input.purchaseDate ? parseDateOnly(input.purchaseDate) : null,
             lastFetchedAt: timestamp,
+            pricesCheckedAt: timestamp,
             lastModifiedBy: actor.name,
             translations: {
               create: merged.translations.map(entry => ({
@@ -611,6 +612,7 @@ export function createCardService(deps: CardServiceDeps) {
             name: primaryName(stored, card.name),
             gameSpecificAttributes: merged.attributes as Json,
             lastFetchedAt: timestamp,
+            pricesCheckedAt: timestamp,
             lastModifiedBy: actor.name,
           },
         })

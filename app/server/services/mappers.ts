@@ -87,6 +87,7 @@ export function toDetail(card: DetailCard, priceSource: string): CardDetailDto {
     })),
     primarySource: priceSource,
     lastFetchedAt: card.lastFetchedAt?.toISOString() ?? null,
+    pricesCheckedAt: card.pricesCheckedAt?.toISOString() ?? null,
     userModifiedAt: card.userModifiedAt?.toISOString() ?? null,
     lastModifiedAt: card.lastModifiedAt.toISOString(),
     lastModifiedBy: card.lastModifiedBy,

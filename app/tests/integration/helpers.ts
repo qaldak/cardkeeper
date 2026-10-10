@@ -23,9 +23,11 @@ export interface Harness {
   /** Two users ("Anna" and "Sven") that exist in every test; they are the people on whose behalf cards are changed. */
   anna: Actor
   sven: Actor
+  /** The services again with another clock (and a pause that does not wait), to follow time: price reloads, ages. */
+  servicesAt: (now: () => Date, sleep?: (milliseconds: number) => Promise<void>, priceRefresh?: Partial<AppConfig['priceRefresh']>) => Services
 }
 
-const TABLES = ['audit_log', 'card_images', 'api_snapshots', 'status_history', 'price_history', 'card_sets', 'card_translations', 'cards', 'users', 'games']
+const TABLES = ['price_refresh_runs', 'audit_log', 'card_images', 'api_snapshots', 'status_history', 'price_history', 'card_sets', 'card_translations', 'cards', 'users', 'games']
 
 /**
  * Sets up services against the real test database with a fake YGOPRODeck and a temporary image
@@ -47,6 +49,7 @@ export function useHarness(): Harness {
       users: [],
       ygoBaseUrl: 'https://ygo.test/api/v7',
       tcgdexBaseUrl: 'https://tcgdex.test/v2',
+      priceRefresh: { after: 7 * 24 * 3_600_000, batchSize: 100, batchEvery: 24 * 3_600_000, delayMs: 500 },
     }
   })
 
@@ -69,6 +72,14 @@ export function useHarness(): Harness {
       config: harness.config,
       fetchFn,
       now: () => new Date('2026-10-04T12:00:00Z'),
+    })
+    harness.servicesAt = (now, sleep, priceRefresh) => createServices({
+      db: harness.db,
+      registry,
+      config: { ...harness.config, priceRefresh: { ...harness.config.priceRefresh, ...priceRefresh } },
+      fetchFn,
+      now,
+      sleep,
     })
     const [anna, sven] = await Promise.all([
       harness.db.user.create({ data: { name: 'Anna' } }),
