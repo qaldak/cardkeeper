@@ -59,7 +59,11 @@ export function createCatalogService({ registry, now = () => new Date() }: Catal
           externalId: card.id,
           number: card.number,
           name: card.name,
-          thumbnailUrl: adapter.searchThumbnails ? allowedImageUrl(card.thumbnailUrl, adapter.imageHosts) : null,
+          thumbnailUrl: adapter.searchThumbnails
+            ? allowedImageUrl(card.thumbnailUrl, adapter.imageHosts)
+            // A host that must not be hotlinked is shown from the app's own copy of the image.
+            : adapter.thumbnailSource?.(card.id) ? `/api/thumbnails/${adapter.slug}/${encodeURIComponent(card.id)}` : null,
+          ...(card.prints ? { prints: card.prints } : {}),
         }))
       })
     },

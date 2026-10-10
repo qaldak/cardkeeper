@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { createCatalogService } from '../../server/services/catalog'
 import { createRegistry } from '../../server/tcg/registry'
 import type { CardAdapter } from '../../server/tcg/types'
-import { createYgoAdapter } from '../../server/tcg/ygo/adapter'
+
+// A game whose database has no set browser.
+const plainAdapter = { slug: 'plain', displayName: 'Plain', defaultLanguage: 'en', languages: ['en'], storedLanguages: ['en'], imageHosts: [], searchThumbnails: false } as unknown as CardAdapter
 
 function setup(overrides: Partial<CardAdapter> = {}) {
   const listSets = vi.fn(async () => [
@@ -17,7 +19,7 @@ function setup(overrides: Partial<CardAdapter> = {}) {
     imageHosts: ['assets.tcgdex.net'], searchThumbnails: true, listSets, listSetCards, ...overrides,
   } as unknown as CardAdapter
   let now = new Date('2026-10-04T12:00:00Z')
-  const catalog = createCatalogService({ registry: createRegistry([adapter, createYgoAdapter({ baseUrl: 'https://ygo.test' })]), now: () => now })
+  const catalog = createCatalogService({ registry: createRegistry([adapter, plainAdapter]), now: () => now })
   return { catalog, listSets, listSetCards, advance: (hours: number) => { now = new Date(now.getTime() + hours * 3600_000) } }
 }
 
@@ -66,7 +68,7 @@ describe('catalog service', () => {
 
   it('reports a game without a set browser as 400', async () => {
     const { catalog } = setup()
-    await expect(catalog.sets('ygo')).rejects.toMatchObject({ status: 400, code: 'sets_not_supported' })
-    await expect(catalog.setCards('ygo', 'x')).rejects.toMatchObject({ status: 400, code: 'sets_not_supported' })
+    await expect(catalog.sets('plain')).rejects.toMatchObject({ status: 400, code: 'sets_not_supported' })
+    await expect(catalog.setCards('plain', 'x')).rejects.toMatchObject({ status: 400, code: 'sets_not_supported' })
   })
 })

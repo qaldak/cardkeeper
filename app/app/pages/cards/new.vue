@@ -27,7 +27,12 @@ const config = computed(() => getGameConfig(gameSlug.value))
 const isPokemon = computed(() => gameSlug.value === 'pokemon')
 
 // Pokémon: by set and number (what is printed on the card) or by name / card id.
-const mode = ref<'set' | 'name'>('set')
+const isYgo = computed(() => gameSlug.value === 'ygo')
+// Pokémon: by set and number or by name. Yu-Gi-Oh!: one card by name, passcode or set code, or a whole set at once.
+const hasModes = computed(() => isPokemon.value || isYgo.value)
+// The mode that is shown first is the one a game starts with.
+const modeEntries = computed(() => (isPokemon.value ? ['set', 'name'] : ['name', 'set']) as ('set' | 'name')[])
+const mode = ref<'set' | 'name'>(gameSlug.value === 'pokemon' ? 'set' : 'name')
 const query = ref('')
 const results = ref<LookupCandidateDto[] | null>(null)
 const searching = ref(false)
@@ -47,6 +52,7 @@ const submitting = ref(false)
 // A search belongs to one game: switching the game starts over.
 watch(gameSlug, (slug) => {
   lastGame.value = slug
+  mode.value = slug === 'pokemon' ? 'set' : 'name'
   results.value = null
   chosen.value = null
   searchError.value = ''
@@ -184,9 +190,9 @@ const MAX_RESULTS = 50
         <USelect v-model="gameSlug" :items="gameItems" class="w-full" />
       </UFormField>
 
-      <div v-if="isPokemon" class="mb-5 flex gap-1.5" role="group" :aria-label="t('add.bySet.modeLabel')">
+      <div v-if="hasModes" class="mb-5 flex gap-1.5" role="group" :aria-label="t('add.bySet.modeLabel')">
         <button
-          v-for="entry in (['set', 'name'] as const)"
+          v-for="entry in modeEntries"
           :key="entry"
           type="button"
           class="rounded-full border px-3.5 py-1.5 text-sm"
@@ -195,11 +201,13 @@ const MAX_RESULTS = 50
           :data-test="`mode-${entry}`"
           @click="mode = entry"
         >
-          {{ t(`add.bySet.mode.${entry}`) }}
+          {{ isPokemon ? t(`add.bySet.mode.${entry}`) : t(`add.setImport.mode.${entry}`) }}
         </button>
       </div>
 
       <PokemonSetPicker v-if="isPokemon && mode === 'set'" @select="choose" />
+
+      <YgoSetWizard v-else-if="isYgo && mode === 'set'" />
 
       <form v-else class="mb-6 flex flex-wrap items-end gap-3" @submit.prevent="search">
         <UFormField :label="t('add.query')" class="min-w-64 flex-1">
@@ -223,7 +231,7 @@ const MAX_RESULTS = 50
         {{ searchError }}
       </p>
 
-      <template v-if="results && !(isPokemon && mode === 'set')">
+      <template v-if="results && !(hasModes && mode === 'set')">
         <p v-if="results.length === 0" class="text-sm text-muted">
           {{ t('add.noResults') }}
         </p>

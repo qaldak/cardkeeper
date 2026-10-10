@@ -160,6 +160,9 @@ export interface GameSetDto {
   official: number | null
   /** Including cards that are not part of the printed numbering (secret rares). */
   total: number | null
+  /** The code the cards of the set start with ("SDAZ"), if the database knows it. */
+  code?: string | null
+  releasedAt?: string | null
 }
 
 /** A card in a set, as listed when browsing the set. */
@@ -169,4 +172,6 @@ export interface SetCardDto {
   number: string
   name: string
   thumbnailUrl: string | null
+  /** The prints of the card in this set: the code on the card and its rarity (Yu-Gi-Oh!). */
+  prints?: { setCode: string, rarity: string | null }[]
 }

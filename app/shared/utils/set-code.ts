@@ -54,3 +54,22 @@ export function printedCodeFor(typed: string, printCode: string): string | undef
   const print = printCode.toUpperCase()
   return isSetCode(code) && code !== print && setCodeSpellings(code).includes(print) ? code : undefined
 }
+
+/** The language letters of a set code for the languages a whole set can be added in. */
+export const SET_IMPORT_REGIONS = { de: 'DE', en: 'EN', ja: 'JP' } as const
+export type SetImportLanguage = keyof typeof SET_IMPORT_REGIONS
+
+/**
+ * The code of the same print in another language: "SDAZ-EN001" in German is "SDAZ-DE001". A code without a language
+ * ("SDY-006") has none to change.
+ */
+export function setCodeInRegion(code: string, region: string): string {
+  const normalized = normalizeSetCode(code)
+  const match = SET_CODE.exec(normalized)
+  if (!match) {
+    return normalized
+  }
+  const [, set, rest] = match as unknown as [string, string, string]
+  const current = REGIONS.find(candidate => rest.startsWith(candidate) && /^[A-Z]{0,2}\d/.test(rest.slice(candidate.length)))
+  return current ? `${set}-${region.toUpperCase()}${rest.slice(current.length)}` : normalized
+}
