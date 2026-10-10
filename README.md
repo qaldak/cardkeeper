@@ -27,9 +27,9 @@ Everything runs in containers: there is nothing to install on the host except Do
 - Yu-Gi-Oh!: "Whole set" adds all cards of a set at once, as a wizard: choose the set, choose the language of the cards
   (German, English, Japanese; the set code is stored in it, e.g. `SDAZ-DE001`), check the cards, add them. A card whose
   print is not clear (a code in several rarities, or a card with several codes in the set) has to be chosen by the
-  person; everything else is chosen already, and adding is only possible once nothing is open. The edition (1st
-  Edition, Limited Edition, none = Unlimited) is chosen once for the whole set and can be changed per card, and single
-  cards can be left out. The cards are added one after the other with the same checks as a single card (three at a
+  person; only those cards are listed, everything else is chosen already, and adding is only possible once nothing is
+  open. Whoever wants to leave single cards out opens the list of all cards and deselects them. The edition (1st
+  Edition, Limited Edition, none = Unlimited) is chosen once for the whole set and can be changed per card. The cards are added one after the other with the same checks as a single card (three at a
   time, so that the rate limit of the card database is respected); a failure is listed and can be retried. Every card
   is added once: there is no quantity.
 - "Update from API" refreshes texts, attributes and prices of a card; set code, edition, status, owner,

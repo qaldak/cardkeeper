@@ -43,6 +43,15 @@ export function buildImportRows(cards: readonly SetCardDto[]): ImportRow[] {
   })
 }
 
+/**
+ * A card that has to be looked at: it has several prints in the set (a code in several rarities, or several codes). This
+ * stays true after the person has chosen, so that the card does not disappear from the list under their hands.
+ */
+export const isConflict = (row: ImportRow): boolean => row.prints.length > 1
+
+/** The rows to show: only the conflicts, or all of them when the person asks for it. */
+export const visibleRows = (rows: readonly ImportRow[], showAll: boolean): ImportRow[] => showAll ? [...rows] : rows.filter(isConflict)
+
 /** A row that is added but whose print is still open: the person has to choose. */
 export const needsChoice = (row: ImportRow): boolean => row.include && row.printIndex === null
 

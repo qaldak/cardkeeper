@@ -217,6 +217,11 @@
       "use": "Diese Karte verwenden"
     },
     "setImport": {
+      "noConflicts": "Alle Karten sind eindeutig, es ist nichts zu entscheiden.",
+      "clearCount": "{count} weitere Karten sind eindeutig und werden ohne Rückfrage hinzugefügt.",
+      "allShown": "Alle Karten sind sichtbar: hier kannst du einzelne Karten abwählen.",
+      "showAll": "Alle {total} Karten anzeigen, um einzelne abzuwählen",
+      "showConflicts": "Nur Karten mit Auswahl anzeigen",
       "mode": {
         "name": "Einzelne Karte",
         "set": "Ganzes Set"

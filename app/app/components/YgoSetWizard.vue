@@ -3,7 +3,7 @@ import type { CardDetailDto, GameSetDto, SetCardDto } from '#shared/types/api'
 import { foldEszett } from '#shared/utils/eszett'
 import { getGameConfig } from '#shared/utils/game-config'
 import { SET_IMPORT_REGIONS, type SetImportLanguage } from '#shared/utils/set-code'
-import { buildImportRows, importBody, needsChoice, shownSetCode, type ImportRow } from '#shared/utils/set-import'
+import { buildImportRows, importBody, isConflict, needsChoice, shownSetCode, visibleRows, type ImportRow } from '#shared/utils/set-import'
 
 // Adds all cards of a set at once, like a wizard: choose the set, choose the language of the cards (the set codes are
 // stored in it), check the cards that are not clear, add them. Only what is unclear has to be decided by the person.
@@ -75,6 +75,7 @@ async function loadCards(set: GameSetDto) {
 
 async function chooseSet(set: GameSetDto) {
   chosenSet.value = set
+  showAll.value = false
   rows.value = []
   if (await loadCards(set)) {
     step.value = 'review'
@@ -85,6 +86,13 @@ watch(language, () => {
     void loadCards(chosenSet.value)
   }
 })
+
+// Only the cards that need a decision are shown. The others are added as they are; whoever wants to leave single
+// cards out opens the whole list.
+const showAll = ref(false)
+const shownRows = computed(() => visibleRows(rows.value, showAll.value))
+const clearCount = computed(() => rows.value.filter(row => !isConflict(row) && row.include).length)
+const conflictCount = computed(() => rows.value.filter(isConflict).length)
 
 const selected = computed(() => rows.value.filter(row => row.include))
 const open = computed(() => rows.value.filter(needsChoice))
@@ -154,6 +162,7 @@ function start() {
 const retry = () => addAll(failed.value)
 
 function another() {
+  showAll.value = false
   Object.keys(status).forEach(key => Reflect.deleteProperty(status, key))
   rows.value = []
   chosenSet.value = null
@@ -242,12 +251,16 @@ function another() {
         {{ t('add.setImport.loading') }}
       </p>
 
-      <div class="overflow-x-auto rounded-xl border border-default bg-default">
+      <p v-if="!loadingCards && rows.length > 0 && conflictCount === 0" class="text-sm text-muted" data-test="no-conflicts">
+        {{ t('add.setImport.noConflicts') }}
+      </p>
+
+      <div v-if="shownRows.length > 0" class="overflow-x-auto rounded-xl border border-default bg-default">
         <table class="w-full text-sm" data-test="set-cards">
           <thead class="border-b border-default text-left text-xs text-muted">
             <tr>
               <th class="w-10 px-3 py-2">
-                <UCheckbox :model-value="allIncluded" :aria-label="t('add.setImport.toggleAll')" data-test="toggle-all" @update:model-value="toggleAll" />
+                <UCheckbox v-if="showAll" :model-value="allIncluded" :aria-label="t('add.setImport.toggleAll')" data-test="toggle-all" @update:model-value="toggleAll" />
               </th>
               <th class="px-2 py-2">
                 {{ t('add.setImport.card') }}
@@ -265,7 +278,7 @@ function another() {
           </thead>
           <tbody class="divide-y divide-default">
             <tr
-              v-for="row in rows"
+              v-for="row in shownRows"
               :key="row.externalId"
               :class="needsChoice(row) ? 'bg-warning/10' : ''"
               :data-test="`row-${row.externalId}`"
@@ -306,6 +319,22 @@ function another() {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div v-if="rows.length > 0" class="flex flex-wrap items-center gap-3 text-sm">
+        <p class="text-muted" data-test="clear-count">
+          {{ showAll ? t('add.setImport.allShown') : t('add.setImport.clearCount', { count: clearCount }) }}
+        </p>
+        <UButton
+          size="xs"
+          variant="link"
+          :icon="showAll ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+          :aria-expanded="showAll"
+          data-test="toggle-list"
+          @click="showAll = !showAll"
+        >
+          {{ showAll ? t('add.setImport.showConflicts') : t('add.setImport.showAll', { total: rows.length }) }}
+        </UButton>
       </div>
 
       <div class="sticky bottom-0 flex flex-wrap items-center gap-4 rounded-xl border border-default bg-default px-4 py-3">

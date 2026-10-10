@@ -217,6 +217,11 @@
       "use": "Use this card"
     },
     "setImport": {
+      "noConflicts": "All cards are clear, there is nothing to decide.",
+      "clearCount": "{count} more cards are clear and are added without asking.",
+      "allShown": "All cards are shown: you can deselect single cards here.",
+      "showAll": "Show all {total} cards to deselect single ones",
+      "showConflicts": "Show only cards that need a choice",
       "mode": {
         "name": "Single card",
         "set": "Whole set"

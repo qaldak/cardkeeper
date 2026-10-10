@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { SetCardDto } from '../../shared/types/api'
-import { buildImportRows, importBody, needsChoice, shownSetCode } from '../../shared/utils/set-import'
+import { buildImportRows, importBody, isConflict, needsChoice, shownSetCode, visibleRows } from '../../shared/utils/set-import'
 import { SET_IMPORT_REGIONS, setCodeInRegion } from '../../shared/utils/set-code'
 
 const card = (externalId: string, prints: SetCardDto['prints'], name = `Card ${externalId}`): SetCardDto => ({ externalId, number: prints?.[0]?.setCode ?? '', name, thumbnailUrl: null, prints })
@@ -88,5 +88,28 @@ describe('set code in another language', () => {
   it('leaves a code without a language and a text that is no code alone', () => {
     expect(setCodeInRegion('SDY-006', 'DE')).toBe('SDY-006')
     expect(setCodeInRegion('Dunkler Magier', 'DE')).toBe('DUNKLER MAGIER')
+  })
+})
+
+describe('which rows are shown', () => {
+  const rows = buildImportRows(CARDS)
+
+  it('shows only the cards with several prints by default', () => {
+    expect(visibleRows(rows, false).map(row => row.externalId)).toEqual(['3', '4'])
+    expect(rows.filter(isConflict).map(row => row.externalId)).toEqual(['3', '4'])
+  })
+
+  it('shows all of them when asked to', () => {
+    expect(visibleRows(rows, true).map(row => row.externalId)).toEqual(['1', '2', '3', '4', '5', '6'])
+  })
+
+  it('keeps a conflict in the list after the person has chosen', () => {
+    const chosen = rows.map(row => (isConflict(row) ? { ...row, printIndex: 0 } : row))
+    expect(chosen.filter(needsChoice)).toEqual([])
+    expect(visibleRows(chosen, false).map(row => row.externalId)).toEqual(['3', '4'])
+  })
+
+  it('shows nothing when there is no conflict', () => {
+    expect(visibleRows(buildImportRows([CARDS[0]!, CARDS[1]!]), false)).toEqual([])
   })
 })
