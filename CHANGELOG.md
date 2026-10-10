@@ -1,3 +1,9 @@
+## [0.18.0](https://github.com/qaldak/cardkeeper/compare/v0.17.0...v0.18.0) (2026-10-10)
+
+### Features
+
+* show the running version in a start banner ([83bdfed](https://github.com/qaldak/cardkeeper/commit/83bdfed7bd41c90beb320474e9e37ceea9a46a81))
+
 ## [0.17.0](https://github.com/qaldak/cardkeeper/compare/v0.16.0...v0.17.0) (2026-10-10)
 
 ### Features
