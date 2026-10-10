@@ -360,6 +360,30 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       // 0.10 (Furret) + 1.10 (Boss's Orders); the energy has no price.
       expect(summary.totals).toEqual([{ currency: 'EUR', amount: 1.2 }])
     })
+
+    it('shows the prices in the display currency in the list, the total and the detail', async () => {
+      const { reverse } = await seed()
+      const rates = (async (input: URL | RequestInfo) => {
+        const url = new URL(String(input))
+        const rate = { 'EUR>CHF': 0.9, 'USD>CHF': 0.8 }[`${url.searchParams.get('base')}>${url.searchParams.get('symbols')}`]
+        return rate === undefined
+          ? new Response('{}', { status: 404 })
+          : new Response(JSON.stringify({ rates: { [url.searchParams.get('symbols')!]: rate } }), { status: 200 })
+      }) as typeof fetch
+      const services = h.servicesAt(() => new Date('2026-10-04T12:00:00Z'), undefined, undefined, { currency: 'CHF', fetchFn: rates })
+
+      const { items, summary } = await services.cards.list({ game: 'pokemon' }, all)
+      expect(items.find(item => item.id === reverse.id)!.price).toMatchObject({ amount: 0.1, currency: 'EUR', converted: { amount: 0.09, currency: 'CHF' } })
+      // 0.10 + 1.10 EUR at 0.90.
+      expect(summary.totals).toEqual([{ currency: 'CHF', amount: 1.08 }])
+
+      const history = (await services.cards.get(reverse.id)).priceHistory
+      expect(history.length).toBeGreaterThan(0)
+      for (const point of history) {
+        expect(point.converted).toEqual({ amount: Math.round(point.price * (point.currency === 'USD' ? 0.8 : 0.9) * 100) / 100, currency: 'CHF' })
+      }
+      expect(new Set(history.map(point => point.currency))).toEqual(new Set(['EUR', 'USD']))
+    })
   })
   // The user's example: a Hippoterus printed "040/088" has the id me03-040. Without a set code on the card, the card is
   // found by the printed set size and the number.
