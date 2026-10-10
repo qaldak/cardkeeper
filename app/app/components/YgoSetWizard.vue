@@ -18,6 +18,7 @@ const editionKeys = getGameConfig(GAME).editions
 
 type Step = 'set' | 'review' | 'run'
 const step = ref<Step>('set')
+const stepIndex = computed(() => ['set', 'review', 'run'].indexOf(step.value))
 const steps = computed(() => (['set', 'review', 'run'] as const).map((key, index) => ({ key, number: index + 1, label: t(`add.setImport.steps.${key}`) })))
 
 // 1. The set
@@ -172,15 +173,26 @@ function another() {
 
 <template>
   <div class="flex flex-col gap-5" data-test="set-wizard">
-    <ol class="flex flex-wrap gap-2 text-sm" data-test="wizard-steps">
+    <!-- Where the person is in the process: a plain list of numbered stations, no buttons, nothing to click. -->
+    <ol class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm select-none" :aria-label="t('add.setImport.progressLabel')" data-test="wizard-steps">
       <li
-        v-for="entry in steps"
+        v-for="(entry, index) in steps"
         :key="entry.key"
-        class="flex items-center gap-2 rounded-full border px-3 py-1"
-        :class="entry.key === step ? 'border-primary bg-primary font-medium text-inverted' : 'border-default text-muted'"
+        class="flex items-center gap-3"
         :aria-current="entry.key === step ? 'step' : undefined"
+        :data-state="index < stepIndex ? 'done' : index === stepIndex ? 'current' : 'next'"
       >
-        <span class="font-semibold">{{ entry.number }}</span> {{ entry.label }}
+        <span
+          class="flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+          :class="index < stepIndex ? 'bg-primary/15 text-primary' : index === stepIndex ? 'bg-primary text-inverted' : 'border border-default text-dimmed'"
+        >
+          <UIcon v-if="index < stepIndex" name="i-lucide-check" class="size-3.5" />
+          <template v-else>{{ entry.number }}</template>
+        </span>
+        <span :class="index === stepIndex ? 'font-semibold text-default' : index < stepIndex ? 'text-muted' : 'text-dimmed'">
+          {{ entry.label }}<span v-if="index < stepIndex" class="sr-only"> ({{ t('add.setImport.stepDone') }})</span>
+        </span>
+        <span v-if="index < steps.length - 1" class="h-px w-6 sm:w-10" :class="index < stepIndex ? 'bg-primary/40' : 'bg-accented'" aria-hidden="true" />
       </li>
     </ol>
 
