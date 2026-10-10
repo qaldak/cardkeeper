@@ -226,6 +226,21 @@ describe('TCGdex adapter: requests', () => {
     expect(card?.externalId).toBe('swsh3-136')
   })
 
+  it('lists the variants of cards, one request per card, in the language of the set', async () => {
+    const fetchFn = vi.fn().mockImplementation(async (input: URL) => {
+      const id = input.pathname.split('/').pop()
+      return id === 'swsh3-136' ? json(load('furret-en')) : id === 'swsh3-000' ? json({ error: 'not found' }, 404) : new Response('boom', { status: 500 })
+    })
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const prints = await adapterWith(fetchFn).listCardPrints!(['swsh3-136', 'swsh3-000', 'swsh3-999'], 'en')
+    expect([...prints.keys()]).toEqual(['swsh3-136'])
+    expect(prints.get('swsh3-136')!.map(print => [print.setCode, print.edition])).toEqual([['swsh3-136', 'normal'], ['swsh3-136', 'reverse']])
+    expect(prints.get('swsh3-136')![0]!.rarity).toEqual(expect.any(String))
+    expect(fetchFn).toHaveBeenCalledTimes(3)
+    expect(new Set(fetchFn.mock.calls.map(call => (call[0] as URL).pathname.split('/')[2]))).toEqual(new Set(['en']))
+    warn.mockRestore()
+  })
+
   it('maps upstream failures to stable error codes and keeps the details', async () => {
     const run = (response: Response | Error) => {
       const fetchFn = response instanceof Error ? vi.fn().mockRejectedValue(response) : vi.fn().mockResolvedValue(response)

@@ -1,6 +1,6 @@
 import { eszettVariants } from '../../../shared/utils/eszett'
 import { badRequest, HttpError } from '../../lib/errors'
-import type { CardAdapter, CommonCard, GameSet, SetCard } from '../types'
+import type { CardAdapter, CommonCard, GameSet, SetCard, SetCardPrint } from '../types'
 import { cardImages, mapTcgdexCard } from './mapper'
 import { tcgdexBriefListSchema, tcgdexSetListSchema, tcgdexSetSchema } from './schema'
 
@@ -160,6 +160,31 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
 
     mapToCommonSchema(raw, language) {
       return mapTcgdexCard(raw, resolveLanguage(language))
+    },
+
+    /**
+     * The variants of cards, one request per card (the list of a set does not carry them), a few at a time. The variants
+     * do not depend on the language, so the language of the set is used: a Japanese card has no English version.
+     */
+    async listCardPrints(cardIds, language) {
+      const lang = resolveLanguage(language)
+      const prints = new Map<string, SetCardPrint[]>()
+      const queue = [...cardIds]
+      const worker = async () => {
+        for (let id = queue.shift(); id !== undefined; id = queue.shift()) {
+          try {
+            const card = await fetchCardById(id, lang)
+            if (card) {
+              prints.set(id, card.sets.map(set => ({ setCode: set.setCode, rarity: set.rarity ?? null, edition: set.edition ?? null })))
+            }
+          }
+          catch (error) {
+            console.warn(`[tcgdex] No variants for ${id}:`, error instanceof Error ? error.message : error)
+          }
+        }
+      }
+      await Promise.all(Array.from({ length: 4 }, worker))
+      return prints
     },
 
     async listSets(language) {

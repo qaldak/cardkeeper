@@ -32,6 +32,12 @@ Everything runs in containers: there is nothing to install on the host except Do
   Edition, Limited Edition, none = Unlimited) is chosen once for the whole set and can be changed per card. The cards are added one after the other with the same checks as a single card (three at a
   time, so that the rate limit of the card database is respected); a failure is listed and can be retried. Every card
   is added once: there is no quantity.
+- Pokémon: "Whole set" works the same way (choose the language of the set list and the set, check, add). What can be
+  unclear is the variant of a card (normal, reverse holo, holo, 1st edition, W-promo): a card that exists in one
+  variant has it chosen, and one variant can be chosen for the whole set, which is taken for every card that has it;
+  only the others are listed. Pokémon cards have no set code of their own and no edition to choose (the variant is
+  it), and all languages of a card are stored as for a single card. The variants of the cards are asked for one
+  request per card (a few at a time) when the set is opened and are kept for a few hours, so a large set takes a moment.
 - "Update from API" refreshes texts, attributes and prices of a card; set code, edition, status, owner,
   purchase date and images are never touched
 - "Add card" lookup by name or passcode against the card database, including the exact printing (set and rarity). For

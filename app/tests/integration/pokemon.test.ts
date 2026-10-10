@@ -169,6 +169,38 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
     })
   })
 
+  describe('adding a whole set', () => {
+    it('lists the cards of a set with the variants of every card, and leaves out a card that cannot be loaded', async () => {
+      const cards = await h.services.catalog.setImport('pokemon', 'me03', 'de')
+      const hippowdon = cards.find(card => card.externalId === 'me03-040')!
+      expect(hippowdon.prints!.map(print => [print.setCode, print.edition])).toEqual([['me03-040', 'normal'], ['me03-040', 'reverse']])
+      expect(hippowdon.thumbnailUrl).toContain('assets.tcgdex.net')
+      // The fake database knows no other card of the set: there is nothing to add for them.
+      expect(cards.filter(card => card.externalId !== 'me03-040').every(card => card.prints!.length === 0)).toBe(true)
+      expect(h.tcgdex.requestedLanguages.filter(language => language === 'de').length).toBeGreaterThan(cards.length)
+    })
+
+    it('asks for the variants of a set once, however often it is listed', async () => {
+      await h.services.catalog.setImport('pokemon', 'me03', 'de')
+      const before = h.tcgdex.requestedUrls.length
+      await h.services.catalog.setImport('pokemon', 'me03', 'de')
+      expect(h.tcgdex.requestedUrls.length).toBe(before)
+    })
+
+    it('adds a card by its variant alone: the rarity is the one of the card', async () => {
+      const card = await h.services.cards.create({ game: 'pokemon', externalId: 'me03-040', set: { setCode: 'me03-040', edition: 'reverse' } }, h.anna)
+      expect(card.sets).toHaveLength(1)
+      expect(card.sets[0]).toMatchObject({ setCode: 'me03-040', edition: 'reverse' })
+      expect(card.sets[0]!.rarity).not.toBeNull()
+    })
+
+    it('still refuses a variant the card does not exist in, and a rarity that is not the card\'s', async () => {
+      await expect(h.services.cards.create({ game: 'pokemon', externalId: 'me03-040', set: { setCode: 'me03-040', edition: 'wPromo' } }, h.anna)).rejects.toMatchObject({ code: 'invalid_set' })
+      await expect(h.services.cards.create({ game: 'pokemon', externalId: 'me03-040', set: { setCode: 'me03-040', rarity: 'Nonsense', edition: 'reverse' } }, h.anna)).rejects.toMatchObject({ code: 'invalid_set' })
+      await expect(h.services.cards.create({ game: 'pokemon', externalId: 'me03-040' }, h.anna)).rejects.toMatchObject({ code: 'printing_required' })
+    })
+  })
+
   describe('update', () => {
     it('changes the variant to another one the card exists in', async () => {
       const card = await addFurret('reverse')

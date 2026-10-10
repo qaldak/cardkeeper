@@ -362,7 +362,8 @@ export function createCardService(deps: CardServiceDeps) {
       if (input.set) {
         chosenSet = merged.sets.find(set =>
           set.setCode === input.set!.setCode
-          && (set.rarity ?? null) === (input.set!.rarity ?? null)
+          // A game with variants may leave the rarity out: the variant of the card is what has to be chosen (adding a whole set).
+          && (!freeEdition && input.set!.rarity === undefined || (set.rarity ?? null) === (input.set!.rarity ?? null))
           && (freeEdition || (set.edition ?? null) === (input.set!.edition ?? null)))
         if (!chosenSet) {
           throw badRequest('invalid_set', 'The selected printing does not exist for this card')

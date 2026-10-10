@@ -217,6 +217,12 @@
       "use": "Diese Karte verwenden"
     },
     "setImport": {
+      "needsChoiceVariant": "{count} Karte(n) brauchen deine Auswahl der Variante.",
+      "setLanguage": "Sprache der Set-Liste",
+      "searchPlaceholderPokemon": "z. B. Stürmische Funken oder swsh3",
+      "variant": "Variante",
+      "variantHint": "Diese Variante wird bei allen Karten genommen, die sie haben. Nur bei den übrigen musst du wählen.",
+      "loadingVariants": "Karten und Varianten werden geladen … bei grossen Sets dauert das einen Moment.",
       "progressLabel": "Fortschritt",
       "stepDone": "abgeschlossen",
       "noConflicts": "Alle Karten sind eindeutig, es ist nichts zu entscheiden.",
@@ -226,7 +232,7 @@
       "showConflicts": "Nur Karten mit Auswahl anzeigen",
       "mode": {
         "name": "Einzelne Karte",
-        "set": "Ganzes Set"
+        "import": "Ganzes Set"
       },
       "steps": {
         "set": "Set wählen",

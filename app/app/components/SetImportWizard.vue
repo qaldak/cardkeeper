@@ -3,16 +3,23 @@ import type { CardDetailDto, GameSetDto, SetCardDto } from '#shared/types/api'
 import { foldEszett } from '#shared/utils/eszett'
 import { getGameConfig } from '#shared/utils/game-config'
 import { SET_IMPORT_REGIONS, type SetImportLanguage } from '#shared/utils/set-code'
-import { buildImportRows, importBody, isConflict, needsChoice, shownSetCode, visibleRows, type ImportRow } from '#shared/utils/set-import'
+import { POKEMON_VARIANTS } from '#shared/types/pokemon'
+import { formatPrintedNumber } from '#shared/utils/pokemon-number'
+import { buildImportRows, effectivePrintIndex, importBody, isConflict, needsChoice, shownSetCode, visibleRows, type ImportRow } from '#shared/utils/set-import'
 
-// Adds all cards of a set at once, like a wizard: choose the set, choose the language of the cards (the set codes are
-// stored in it), check the cards that are not clear, add them. Only what is unclear has to be decided by the person.
+// Adds all cards of a set at once, like a wizard: choose the set, check the cards that are not clear, add them. Only
+// what is unclear has to be decided by the person.
+// Yu-Gi-Oh!: the language of the cards is chosen with the cards (the set codes are stored in it) and so is the edition.
+// Pokémon: the language is the one of the list of sets (the sets of the languages differ), and what is unclear is the
+// variant of a card (normal, reverse holo, ...); one variant can be chosen for the whole set.
 
 const { t } = useI18n()
 const apiError = useApiError()
 const labels = useGameLabels()
 
-const GAME = 'ygo'
+const props = defineProps<{ game: 'ygo' | 'pokemon' }>()
+const GAME = props.game
+const isPokemon = GAME === 'pokemon'
 const PARALLEL = 3
 const editionKeys = getGameConfig(GAME).editions
 
@@ -22,17 +29,26 @@ const stepIndex = computed(() => ['set', 'review', 'run'].indexOf(step.value))
 const steps = computed(() => (['set', 'review', 'run'] as const).map((key, index) => ({ key, number: index + 1, label: t(`add.setImport.steps.${key}`) })))
 
 // 1. The set
+const language = ref<SetImportLanguage>('de')
 const sets = ref<GameSetDto[]>([])
 const loadingSets = ref(true)
 const filter = ref('')
 const error = ref('')
-try {
-  sets.value = await $fetch<GameSetDto[]>('/api/sets', { query: { game: GAME } })
+async function loadSets() {
+  loadingSets.value = true
+  error.value = ''
+  try {
+    sets.value = await $fetch<GameSetDto[]>('/api/sets', { query: isPokemon ? { game: GAME, language: language.value } : { game: GAME } })
+  }
+  catch (failure) {
+    sets.value = []
+    error.value = apiError(failure)
+  }
+  finally {
+    loadingSets.value = false
+  }
 }
-catch (failure) {
-  error.value = apiError(failure)
-}
-loadingSets.value = false
+await loadSets()
 
 const MAX_LISTED = 100
 const visibleSets = computed(() => {
@@ -45,10 +61,12 @@ const dateOf = (set: GameSetDto) => set.releasedAt ? new Date(set.releasedAt).to
 
 // 2. Language, edition and cards
 const chosenSet = ref<GameSetDto | null>(null)
-const language = ref<SetImportLanguage>('de')
 const region = computed(() => SET_IMPORT_REGIONS[language.value])
 const languageItems = computed(() => (Object.keys(SET_IMPORT_REGIONS) as SetImportLanguage[]).map(code => ({ label: t(`add.setImport.languages.${code}`), value: code })))
 const setEdition = ref<string | null>(null)
+// Pokémon: the variant taken for every card that has it; none chosen yet.
+const defaultVariant = ref<string | null>(null)
+const variantFor = computed(() => (isPokemon ? defaultVariant.value : null))
 const rows = ref<ImportRow[]>([])
 const loadingCards = ref(false)
 
@@ -56,7 +74,7 @@ async function loadCards(set: GameSetDto) {
   loadingCards.value = true
   error.value = ''
   try {
-    const cards = await $fetch<SetCardDto[]>(`/api/sets/${encodeURIComponent(set.id)}`, { query: { game: GAME, language: language.value } })
+    const cards = await $fetch<SetCardDto[]>(`/api/sets/${encodeURIComponent(set.id)}/import`, { query: { game: GAME, language: language.value } })
     // Changing the language keeps what was decided for a card.
     const before = new Map(rows.value.map(row => [row.externalId, row]))
     rows.value = buildImportRows(cards).map((row) => {
@@ -83,7 +101,11 @@ async function chooseSet(set: GameSetDto) {
   }
 }
 watch(language, () => {
-  if (chosenSet.value && step.value === 'review') {
+  if (isPokemon && step.value === 'set') {
+    // The sets of Pokémon differ from language to language.
+    void loadSets()
+  }
+  else if (chosenSet.value && step.value === 'review') {
     void loadCards(chosenSet.value)
   }
 })
@@ -91,12 +113,12 @@ watch(language, () => {
 // Only the cards that need a decision are shown. The others are added as they are; whoever wants to leave single
 // cards out opens the whole list.
 const showAll = ref(false)
-const shownRows = computed(() => visibleRows(rows.value, showAll.value))
-const clearCount = computed(() => rows.value.filter(row => !isConflict(row) && row.include).length)
-const conflictCount = computed(() => rows.value.filter(isConflict).length)
+const shownRows = computed(() => visibleRows(rows.value, showAll.value, variantFor.value))
+const clearCount = computed(() => rows.value.filter(row => !isConflict(row, variantFor.value) && row.include).length)
+const conflictCount = computed(() => rows.value.filter(row => isConflict(row, variantFor.value)).length)
 
 const selected = computed(() => rows.value.filter(row => row.include))
-const open = computed(() => rows.value.filter(needsChoice))
+const open = computed(() => rows.value.filter(row => needsChoice(row, variantFor.value)))
 const allIncluded = computed(() => rows.value.filter(row => row.prints.length > 0).every(row => row.include))
 function toggleAll() {
   const value = !allIncluded.value
@@ -106,9 +128,14 @@ function toggleAll() {
 }
 
 const printItems = (row: ImportRow) => row.prints.map((print, index) => ({
-  label: `${print.rarity ?? '–'} · ${shownSetCode({ ...row, printIndex: index }, region.value)}`,
+  label: isPokemon
+    ? labels.variant(print.edition)
+    : `${print.rarity ?? '–'} · ${shownSetCode({ ...row, printIndex: index }, region.value)}`,
   value: index,
 }))
+// What is shown for a card whose print is clear.
+const clearPrintLabel = (row: ImportRow) => isPokemon ? labels.variant(row.prints[0]!.edition) : (row.prints[0]!.rarity ?? '–')
+const variantItems = POKEMON_VARIANTS.map(key => ({ key, label: labels.variant(key) }))
 
 // The edition of a single card: the one of the whole set unless it is set here.
 const SAME = 'same'
@@ -141,7 +168,7 @@ async function addAll(targets: ImportRow[]) {
   const worker = async () => {
     for (let row = queue.shift(); row; row = queue.shift()) {
       status[row.externalId] = { state: 'busy' }
-      const body = importBody(row, region.value, setEdition.value)
+      const body = importBody(row, { game: GAME, region: region.value, setEdition: setEdition.value, defaultVariant: variantFor.value })
       try {
         await $fetch<CardDetailDto>('/api/cards', { method: 'POST', body })
         status[row.externalId] = { state: 'ok' }
@@ -202,9 +229,14 @@ function another() {
 
     <!-- 1. Set -->
     <section v-if="step === 'set'">
-      <UFormField :label="t('add.setImport.searchLabel')" class="mb-3 max-w-md">
-        <UInput v-model="filter" :placeholder="t('add.setImport.searchPlaceholder')" class="w-full" data-test="set-filter" autofocus />
-      </UFormField>
+      <div class="mb-3 flex flex-wrap items-end gap-3">
+        <UFormField v-if="isPokemon" :label="t('add.setImport.setLanguage')" class="w-52">
+          <USelect v-model="language" :items="languageItems" class="w-full" data-test="set-list-language" />
+        </UFormField>
+        <UFormField :label="t('add.setImport.searchLabel')" class="min-w-52 max-w-md flex-1">
+          <UInput v-model="filter" :placeholder="isPokemon ? t('add.setImport.searchPlaceholderPokemon') : t('add.setImport.searchPlaceholder')" class="w-full" data-test="set-filter" autofocus />
+        </UFormField>
+      </div>
       <p v-if="loadingSets || loadingCards" class="text-sm text-muted">
         {{ t('add.setImport.loading') }}
       </p>
@@ -219,10 +251,11 @@ function another() {
             :data-test="`set-${set.code ?? set.id}`"
             @click="chooseSet(set)"
           >
-            <span class="min-w-0">
+            <RemoteImage v-if="set.logoUrl" :src="set.logoUrl" :alt="set.name" loading="lazy" class="h-8 w-16 shrink-0 object-contain" />
+            <span class="min-w-0 flex-1">
               <span class="block truncate text-sm font-medium">{{ set.name }}</span>
               <span class="block truncate text-xs text-muted">
-                {{ [set.code, set.official !== null ? t('add.setImport.cardsCount', { count: set.official }) : null, dateOf(set)].filter(Boolean).join(' · ') }}
+                {{ [isPokemon ? set.id : set.code, set.official !== null ? t('add.setImport.cardsCount', { count: set.official }) : null, dateOf(set)].filter(Boolean).join(' · ') }}
               </span>
             </span>
             <UIcon name="i-lucide-chevron-right" class="shrink-0 text-muted" />
@@ -242,7 +275,7 @@ function another() {
             {{ chosenSet.name }}
           </p>
           <p class="text-xs text-muted">
-            {{ [chosenSet.code, chosenSet.official !== null ? t('add.setImport.cardsCount', { count: chosenSet.official }) : null].filter(Boolean).join(' · ') }}
+            {{ [isPokemon ? chosenSet.id : chosenSet.code, chosenSet.official !== null ? t('add.setImport.cardsCount', { count: chosenSet.official }) : null].filter(Boolean).join(' · ') }}
           </p>
         </div>
         <UButton size="xs" variant="link" data-test="other-set" @click="another">
@@ -250,7 +283,25 @@ function another() {
         </UButton>
       </div>
 
-      <div class="flex flex-wrap items-start gap-6">
+      <div v-if="isPokemon" class="flex flex-wrap items-start gap-6">
+        <UFormField :label="t('add.setImport.variant')" :description="t('add.setImport.variantHint')">
+          <div role="group" :aria-label="t('add.setImport.variant')" class="flex flex-wrap gap-1.5" data-test="default-variant">
+            <button
+              v-for="entry in variantItems"
+              :key="entry.key"
+              type="button"
+              class="rounded-full border px-3 py-1 text-sm"
+              :class="defaultVariant === entry.key ? 'border-primary bg-primary font-medium text-inverted' : 'border-default bg-default text-muted hover:text-default'"
+              :aria-pressed="defaultVariant === entry.key"
+              :data-test="`variant-${entry.key}`"
+              @click="defaultVariant = defaultVariant === entry.key ? null : entry.key"
+            >
+              {{ entry.label }}
+            </button>
+          </div>
+        </UFormField>
+      </div>
+      <div v-else class="flex flex-wrap items-start gap-6">
         <UFormField :label="t('add.setImport.language')" :description="t('add.setImport.languageHint', { example: `${chosenSet.code ?? 'SDAZ'}-${region}001` })" class="w-72">
           <USelect v-model="language" :items="languageItems" class="w-full" data-test="set-language" />
         </UFormField>
@@ -260,7 +311,7 @@ function another() {
       </div>
 
       <p v-if="loadingCards" class="text-sm text-muted">
-        {{ t('add.setImport.loading') }}
+        {{ isPokemon ? t('add.setImport.loadingVariants') : t('add.setImport.loading') }}
       </p>
 
       <p v-if="!loadingCards && rows.length > 0 && conflictCount === 0" class="text-sm text-muted" data-test="no-conflicts">
@@ -277,13 +328,13 @@ function another() {
               <th class="px-2 py-2">
                 {{ t('add.setImport.card') }}
               </th>
-              <th class="px-2 py-2">
+              <th v-if="!isPokemon" class="px-2 py-2">
                 {{ t('add.setImport.code') }}
               </th>
               <th class="px-2 py-2">
-                {{ t('add.setImport.rarity') }}
+                {{ isPokemon ? t('add.setImport.variant') : t('add.setImport.rarity') }}
               </th>
-              <th class="px-2 py-2">
+              <th v-if="!isPokemon" class="px-2 py-2">
                 {{ t('add.setImport.editionColumn') }}
               </th>
             </tr>
@@ -292,9 +343,9 @@ function another() {
             <tr
               v-for="row in shownRows"
               :key="row.externalId"
-              :class="needsChoice(row) ? 'bg-warning/10' : ''"
+              :class="needsChoice(row, variantFor) ? 'bg-warning/10' : ''"
               :data-test="`row-${row.externalId}`"
-              :data-open="needsChoice(row) ? 'true' : 'false'"
+              :data-open="needsChoice(row, variantFor) ? 'true' : 'false'"
             >
               <td class="px-3 py-2">
                 <UCheckbox v-model="row.include" :disabled="row.prints.length === 0" :aria-label="row.name" />
@@ -304,28 +355,28 @@ function another() {
                   <RemoteImage v-if="row.thumbnailUrl" :src="row.thumbnailUrl" :alt="row.name" loading="lazy" class="h-12 w-9 shrink-0 rounded bg-(--app-art) object-cover" />
                   <span class="min-w-0">
                     <span class="block truncate font-medium">{{ row.name }}</span>
-                    <span class="block text-xs text-muted">#{{ row.externalId }}</span>
+                    <span class="block text-xs text-muted">{{ isPokemon ? formatPrintedNumber(row.number, chosenSet?.official) : `#${row.externalId}` }}</span>
                   </span>
                 </div>
               </td>
-              <td class="whitespace-nowrap px-2 py-2 font-mono text-xs" data-test="row-code">
+              <td v-if="!isPokemon" class="whitespace-nowrap px-2 py-2 font-mono text-xs" data-test="row-code">
                 {{ shownSetCode(row, region) ?? '–' }}
               </td>
               <td class="px-2 py-2">
                 <span v-if="row.prints.length === 0" class="text-muted">{{ t('add.setImport.noPrint') }}</span>
-                <span v-else-if="row.prints.length === 1">{{ row.prints[0]!.rarity ?? '–' }}</span>
+                <span v-else-if="row.prints.length === 1">{{ clearPrintLabel(row) }}</span>
                 <USelect
                   v-else
-                  :model-value="row.printIndex ?? undefined"
+                  :model-value="effectivePrintIndex(row, variantFor) ?? undefined"
                   :items="printItems(row)"
                   :placeholder="t('add.setImport.pleaseChoose')"
-                  :color="needsChoice(row) ? 'warning' : 'neutral'"
+                  :color="needsChoice(row, variantFor) ? 'warning' : 'neutral'"
                   class="w-56"
                   data-test="row-print"
                   @update:model-value="(value: number) => (row.printIndex = value)"
                 />
               </td>
-              <td class="px-2 py-2">
+              <td v-if="!isPokemon" class="px-2 py-2">
                 <USelect :model-value="rowEdition(row)" :items="rowEditionItems" size="sm" class="w-44" @update:model-value="(value: string) => setRowEdition(row, value)" />
               </td>
             </tr>
@@ -354,7 +405,7 @@ function another() {
           {{ t('add.setImport.summary', { selected: selected.length, total: rows.length }) }}
         </p>
         <p v-if="open.length > 0" class="text-sm font-medium text-warning" data-test="needs-choice">
-          {{ t('add.setImport.needsChoice', { count: open.length }) }}
+          {{ isPokemon ? t('add.setImport.needsChoiceVariant', { count: open.length }) : t('add.setImport.needsChoice', { count: open.length }) }}
         </p>
         <UButton class="ml-auto" icon="i-lucide-plus" :disabled="open.length > 0 || selected.length === 0 || loadingCards" data-test="add-all" @click="start">
           {{ t('add.setImport.add', { count: selected.length }) }}

@@ -29,10 +29,12 @@ const isPokemon = computed(() => gameSlug.value === 'pokemon')
 // Pokémon: by set and number (what is printed on the card) or by name / card id.
 const isYgo = computed(() => gameSlug.value === 'ygo')
 // Pokémon: by set and number or by name. Yu-Gi-Oh!: one card by name, passcode or set code, or a whole set at once.
+const wizardGame = computed<'ygo' | 'pokemon'>(() => (isPokemon.value ? 'pokemon' : 'ygo'))
 const hasModes = computed(() => isPokemon.value || isYgo.value)
-// The mode that is shown first is the one a game starts with.
-const modeEntries = computed(() => (isPokemon.value ? ['set', 'name'] : ['name', 'set']) as ('set' | 'name')[])
-const mode = ref<'set' | 'name'>(gameSlug.value === 'pokemon' ? 'set' : 'name')
+type Mode = 'set' | 'name' | 'import'
+// The mode that is shown first is the one a game starts with. 'import' adds a whole set (both games).
+const modeEntries = computed<Mode[]>(() => (isPokemon.value ? ['set', 'name', 'import'] : ['name', 'import']))
+const mode = ref<Mode>(gameSlug.value === 'pokemon' ? 'set' : 'name')
 const query = ref('')
 const results = ref<LookupCandidateDto[] | null>(null)
 const searching = ref(false)
@@ -201,13 +203,13 @@ const MAX_RESULTS = 50
           :data-test="`mode-${entry}`"
           @click="mode = entry"
         >
-          {{ isPokemon ? t(`add.bySet.mode.${entry}`) : t(`add.setImport.mode.${entry}`) }}
+          {{ isPokemon && entry !== 'import' ? t(`add.bySet.mode.${entry}`) : t(`add.setImport.mode.${entry}`) }}
         </button>
       </div>
 
       <PokemonSetPicker v-if="isPokemon && mode === 'set'" @select="choose" />
 
-      <YgoSetWizard v-else-if="isYgo && mode === 'set'" />
+      <SetImportWizard v-else-if="hasModes && mode === 'import'" :key="gameSlug" :game="wizardGame" />
 
       <form v-else class="mb-6 flex flex-wrap items-end gap-3" @submit.prevent="search">
         <UFormField :label="t('add.query')" class="min-w-64 flex-1">
@@ -231,7 +233,7 @@ const MAX_RESULTS = 50
         {{ searchError }}
       </p>
 
-      <template v-if="results && !(hasModes && mode === 'set')">
+      <template v-if="results && !(hasModes && mode !== 'name')">
         <p v-if="results.length === 0" class="text-sm text-muted">
           {{ t('add.noResults') }}
         </p>
