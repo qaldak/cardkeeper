@@ -84,8 +84,9 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
     defaultLanguage: 'en',
     storedLanguages: ['de', 'en'],
     imageHosts: ['images.ygoprodeck.com'],
-    // YGOPRODeck asks not to hotlink its images.
+    // YGOPRODeck asks not to hotlink its images: the lookup shows them from the app's own copy (see thumbnails).
     searchThumbnails: false,
+    thumbnailSource: externalId => /^\d{1,12}$/.test(externalId) ? `https://images.ygoprodeck.com/images/cards_small/${externalId}.jpg` : null,
 
     async fetchCardById(externalId, language) {
       const lang = resolveLanguage(language)

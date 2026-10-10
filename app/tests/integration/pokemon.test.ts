@@ -160,10 +160,12 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       await expect(h.services.cards.lookupDetails('pokemon', 'swsh3-999')).rejects.toMatchObject({ status: 404 })
     })
 
-    it('shows no thumbnails for Yu-Gi-Oh!, whose image host must not be hotlinked', async () => {
+    it('shows the thumbnails of Yu-Gi-Oh! from the app itself, never from its image host', async () => {
       const results = await h.services.cards.lookup('ygo', 'dunkler')
-      expect(results[0]!.thumbnailUrl).toBeNull()
-      expect((await h.services.cards.lookupDetails('ygo', String(DARK_MAGICIAN.id))).thumbnailUrl).toBeNull()
+      expect(results[0]!.thumbnailUrl).toBe(`/api/thumbnails/ygo/${DARK_MAGICIAN.id}`)
+      expect((await h.services.cards.lookupDetails('ygo', String(DARK_MAGICIAN.id))).thumbnailUrl).toBe(`/api/thumbnails/ygo/${DARK_MAGICIAN.id}`)
+      // Only the address is passed on; nothing is downloaded before the image is asked for.
+      expect(h.ygo.requestedImages).toEqual([])
     })
   })
 

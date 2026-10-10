@@ -135,9 +135,18 @@ export function createCardService(deps: CardServiceDeps) {
     }
   }
 
-  /** The image host of the game must allow it, and only URLs on that host are passed on. */
-  const thumbnailOf = (adapter: CardAdapter, card: { images: CommonCardImage[] }): string | null =>
-    adapter.searchThumbnails ? allowedImageUrl(card.images[0]?.smallUrl, adapter.imageHosts) : null
+  /**
+   * The small image of a card in the lookup. A host that allows it is used directly (only URLs on the hosts of the game
+   * are passed on). A host that asks not to be hotlinked is shown from the app's own copy of the image.
+   */
+  const thumbnailOf = (adapter: CardAdapter, card: { externalId: string, images: CommonCardImage[] }): string | null => {
+    if (adapter.searchThumbnails) {
+      return allowedImageUrl(card.images[0]?.smallUrl, adapter.imageHosts)
+    }
+    return card.images.length > 0 && adapter.thumbnailSource?.(card.externalId)
+      ? `/api/thumbnails/${adapter.slug}/${encodeURIComponent(card.externalId)}`
+      : null
+  }
 
   const candidateOf = (adapter: CardAdapter, merged: MergedCard): LookupCandidateDto => {
     const text = merged.translations.find(entry => entry.name === merged.name) ?? merged.translations[0]!

@@ -48,6 +48,11 @@ export interface CardAdapter {
   readonly imageHosts: readonly string[]
   /** Whether search results may show small images loaded straight from the image host. */
   readonly searchThumbnails: boolean
+  /**
+   * For games whose image host asks not to be hotlinked: the url of the small image of a card, which the app downloads
+   * once, keeps, and shows from its own address in the "add card" lookup. `null` if the card has none.
+   */
+  thumbnailSource?(externalId: string): string | null
   fetchCardById(externalId: string, language?: string): Promise<CommonCard | null>
   fetchCardByName(name: string, language?: string): Promise<CommonCard | null>
   /** Fuzzy search used by the "add card" lookup. */
