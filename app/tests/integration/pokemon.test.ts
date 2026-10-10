@@ -365,7 +365,8 @@ describe.skipIf(!TEST_DATABASE_URL)('Pokémon cards', () => {
       const { reverse } = await seed()
       const rates = (async (input: URL | RequestInfo) => {
         const url = new URL(String(input))
-        const rate = { 'EUR>CHF': 0.9, 'USD>CHF': 0.8 }[`${url.searchParams.get('base')}>${url.searchParams.get('symbols')}`]
+        const table: Record<string, number> = { 'EUR>CHF': 0.9, 'USD>CHF': 0.8 }
+        const rate = table[`${url.searchParams.get('base')}>${url.searchParams.get('symbols')}`]
         return rate === undefined
           ? new Response('{}', { status: 404 })
           : new Response(JSON.stringify({ rates: { [url.searchParams.get('symbols')!]: rate } }), { status: 200 })
