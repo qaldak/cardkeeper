@@ -1,3 +1,10 @@
+## [0.17.0](https://github.com/qaldak/cardkeeper/compare/v0.16.0...v0.17.0) (2026-10-10)
+
+### Features
+
+* larger tranches by default, rate limit reaches the user everywhere ([f712a04](https://github.com/qaldak/cardkeeper/commit/f712a04da0dc4da91fc6eb547ea822d5e6981b6a))
+* reload the prices of the cards on a schedule ([c30b158](https://github.com/qaldak/cardkeeper/commit/c30b158daa51612186ab85df1042a93f2804fa37))
+
 ## [0.16.0](https://github.com/qaldak/cardkeeper/compare/v0.15.0...v0.16.0) (2026-10-10)
 
 ### Features
