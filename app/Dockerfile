@@ -75,6 +75,10 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
     && mkdir -p /data/card-images \
     && chown -R node:node /data /opt/migrate
 
+# Shown in the start banner: only the release workflow builds with BUILD_KIND=release, any other build is a local one.
+ARG BUILD_KIND=local
+ENV BUILD_KIND=${BUILD_KIND}
+
 USER node
 EXPOSE 3000
 VOLUME ["/data/card-images"]
