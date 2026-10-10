@@ -5,6 +5,7 @@ import type { AdapterRegistry } from '../tcg/registry'
 import { createCardService } from './cards'
 import { createCatalogService } from './catalog'
 import { createImageService } from './images'
+import { createPriceRefreshService } from './prices'
 import { createThumbnailService } from './thumbnails'
 import { createUserService } from './users'
 
@@ -14,6 +15,8 @@ export interface ServiceDeps {
   config: AppConfig
   fetchFn?: typeof fetch
   now?: () => Date
+  /** Waits between two requests of the scheduled price reload; replaced in tests. */
+  sleep?: (milliseconds: number) => Promise<void>
 }
 
 export function createServices(deps: ServiceDeps) {
@@ -23,6 +26,7 @@ export function createServices(deps: ServiceDeps) {
     cards: createCardService(deps),
     catalog: createCatalogService(deps),
     images: createImageService(deps),
+    prices: createPriceRefreshService(deps),
     thumbnails: createThumbnailService(deps),
     users: createUserService(deps),
     games: (): GameDto[] => deps.registry.list().map(adapter => ({

@@ -46,6 +46,11 @@ services:
       DATABASE_URL: postgresql://${APP_DB_USER:-cardkeeper}:${APP_DB_PASSWORD}@db:5432/${APP_DB_NAME:-cardkeeper}
       PRICE_SOURCE: ${PRICE_SOURCE:-cardmarket}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-5}
+      # Scheduled price reload, see .env.example
+      PRICE_REFRESH_AFTER: ${PRICE_REFRESH_AFTER:-1w}
+      PRICE_REFRESH_BATCH_SIZE: ${PRICE_REFRESH_BATCH_SIZE:-300}
+      PRICE_REFRESH_BATCH_EVERY: ${PRICE_REFRESH_BATCH_EVERY:-1d}
+      PRICE_REFRESH_DELAY_MS: ${PRICE_REFRESH_DELAY_MS:-500}
       # Seals the login cookies; without it nobody could log in, and with a guessable one anybody could forge a login.
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env (openssl rand -hex 32)}
       # Users that are created at startup if they do not exist yet, e.g. USERS=anna,max

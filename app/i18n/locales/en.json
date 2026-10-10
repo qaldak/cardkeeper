@@ -158,6 +158,7 @@
       "done": "Data updated"
     },
     "lastFetched": "Data last fetched from the API on {date}",
+    "pricesChecked": "Prices last checked on {date}",
     "basicsHintVariant": "Names, texts and data come from the card database. Only the variant of your card (e.g. Reverse Holo or 1st Edition) can be adjusted.",
     "readOnly": {
       "owned": "This card belongs to {owner}. You can look at it, but only {owner} can change it.",
@@ -288,7 +289,7 @@
     "card_not_found": "The card was not found.",
     "image_not_found": "The image was not found.",
     "upstream_card_not_found": "The card was not found in the card database.",
-    "upstream_rate_limited": "The card database is busy. Please try again later.",
+    "upstream_rate_limited": "The card database has reached its request limit. Please wait a while (up to an hour) and try again.",
     "upstream_unreachable": "The card database is not reachable.",
     "upstream_error": "The card database reported an error.",
     "upstream_invalid_response": "The card database returned unexpected data.",

@@ -241,6 +241,27 @@ describe('TCGdex adapter: requests', () => {
     warn.mockRestore()
   })
 
+  it('passes the rate limit on when listing the variants of a set instead of leaving cards out', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(new Response('', { status: 429 }))
+    await expect(adapterWith(fetchFn).listCardPrints!(['swsh3-136', 'swsh3-137'], 'en')).rejects.toMatchObject({ status: 429, code: 'upstream_rate_limited' })
+  })
+
+  it('asks for the price of a card in the language it has, one card per request', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(json(load('furret-en'))).mockResolvedValueOnce(json({ error: 'not found' }, 404))
+    const adapter = adapterWith(fetchFn)
+    expect(adapter.priceBatchSize).toBe(1)
+    const found = await adapter.fetchPrices!([{ externalId: 'swsh3-136', language: 'en' }])
+    expect((found.get('swsh3-136') ?? []).length).toBeGreaterThan(0)
+    expect(requested(fetchFn).pathname).toBe('/v2/en/cards/swsh3-136')
+    expect((await adapter.fetchPrices!([{ externalId: 'swsh3-000', language: 'de' }])).size).toBe(0)
+    expect(requested(fetchFn, 1).pathname).toBe('/v2/de/cards/swsh3-000')
+  })
+
+  it('reports the rate limit of the price request', async () => {
+    await expect(adapterWith(vi.fn().mockResolvedValue(new Response('', { status: 429 }))).fetchPrices!([{ externalId: 'swsh3-136', language: 'en' }]))
+      .rejects.toMatchObject({ status: 429, code: 'upstream_rate_limited' })
+  })
+
   it('maps upstream failures to stable error codes and keeps the details', async () => {
     const run = (response: Response | Error) => {
       const fetchFn = response instanceof Error ? vi.fn().mockRejectedValue(response) : vi.fn().mockResolvedValue(response)

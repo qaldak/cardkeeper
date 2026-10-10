@@ -61,6 +61,9 @@ model Card {
   purchaseDate           DateTime?  @map("purchase_date") @db.Date
   createdAt              DateTime   @default(now()) @map("created_at")
   lastFetchedAt          DateTime?  @map("last_fetched_at")
+  // When the prices were last asked for at the card database (the scheduled reload, a refresh, the creation), also when
+  // the answer had no prices or failed (then shortly before the next try is due).
+  pricesCheckedAt        DateTime?  @map("prices_checked_at")
   // Set when a user changes the card (not when data is refreshed from the API).
   userModifiedAt         DateTime?  @map("user_modified_at")
   lastModifiedAt         DateTime   @default(now()) @updatedAt @map("last_modified_at")
@@ -182,4 +185,20 @@ model AuditLog {
 
   @@index([entity, entityId])
   @@map("audit_log")
+}
+
+// One tranche of the scheduled reload of the prices: which cards, and how it went.
+model PriceRefreshRun {
+  id           Int       @id @default(autoincrement())
+  startedAt    DateTime  @default(now()) @map("started_at")
+  finishedAt   DateTime? @map("finished_at")
+  // running, done, rate_limited, failed or interrupted
+  status       String
+  cardsDue     Int       @default(0) @map("cards_due")
+  cardsUpdated Int       @default(0) @map("cards_updated")
+  cardsFailed  Int       @default(0) @map("cards_failed")
+  message      String?
+
+  @@index([startedAt])
+  @@map("price_refresh_runs")
 }

@@ -1,8 +1,8 @@
 import { eszettVariants } from '../../../shared/utils/eszett'
 import { isSetCode, normalizeSetCode, setCodeSpellings } from '../../../shared/utils/set-code'
 import { badRequest, HttpError } from '../../lib/errors'
-import type { CardAdapter, CommonCard, GameSet, SetCard } from '../types'
-import { mapYgoCard } from './mapper'
+import type { CardAdapter, CommonCard, CommonCardPrice, GameSet, SetCard } from '../types'
+import { mapYgoCard, ygoPrices } from './mapper'
 import { parseYgoCard, setInfoSchema, setPrintSchema, ygoResponseSchema } from './schema'
 
 export interface YgoAdapterOptions {
@@ -201,6 +201,24 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
       return cards
     },
 
+    // The API takes several passcodes in one request ("id=1,2,3"), so the scheduled reload needs few requests.
+    priceBatchSize: 20,
+
+    async fetchPrices(requests) {
+      const prices = new Map<string, CommonCardPrice[]>()
+      const ids = [...new Set(requests.map(request => request.externalId).filter(id => /^\d{1,12}$/.test(id)))]
+      if (ids.length === 0) {
+        return prices
+      }
+      for (const raw of await query({ id: ids.join(',') }, 'en')) {
+        const card = parseYgoCard(raw)?.card
+        if (card) {
+          prices.set(String(card.id), ygoPrices(card.card_prices))
+        }
+      }
+      return prices
+    },
+
     async listSets() {
       const { response, body, apiError } = await call('cardsets.php', {})
       if (!response.ok) {
@@ -247,6 +265,10 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
           }
         }
         catch (error) {
+          // The limit is not a missing translation: the person has to know that they have to wait.
+          if (error instanceof HttpError && error.status === 429) {
+            throw error
+          }
           console.warn(`[ygo] No ${lang} names for the set "${setId}":`, error instanceof Error ? error.message : error)
         }
       }

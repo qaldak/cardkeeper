@@ -158,6 +158,7 @@
       "done": "Daten aktualisiert"
     },
     "lastFetched": "Daten zuletzt von der API abgerufen am {date}",
+    "pricesChecked": "Preise zuletzt geprüft am {date}",
     "basicsHintVariant": "Namen, Texte und Daten stammen aus der Kartendatenbank. Nur die Variante deiner Karte (z. B. Reverse Holo oder 1st Edition) lässt sich anpassen.",
     "readOnly": {
       "owned": "Diese Karte gehört {owner}. Du kannst sie ansehen, ändern kann sie aber nur {owner}.",
@@ -288,7 +289,7 @@
     "card_not_found": "Die Karte wurde nicht gefunden.",
     "image_not_found": "Das Bild wurde nicht gefunden.",
     "upstream_card_not_found": "Die Karte wurde in der Kartendatenbank nicht gefunden.",
-    "upstream_rate_limited": "Die Kartendatenbank ist ausgelastet. Bitte später erneut versuchen.",
+    "upstream_rate_limited": "Die Kartendatenbank hat das Limit an Abfragen erreicht. Bitte warte eine Weile (bis zu einer Stunde) und versuche es dann erneut.",
     "upstream_unreachable": "Die Kartendatenbank ist nicht erreichbar.",
     "upstream_error": "Die Kartendatenbank hat einen Fehler gemeldet.",
     "upstream_invalid_response": "Die Kartendatenbank hat unerwartete Daten geliefert.",

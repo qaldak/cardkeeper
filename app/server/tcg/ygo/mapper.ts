@@ -12,6 +12,21 @@ const PRICE_SOURCES = [
   { field: 'coolstuffinc_price', source: 'coolstuffinc', currency: 'USD' },
 ] as const
 
+/** The marketplace prices of a card (`card_prices` of the API) with their currency; a price of zero is none. */
+export function ygoPrices(cardPrices: Record<string, unknown>[] | undefined): CommonCardPrice[] {
+  const prices: CommonCardPrice[] = []
+  const priceRecord = cardPrices?.[0]
+  if (priceRecord) {
+    for (const { field, source, currency } of PRICE_SOURCES) {
+      const price = parsePrice(priceRecord[field])
+      if (price !== null) {
+        prices.push({ source, price, currency })
+      }
+    }
+  }
+  return prices
+}
+
 // A card whose fields were ignored is reported once per card and field, not at every lookup.
 const reported = new Set<string>()
 
@@ -56,16 +71,7 @@ export function mapYgoCard(raw: unknown, language: string): CommonCard {
     linkmarkers: card.linkmarkers,
   }).filter(([, value]) => value !== undefined))
 
-  const prices: CommonCardPrice[] = []
-  const priceRecord = card.card_prices?.[0]
-  if (priceRecord) {
-    for (const { field, source, currency } of PRICE_SOURCES) {
-      const price = parsePrice(priceRecord[field])
-      if (price !== null) {
-        prices.push({ source, price, currency })
-      }
-    }
-  }
+  const prices = ygoPrices(card.card_prices)
 
   return {
     externalId: String(card.id),

@@ -112,6 +112,8 @@ export interface CardDetailDto {
   primarySource: string
   /** Last time the data was fetched from the card API. */
   lastFetchedAt: string | null
+  /** When the prices were last asked for at the card database (the scheduled reload, a refresh, the creation). */
+  pricesCheckedAt: string | null
   /** Last change made by a user; null while the card is exactly as imported. */
   userModifiedAt: string | null
   lastModifiedAt: string

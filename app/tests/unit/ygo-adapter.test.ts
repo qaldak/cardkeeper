@@ -312,9 +312,48 @@ describe('YGO adapter: sets', () => {
     warn.mockRestore()
   })
 
+  it('passes the rate limit on instead of falling back to English names', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(answer([card(1, 'Card A', [{ set_name: SET, set_code: 'SDAZ-EN001' }])])).mockResolvedValueOnce(new Response('', { status: 429 }))
+    await expect(adapterWith(fetchFn).listSetCards!(SET, 'de')).rejects.toMatchObject({ status: 429, code: 'upstream_rate_limited' })
+  })
+
   it('answers null for a set that does not exist', async () => {
     const fetchFn = vi.fn().mockResolvedValue(json({ error: 'No card matching your query was found in the database.' }, 400))
     expect(await adapterWith(fetchFn).listSetCards!('Nope', 'en')).toBeNull()
+  })
+})
+
+describe('YGO adapter: prices', () => {
+  const urlOf = (call: unknown[]) => call[0] as URL
+  const priced = (id: number, cardmarket: string) => ({ id, name: `Card ${id}`, card_prices: [{ cardmarket_price: cardmarket, tcgplayer_price: '0.00', ebay_price: '1.50', amazon_price: '0', coolstuffinc_price: '0' }] })
+
+  it('asks for several cards in one request and maps their prices', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(json({ data: [priced(1, '2.50'), priced(2, '0.00'), { name: 'no id' }] }))
+    const adapter = adapterWith(fetchFn)
+    expect(adapter.priceBatchSize).toBe(20)
+    const prices = await adapter.fetchPrices!([{ externalId: '1', language: 'en' }, { externalId: '2', language: 'de' }, { externalId: '3', language: 'en' }, { externalId: 'x1', language: 'en' }])
+    expect(urlOf(fetchFn.mock.calls[0]!).searchParams.get('id')).toBe('1,2,3')
+    expect(urlOf(fetchFn.mock.calls[0]!).searchParams.has('language')).toBe(false)
+    expect(prices.get('1')).toEqual([{ source: 'cardmarket', price: 2.5, currency: 'EUR' }, { source: 'ebay', price: 1.5, currency: 'USD' }])
+    // A card without a price is known, but has nothing to add; a card that is not in the answer is not known.
+    expect(prices.get('2')).toEqual([{ source: 'ebay', price: 1.5, currency: 'USD' }])
+    expect(prices.has('3')).toBe(false)
+    expect([...prices.keys()]).toEqual(['1', '2'])
+  })
+
+  it('answers nothing for a list without a passcode, without asking, and for cards that do not exist', async () => {
+    const none = vi.fn()
+    expect((await adapterWith(none).fetchPrices!([{ externalId: 'abc', language: 'en' }])).size).toBe(0)
+    expect(none).not.toHaveBeenCalled()
+    const gone = vi.fn().mockResolvedValue(json({ error: 'No card matching your query was found in the database.' }, 400))
+    expect((await adapterWith(gone).fetchPrices!([{ externalId: '5', language: 'en' }])).size).toBe(0)
+  })
+
+  it('reports the rate limit and failures instead of answering with nothing', async () => {
+    await expect(adapterWith(vi.fn().mockResolvedValue(new Response('', { status: 429 }))).fetchPrices!([{ externalId: '1', language: 'en' }]))
+      .rejects.toMatchObject({ status: 429, code: 'upstream_rate_limited' })
+    await expect(adapterWith(vi.fn().mockRejectedValue(new Error('offline'))).fetchPrices!([{ externalId: '1', language: 'en' }]))
+      .rejects.toMatchObject({ status: 502, code: 'upstream_unreachable' })
   })
 })
 

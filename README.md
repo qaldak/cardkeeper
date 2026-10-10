@@ -56,12 +56,14 @@ Everything runs in containers: there is nothing to install on the host except Do
 - Card images are downloaded once and stored on a volume, never hotlinked
 - Prices are stored per marketplace in the currency of that marketplace and are **not converted**
   (Cardmarket in EUR, TCGplayer/eBay/Amazon/CoolStuffInc in USD); the list uses the marketplace set in `PRICE_SOURCE`
+- Prices are reloaded on a schedule, in small tranches, and every reload is kept in the price history, also when the price
+  has not changed (see [Scheduled price reload](#scheduled-price-reload))
 - Changes made by users are written to an audit log, and the card page shows "modified on" next to the origin as soon
   as a user has changed anything (printing, status, assignment, purchase date, images; a refresh does not count)
 - User interface in German and English
 - Semantic releases, multi-arch (amd64 + arm64) Docker images, automated dependency updates
 
-Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): scheduled price refresh and PDF/CSV/Markdown export. See [Roadmap](#roadmap).
+Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): PDF/CSV/Markdown export. See [Roadmap](#roadmap).
 
 ## Quick start
 
@@ -99,11 +101,35 @@ All settings are environment variables in `.env`:
 | `MAX_UPLOAD_MB` | `5` | Maximum size of a manually uploaded image |
 | `SESSION_SECRET` | – (required) | At least 32 random characters (`openssl rand -hex 32`) that seal the login cookies; the app refuses to start with less. Changing it logs everybody out |
 | `USERS` | – (required) | Comma separated user names, e.g. `anna,max`; missing users are created at startup (see [Users and passwords](#users-and-passwords)) |
+| `PRICE_REFRESH_AFTER` | `1w` | Age after which the prices of a card are reloaded; `off` switches the reload off (see [Scheduled price reload](#scheduled-price-reload)) |
+| `PRICE_REFRESH_BATCH_SIZE` | `300` | Cards reloaded in one tranche; a larger tranche only takes longer, keep it below about 1000 Pokémon cards |
+| `PRICE_REFRESH_BATCH_EVERY` | `1d` | Least time between two tranches (at least `1h`) |
+| `PRICE_REFRESH_DELAY_MS` | `500` | Pause between two requests to a card database (at least `100`) |
 | `CONTAINER_PREFIX` | `cardkeeper` | Prefix of the container names (`cardkeeper_app`, `cardkeeper_db`) |
 | `APP_IMAGE` | `ghcr.io/qaldak/cardkeeper:latest` | Image to run, e.g. to pin a version |
 
 The database role is created by [`db/init/10-create-app-role.sh`](db/init/10-create-app-role.sh) when the data directory is
 initialized for the first time. Changing the passwords later does not alter an existing database.
+
+### Scheduled price reload
+
+The app reloads the prices of the cards by itself. Only prices are written; texts, images and everything you entered stay
+as they are. Every reload adds a price per marketplace to the history, also when the price has not changed, so a later
+report can show that it held. The card page shows when the prices were last checked.
+
+- A card is **due** when its prices are older than `PRICE_REFRESH_AFTER`: a number and `h`, `d`, `w` or `mo` (30 days),
+  e.g. `12h`, `3d`, `1w`, `1mo`; `off` switches the reload off. Only active cards are reloaded.
+- It is done in **tranches**: at most `PRICE_REFRESH_BATCH_SIZE` due cards at a time, the oldest prices first and the cards of
+  one set together, the next tranche at the earliest `PRICE_REFRESH_BATCH_EVERY` later. The defaults (a week, 300 cards, a
+  day) cover up to 2100 cards a week; a tranche is recorded in the database, so a restart neither skips nor repeats one.
+- **Limits of the card databases:** YGOPRODeck allows 20 requests per second and blocks above that for an hour. The request
+  rate depends on `PRICE_REFRESH_DELAY_MS` (default 500, at least 100), **not** on the tranche size; a larger tranche only
+  takes longer: a few seconds per 100 Yu-Gi-Oh! cards (20 cards per request), about 0.5 to 1 second per Pokémon card (TCGdex
+  answers one card per request and publishes no limit). Keep a tranche below about 1000 Pokémon cards; a larger value is
+  not prevented.
+- If a card database refuses further requests, the tranche stops and the rest follows with the next one; what you do in the
+  app meanwhile shows "The card database has reached its request limit, please wait a while". Failed cards are tried again
+  after `PRICE_REFRESH_BATCH_EVERY`. The log tells more: `docker logs cardkeeper_app 2>&1 | grep '\[prices\]'`.
 
 ### Users and passwords
 
@@ -376,7 +402,6 @@ No schema change and no change in the core services is required.
 
 ## Roadmap
 
-- Scheduler container for periodic price refresh (`node-cron`)
 - Export as PDF, CSV and Markdown
 - Pokémon: a list price that depends on the variant (holo and reverse holo have their own prices), paging through the search
   results, more filters (set, illustrator, regulation mark)
