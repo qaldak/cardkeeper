@@ -148,16 +148,31 @@ export function createFakeYgoServer(initial: FakeYgoCard[]): FakeYgoServer {
         }
         return new Response(JSON.stringify({ error: 'No card set found matching your query.' }), { status: 400 })
       }
+      if (url.pathname.endsWith('/cardsets.php')) {
+        // Like the real API: a plain list of the sets (name, code prefix, size, date).
+        const sets = new Map<string, Set<string>>()
+        for (const card of cards.values()) {
+          for (const print of card.sets ?? []) {
+            sets.set(print.set_name, (sets.get(print.set_name) ?? new Set()).add(print.set_code))
+          }
+        }
+        const list = [...sets].map(([name, codes]) => ({ set_name: name, set_code: [...codes][0]!.split('-')[0], num_of_cards: codes.size, tcg_date: '2021-12-03' }))
+        return new Response(JSON.stringify(list), { status: 200 })
+      }
       const language = url.searchParams.get('language') ?? 'en'
       server.requestedLanguages.push(language)
       const german = language === 'de'
       const id = url.searchParams.get('id')
       const fname = url.searchParams.get('fname')?.toLowerCase()
+      const cardset = url.searchParams.get('cardset')?.toLowerCase()
       const matches = [...cards.values()].filter((card) => {
         if (german && !card.nameDe && !server.germanFallsBackToEnglish) {
           return false
         }
         const nameInLanguage = (german ? card.nameDe : undefined) ?? card.name
+        if (cardset) {
+          return (card.sets ?? []).some(print => print.set_name.toLowerCase() === cardset)
+        }
         return id ? String(card.id) === id : fname ? nameInLanguage.toLowerCase().includes(fname) : false
       })
       if (matches.length === 0) {

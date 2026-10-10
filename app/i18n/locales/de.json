@@ -216,6 +216,51 @@
       "found": "Karte nach Set und Nummer gefunden",
       "use": "Diese Karte verwenden"
     },
+    "setImport": {
+      "mode": {
+        "name": "Einzelne Karte",
+        "set": "Ganzes Set"
+      },
+      "steps": {
+        "set": "Set wählen",
+        "review": "Karten prüfen",
+        "run": "Hinzufügen"
+      },
+      "searchLabel": "Set suchen",
+      "searchPlaceholder": "z. B. Albaz Strike oder SDAZ",
+      "loading": "Wird geladen …",
+      "noSets": "Kein Set gefunden.",
+      "cardsCount": "{count} Karten",
+      "manySets": "Es werden die ersten {count} Sets angezeigt. Grenze die Suche ein.",
+      "otherSet": "Anderes Set",
+      "language": "Sprache der Karten",
+      "languageHint": "Der Set-Code wird in dieser Sprache gespeichert, z. B. {example}.",
+      "languages": {
+        "de": "Deutsch",
+        "en": "Englisch",
+        "ja": "Japanisch"
+      },
+      "edition": "Edition für alle Karten",
+      "editionHint": "Nichts gewählt: Unlimited. Pro Karte änderbar.",
+      "toggleAll": "Alle Karten ein- oder ausschliessen",
+      "card": "Karte",
+      "code": "Set-Code",
+      "rarity": "Seltenheit",
+      "editionColumn": "Edition",
+      "noPrint": "Nicht in diesem Set",
+      "pleaseChoose": "Bitte wählen",
+      "sameEdition": "Wie oben",
+      "noEdition": "Keine (Unlimited)",
+      "summary": "{selected} von {total} Karten ausgewählt",
+      "needsChoice": "{count} Karte(n) brauchen deine Auswahl der Seltenheit.",
+      "add": "{count} Karten hinzufügen",
+      "progress": "{done} von {total} hinzugefügt",
+      "done": "{count} Karten hinzugefügt.",
+      "failed": "{count} Karten konnten nicht hinzugefügt werden:",
+      "retry": "Fehlgeschlagene erneut versuchen",
+      "toOverview": "Zur Übersicht",
+      "another": "Weiteres Set erfassen"
+    },
     "printedCodeNote": "Auf der Karte steht {code}: dieser Set-Code wird gespeichert, Set und Seltenheit stammen aus der gewählten (englischen) Ausgabe.",
     "ownerNote": "Die Karte wird deiner Sammlung ({name}) hinzugefügt. Nur du kannst sie danach ändern.",
     "edition": {

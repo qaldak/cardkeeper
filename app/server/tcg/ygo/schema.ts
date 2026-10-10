@@ -111,3 +111,11 @@ export const setPrintSchema = z.object({
   id: z.union([z.number().int(), z.string().regex(/^\d{1,12}$/)]),
   name: z.string().optional(),
 })
+
+/** A set in the list of `cardsets.php`. */
+export const setInfoSchema = z.object({
+  set_name: z.string().min(1),
+  set_code: z.string().nullish(),
+  num_of_cards: z.number().nullish(),
+  tcg_date: z.string().nullish(),
+})

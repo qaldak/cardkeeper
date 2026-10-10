@@ -164,6 +164,33 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect(await h.db.card.count()).toBe(0)
     })
 
+    it('lists the sets and the cards of a set with their prints, and adds them in the language of the set', async () => {
+      const SET = 'Structure Deck: Albaz Strike'
+      const print = (code: string, rarity: string) => ({ set_name: SET, set_code: code, set_rarity: rarity })
+      h.ygo.cards.set(1001, { id: 1001, name: 'Albaz Card One', nameDe: 'Albaz Karte Eins', sets: [print('SDAZ-EN001', 'Ultra Rare')] })
+      h.ygo.cards.set(1002, { id: 1002, name: 'Albaz Card Two', nameDe: 'Albaz Karte Zwei', sets: [print('SDAZ-EN002', 'Common'), print('SDAZ-EN002', 'Super Rare')] })
+
+      const sets = await h.services.catalog.sets('ygo')
+      expect(sets.find(set => set.id === SET)).toMatchObject({ name: SET, code: 'SDAZ', official: 2, logoUrl: null })
+
+      const cards = await h.services.catalog.setCards('ygo', SET, 'de')
+      expect(cards.map(entry => [entry.externalId, entry.name, entry.number])).toEqual([
+        ['1001', 'Albaz Karte Eins', 'SDAZ-EN001'],
+        ['1002', 'Albaz Karte Zwei', 'SDAZ-EN002'],
+      ])
+      expect(cards[0]).toMatchObject({ thumbnailUrl: '/api/thumbnails/ygo/1001', prints: [{ setCode: 'SDAZ-EN001', rarity: 'Ultra Rare' }] })
+      expect(cards[1]!.prints).toHaveLength(2)
+      await expect(h.services.catalog.setCards('ygo', 'No such set', 'de')).rejects.toMatchObject({ status: 404, code: 'set_not_found' })
+
+      // Adding a card of the set in German stores the German code, with set and rarity of the print.
+      const added = await h.services.cards.create({
+        game: 'ygo',
+        externalId: '1001',
+        set: { setCode: 'SDAZ-EN001', rarity: 'Ultra Rare', edition: 'FIRST_EDITION', printedSetCode: 'SDAZ-DE001' },
+      }, h.anna)
+      expect(added.sets[0]).toMatchObject({ setCode: 'SDAZ-DE001', setName: SET, rarity: 'Ultra Rare', edition: 'FIRST_EDITION' })
+    })
+
     it('does not block creation when the image download fails', async () => {
       h.ygo.failImages = true
       const card = await addDarkMagician()

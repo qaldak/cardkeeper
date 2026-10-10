@@ -1,9 +1,9 @@
 import { eszettVariants } from '../../../shared/utils/eszett'
 import { isSetCode, normalizeSetCode, setCodeSpellings } from '../../../shared/utils/set-code'
 import { badRequest, HttpError } from '../../lib/errors'
-import type { CardAdapter, CommonCard } from '../types'
+import type { CardAdapter, CommonCard, GameSet, SetCard } from '../types'
 import { mapYgoCard } from './mapper'
-import { setPrintSchema, ygoResponseSchema } from './schema'
+import { parseYgoCard, setInfoSchema, setPrintSchema, ygoResponseSchema } from './schema'
 
 export interface YgoAdapterOptions {
   baseUrl: string
@@ -199,6 +199,76 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
         throw failure
       }
       return cards
+    },
+
+    async listSets() {
+      const { response, body, apiError } = await call('cardsets.php', {})
+      if (!response.ok) {
+        const detail = apiError ? `: ${apiError.slice(0, MAX_ERROR_TEXT)}` : ''
+        throw new HttpError(502, 'upstream_error', `YGOPRODeck answered with status ${response.status}${detail}`)
+      }
+      if (!Array.isArray(body)) {
+        throw new HttpError(502, 'upstream_invalid_response', 'Unexpected response from YGOPRODeck')
+      }
+      const sets = body.flatMap((entry): GameSet[] => {
+        const parsed = setInfoSchema.safeParse(entry)
+        return parsed.success
+          ? [{
+              id: parsed.data.set_name,
+              name: parsed.data.set_name,
+              logoUrl: null,
+              official: parsed.data.num_of_cards ?? null,
+              total: parsed.data.num_of_cards ?? null,
+              code: parsed.data.set_code ?? null,
+              releasedAt: parsed.data.tcg_date ?? null,
+            }]
+          : []
+      })
+      // The newest sets first; sets without a date last.
+      return sets.sort((a, b) => (b.releasedAt ?? '').localeCompare(a.releasedAt ?? '') || a.name.localeCompare(b.name))
+    },
+
+    /** All cards of a set (`setId` is its name) with their prints in it; the names in the language asked for, if known. */
+    async listSetCards(setId, language) {
+      const lang = resolveLanguage(language)
+      const english = await query({ cardset: setId }, 'en')
+      if (english.length === 0) {
+        return null
+      }
+      // The names of another language come from a second answer; without it the English names are used.
+      const names = new Map<string, string>()
+      if (lang !== 'en') {
+        try {
+          for (const raw of await query({ cardset: setId }, lang)) {
+            const card = parseYgoCard(raw)?.card
+            if (card) {
+              names.set(String(card.id), card.name)
+            }
+          }
+        }
+        catch (error) {
+          console.warn(`[ygo] No ${lang} names for the set "${setId}":`, error instanceof Error ? error.message : error)
+        }
+      }
+      const wanted = setId.toLowerCase()
+      return english.flatMap((raw): SetCard[] => {
+        const card = parseYgoCard(raw)?.card
+        if (!card) {
+          return []
+        }
+        const seen = new Set<string>()
+        const prints = (card.card_sets ?? [])
+          .filter(print => print.set_name.toLowerCase() === wanted)
+          .map(print => ({ setCode: print.set_code, rarity: print.set_rarity ?? null }))
+          .filter((print) => {
+            const key = `${print.setCode}|${print.rarity}`
+            return seen.has(key) ? false : (seen.add(key), true)
+          })
+        if (prints.length === 0) {
+          return []
+        }
+        return [{ id: String(card.id), number: prints[0]!.setCode, name: names.get(String(card.id)) ?? card.name, imageUrl: null, thumbnailUrl: null, prints }]
+      }).sort((a, b) => a.number.localeCompare(b.number, 'en', { numeric: true }))
     },
 
     mapToCommonSchema(raw, language) {

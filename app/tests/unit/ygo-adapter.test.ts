@@ -253,6 +253,71 @@ describe('YGO adapter: search by set code', () => {
   })
 })
 
+describe('YGO adapter: sets', () => {
+  const urlOf = (call: unknown[]) => call[0] as URL
+  const card = (id: number, name: string, sets: { set_name: string, set_code: string, set_rarity?: string }[]) => ({ id, name, card_sets: sets })
+  const SET = 'Structure Deck: Albaz Strike'
+  const answer = (data: unknown[]) => json({ data })
+
+  it('lists the sets, the newest first', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(json([
+      { set_name: 'Old Set', set_code: 'OLD', num_of_cards: 10, tcg_date: '2002-03-08' },
+      { set_name: SET, set_code: 'SDAZ', num_of_cards: 43, tcg_date: '2021-12-03' },
+      { set_name: 'Undated', num_of_cards: null, tcg_date: null },
+      { broken: true },
+    ]))
+    const sets = await adapterWith(fetchFn).listSets!()
+    expect(urlOf(fetchFn.mock.calls[0]!).pathname.endsWith('/cardsets.php')).toBe(true)
+    expect(sets.map(set => set.name)).toEqual([SET, 'Old Set', 'Undated'])
+    expect(sets[0]).toEqual({ id: SET, name: SET, logoUrl: null, official: 43, total: 43, code: 'SDAZ', releasedAt: '2021-12-03' })
+    expect(sets[2]).toMatchObject({ official: null, code: null, releasedAt: null })
+  })
+
+  it('reports a set list that is no list or an error of the API', async () => {
+    await expect(adapterWith(vi.fn().mockResolvedValue(json({ unexpected: 1 }))).listSets!()).rejects.toMatchObject({ status: 502, code: 'upstream_invalid_response' })
+    await expect(adapterWith(vi.fn().mockResolvedValue(new Response('', { status: 500 }))).listSets!()).rejects.toMatchObject({ status: 502, code: 'upstream_error' })
+  })
+
+  it('lists the cards of a set with their prints in that set only, in the order of the set', async () => {
+    const english = [
+      card(2, 'Card B', [{ set_name: 'Other Set', set_code: 'OTH-EN001', set_rarity: 'Rare' }, { set_name: SET, set_code: 'SDAZ-EN002', set_rarity: 'Common' }]),
+      card(10, 'Card J', [{ set_name: SET, set_code: 'SDAZ-EN010', set_rarity: 'Super Rare' }, { set_name: SET, set_code: 'SDAZ-EN010', set_rarity: 'Common' }, { set_name: SET, set_code: 'SDAZ-EN010', set_rarity: 'Common' }]),
+      card(1, 'Card A', [{ set_name: SET.toLowerCase(), set_code: 'SDAZ-EN001' }]),
+      card(99, 'Not in the set', [{ set_name: 'Other Set', set_code: 'OTH-EN002' }]),
+      { name: 'no id' },
+    ]
+    const fetchFn = vi.fn().mockResolvedValue(answer(english))
+    const cards = await adapterWith(fetchFn).listSetCards!(SET, 'en')
+    expect(urlOf(fetchFn.mock.calls[0]!).searchParams.get('cardset')).toBe(SET)
+    expect(cards!.map(entry => [entry.id, entry.number])).toEqual([['1', 'SDAZ-EN001'], ['2', 'SDAZ-EN002'], ['10', 'SDAZ-EN010']])
+    expect(cards![1]!.prints).toEqual([{ setCode: 'SDAZ-EN002', rarity: 'Common' }])
+    expect(cards![2]!.prints).toEqual([{ setCode: 'SDAZ-EN010', rarity: 'Super Rare' }, { setCode: 'SDAZ-EN010', rarity: 'Common' }])
+    expect(cards![0]!.prints).toEqual([{ setCode: 'SDAZ-EN001', rarity: null }])
+    expect(fetchFn).toHaveBeenCalledTimes(1)
+  })
+
+  it('takes the names of the language asked for, and the English ones where it has none', async () => {
+    const english = [card(1, 'Card A', [{ set_name: SET, set_code: 'SDAZ-EN001' }]), card(2, 'Card B', [{ set_name: SET, set_code: 'SDAZ-EN002' }])]
+    const german = [card(1, 'Karte A', [{ set_name: SET, set_code: 'SDAZ-EN001' }])]
+    const fetchFn = vi.fn().mockResolvedValueOnce(answer(english)).mockResolvedValueOnce(answer(german))
+    const cards = await adapterWith(fetchFn).listSetCards!(SET, 'de')
+    expect(cards!.map(entry => entry.name)).toEqual(['Karte A', 'Card B'])
+    expect(urlOf(fetchFn.mock.calls[1]!).searchParams.get('language')).toBe('de')
+  })
+
+  it('still lists the set when the names of the language cannot be had', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const fetchFn = vi.fn().mockResolvedValueOnce(answer([card(1, 'Card A', [{ set_name: SET, set_code: 'SDAZ-EN001' }])])).mockResolvedValueOnce(new Response('', { status: 500 }))
+    expect((await adapterWith(fetchFn).listSetCards!(SET, 'de'))!.map(entry => entry.name)).toEqual(['Card A'])
+    warn.mockRestore()
+  })
+
+  it('answers null for a set that does not exist', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(json({ error: 'No card matching your query was found in the database.' }, 400))
+    expect(await adapterWith(fetchFn).listSetCards!('Nope', 'en')).toBeNull()
+  })
+})
+
 describe('YGO adapter: requests', () => {
   it('fetches a card by passcode', async () => {
     const fetchFn = vi.fn().mockResolvedValue(json(fixture))

@@ -216,6 +216,51 @@
       "found": "Card found by set and number",
       "use": "Use this card"
     },
+    "setImport": {
+      "mode": {
+        "name": "Single card",
+        "set": "Whole set"
+      },
+      "steps": {
+        "set": "Choose set",
+        "review": "Check cards",
+        "run": "Add"
+      },
+      "searchLabel": "Search set",
+      "searchPlaceholder": "e.g. Albaz Strike or SDAZ",
+      "loading": "Loading …",
+      "noSets": "No set found.",
+      "cardsCount": "{count} cards",
+      "manySets": "Showing the first {count} sets. Narrow the search down.",
+      "otherSet": "Other set",
+      "language": "Language of the cards",
+      "languageHint": "The set code is stored in this language, e.g. {example}.",
+      "languages": {
+        "de": "German",
+        "en": "English",
+        "ja": "Japanese"
+      },
+      "edition": "Edition for all cards",
+      "editionHint": "Nothing chosen: Unlimited. Can be changed per card.",
+      "toggleAll": "Include or exclude all cards",
+      "card": "Card",
+      "code": "Set code",
+      "rarity": "Rarity",
+      "editionColumn": "Edition",
+      "noPrint": "Not in this set",
+      "pleaseChoose": "Please choose",
+      "sameEdition": "As above",
+      "noEdition": "None (Unlimited)",
+      "summary": "{selected} of {total} cards selected",
+      "needsChoice": "{count} card(s) need your choice of rarity.",
+      "add": "Add {count} cards",
+      "progress": "{done} of {total} added",
+      "done": "{count} cards added.",
+      "failed": "{count} cards could not be added:",
+      "retry": "Retry the failed ones",
+      "toOverview": "To the overview",
+      "another": "Add another set"
+    },
     "printedCodeNote": "The card says {code}: this set code is stored, the set and rarity come from the selected (English) printing.",
     "ownerNote": "The card is added to your collection ({name}). Only you can change it afterwards.",
     "edition": {

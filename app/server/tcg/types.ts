@@ -72,6 +72,16 @@ export interface GameSet {
   /** Size of the set as printed on the cards. */
   official: number | null
   total: number | null
+  /** The code the cards of the set start with ("SDAZ"), if the database knows it. */
+  code?: string | null
+  /** Release date as the database writes it ("2021-12-03"). */
+  releasedAt?: string | null
+}
+
+/** One print of a card in a set: the code on the card and its rarity. */
+export interface SetCardPrint {
+  setCode: string
+  rarity: string | null
 }
 
 /** A card in a set. */
@@ -82,4 +92,6 @@ export interface SetCard {
   name: string
   imageUrl: string | null
   thumbnailUrl: string | null
+  /** The prints of the card in this set (one code, usually in one rarity); only for games that list them. */
+  prints?: SetCardPrint[]
 }
