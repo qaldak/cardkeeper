@@ -1,3 +1,10 @@
+## [0.14.0](https://github.com/qaldak/cardkeeper/compare/v0.13.0...v0.14.0) (2026-10-10)
+
+### Features
+
+* add Yu-Gi-Oh! cards by the set code of a print ([2530f82](https://github.com/qaldak/cardkeeper/commit/2530f82ca6b7de71d0ee24145fc98c2e7a7c02fc))
+* store the printed set code when the English print was found ([0fb790d](https://github.com/qaldak/cardkeeper/commit/0fb790dda4a35db7cb21cc3becfe8c87530b7904))
+
 ## [0.13.0](https://github.com/qaldak/cardkeeper/compare/v0.12.0...v0.13.0) (2026-10-10)
 
 ### Features
