@@ -58,7 +58,7 @@ function priceRefresh(env: Record<string, string | undefined>): PriceRefreshConf
   }
   return {
     after: parseOptionalDuration(env.PRICE_REFRESH_AFTER, '1w', 'PRICE_REFRESH_AFTER'),
-    batchSize: Math.round(positiveNumber(env.PRICE_REFRESH_BATCH_SIZE, 100, 'PRICE_REFRESH_BATCH_SIZE')),
+    batchSize: Math.round(positiveNumber(env.PRICE_REFRESH_BATCH_SIZE, 300, 'PRICE_REFRESH_BATCH_SIZE')),
     batchEvery,
     delayMs,
   }

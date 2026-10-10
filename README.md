@@ -102,7 +102,7 @@ All settings are environment variables in `.env`:
 | `SESSION_SECRET` | – (required) | At least 32 random characters (`openssl rand -hex 32`) that seal the login cookies; the app refuses to start with less. Changing it logs everybody out |
 | `USERS` | – (required) | Comma separated user names, e.g. `anna,max`; missing users are created at startup (see [Users and passwords](#users-and-passwords)) |
 | `PRICE_REFRESH_AFTER` | `1w` | Age after which the prices of a card are reloaded; `off` switches the reload off (see [Scheduled price reload](#scheduled-price-reload)) |
-| `PRICE_REFRESH_BATCH_SIZE` | `100` | Cards reloaded in one tranche |
+| `PRICE_REFRESH_BATCH_SIZE` | `300` | Cards reloaded in one tranche; a larger tranche only takes longer, keep it below about 1000 Pokémon cards |
 | `PRICE_REFRESH_BATCH_EVERY` | `1d` | Least time between two tranches (at least `1h`) |
 | `PRICE_REFRESH_DELAY_MS` | `500` | Pause between two requests to a card database (at least `100`) |
 | `CONTAINER_PREFIX` | `cardkeeper` | Prefix of the container names (`cardkeeper_app`, `cardkeeper_db`) |
@@ -113,33 +113,23 @@ initialized for the first time. Changing the passwords later does not alter an e
 
 ### Scheduled price reload
 
-The app reloads the prices of the cards by itself, so that the list, the total value and the price history stay current.
-Nothing but prices is written: texts, attributes, images and everything you entered (printing, edition, status, owner,
-purchase date) stay as they are, and the card does not count as modified. "Update from API" on a card page still
-refreshes the texts as well.
+The app reloads the prices of the cards by itself. Only prices are written; texts, images and everything you entered stay
+as they are. Every reload adds a price per marketplace to the history, also when the price has not changed, so a later
+report can show that it held. The card page shows when the prices were last checked.
 
-- **When a card is due:** its prices were looked at more than `PRICE_REFRESH_AFTER` ago. The time is a number and a unit:
-  `h` hours, `d` days, `w` weeks, `mo` months (30 days), e.g. `12h`, `1d`, `3d`, `1w`, `2w`, `1mo`, `3mo`. `off` switches
-  the reload off. Only active cards are reloaded (not sold, traded, given away or lost ones). Adding a card and "Update
-  from API" count as a look at the prices.
-- **In tranches:** at most `PRICE_REFRESH_BATCH_SIZE` due cards are reloaded in one go, the oldest prices first and, of
-  those, the cards of one set together. The next tranche starts at the earliest `PRICE_REFRESH_BATCH_EVERY` later, so a large
-  collection is spread over days: with the defaults (a week, 100 cards, a day) up to 700 cards are reloaded a week. If
-  there are more cards than that, raise `PRICE_REFRESH_BATCH_SIZE` or shorten `PRICE_REFRESH_BATCH_EVERY`; cards that do not
-  fit wait for the next tranche. The app looks every ten minutes whether a tranche is due, and the first look is a minute
-  after the start. What was done is recorded in the database (`price_refresh_runs`), so that a restart neither skips nor
-  repeats a tranche.
-- **Limits of the card databases:** YGOPRODeck allows 20 requests per second and blocks everybody above that for an hour.
-  The app asks for up to 20 cards in one request and waits `PRICE_REFRESH_DELAY_MS` (default half a second, never less than 100
-  ms) between two requests, which is far below the limit. TCGdex answers one card per request and publishes no limit; the
-  same pause applies. When a database answers "too many requests", the tranche stops and the rest follows with the next one.
-- **History:** every reload adds a price per marketplace, also when the price is the same as before, so the history shows
-  when it was looked at and that it held, which is what a later report needs. The card page shows "Prices last checked
-  on ..." next to the history, which lists the latest 200 entries.
-- **Failures:** a card the database does not know (any more) or a request that fails is tried again with the next tranche
-  after `PRICE_REFRESH_BATCH_EVERY`, not after a week. After three failed requests in a row a tranche stops. The log of the app
-  container tells what happened (lines starting with `[prices]`), e.g. `docker logs cardkeeper_app 2>&1 | grep '\[prices\]'`.
-- **Time:** all of it counts in elapsed time, not in clock times; nothing is tied to a time of day.
+- A card is **due** when its prices are older than `PRICE_REFRESH_AFTER`: a number and `h`, `d`, `w` or `mo` (30 days),
+  e.g. `12h`, `3d`, `1w`, `1mo`; `off` switches the reload off. Only active cards are reloaded.
+- It is done in **tranches**: at most `PRICE_REFRESH_BATCH_SIZE` due cards at a time, the oldest prices first and the cards of
+  one set together, the next tranche at the earliest `PRICE_REFRESH_BATCH_EVERY` later. The defaults (a week, 300 cards, a
+  day) cover up to 2100 cards a week; a tranche is recorded in the database, so a restart neither skips nor repeats one.
+- **Limits of the card databases:** YGOPRODeck allows 20 requests per second and blocks above that for an hour. The request
+  rate depends on `PRICE_REFRESH_DELAY_MS` (default 500, at least 100), **not** on the tranche size; a larger tranche only
+  takes longer: a few seconds per 100 Yu-Gi-Oh! cards (20 cards per request), about 0.5 to 1 second per Pokémon card (TCGdex
+  answers one card per request and publishes no limit). Keep a tranche below about 1000 Pokémon cards; a larger value is
+  not prevented.
+- If a card database refuses further requests, the tranche stops and the rest follows with the next one; what you do in the
+  app meanwhile shows "The card database has reached its request limit, please wait a while". Failed cards are tried again
+  after `PRICE_REFRESH_BATCH_EVERY`. The log tells more: `docker logs cardkeeper_app 2>&1 | grep '\[prices\]'`.
 
 ### Users and passwords
 

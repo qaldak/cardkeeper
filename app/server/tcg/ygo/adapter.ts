@@ -265,6 +265,10 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
           }
         }
         catch (error) {
+          // The limit is not a missing translation: the person has to know that they have to wait.
+          if (error instanceof HttpError && error.status === 429) {
+            throw error
+          }
           console.warn(`[ygo] No ${lang} names for the set "${setId}":`, error instanceof Error ? error.message : error)
         }
       }

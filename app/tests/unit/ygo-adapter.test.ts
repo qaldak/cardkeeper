@@ -312,6 +312,11 @@ describe('YGO adapter: sets', () => {
     warn.mockRestore()
   })
 
+  it('passes the rate limit on instead of falling back to English names', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(answer([card(1, 'Card A', [{ set_name: SET, set_code: 'SDAZ-EN001' }])])).mockResolvedValueOnce(new Response('', { status: 429 }))
+    await expect(adapterWith(fetchFn).listSetCards!(SET, 'de')).rejects.toMatchObject({ status: 429, code: 'upstream_rate_limited' })
+  })
+
   it('answers null for a set that does not exist', async () => {
     const fetchFn = vi.fn().mockResolvedValue(json({ error: 'No card matching your query was found in the database.' }, 400))
     expect(await adapterWith(fetchFn).listSetCards!('Nope', 'en')).toBeNull()

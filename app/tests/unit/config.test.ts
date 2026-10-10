@@ -15,7 +15,7 @@ describe('loadConfig', () => {
       users: [],
       ygoBaseUrl: 'https://db.ygoprodeck.com/api/v7',
       tcgdexBaseUrl: 'https://api.tcgdex.net/v2',
-      priceRefresh: { after: 7 * 24 * 3_600_000, batchSize: 100, batchEvery: 24 * 3_600_000, delayMs: 500 },
+      priceRefresh: { after: 7 * 24 * 3_600_000, batchSize: 300, batchEvery: 24 * 3_600_000, delayMs: 500 },
     })
   })
 

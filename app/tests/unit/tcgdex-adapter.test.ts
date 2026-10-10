@@ -241,6 +241,11 @@ describe('TCGdex adapter: requests', () => {
     warn.mockRestore()
   })
 
+  it('passes the rate limit on when listing the variants of a set instead of leaving cards out', async () => {
+    const fetchFn = vi.fn().mockResolvedValue(new Response('', { status: 429 }))
+    await expect(adapterWith(fetchFn).listCardPrints!(['swsh3-136', 'swsh3-137'], 'en')).rejects.toMatchObject({ status: 429, code: 'upstream_rate_limited' })
+  })
+
   it('asks for the price of a card in the language it has, one card per request', async () => {
     const fetchFn = vi.fn().mockResolvedValueOnce(json(load('furret-en'))).mockResolvedValueOnce(json({ error: 'not found' }, 404))
     const adapter = adapterWith(fetchFn)

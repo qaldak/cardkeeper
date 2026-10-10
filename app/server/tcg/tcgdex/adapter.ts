@@ -179,6 +179,10 @@ export function createTcgdexAdapter(options: TcgdexAdapterOptions): CardAdapter 
             }
           }
           catch (error) {
+            // The limit is not a card that cannot be loaded: the person has to know that they have to wait.
+            if (error instanceof HttpError && error.status === 429) {
+              throw error
+            }
             console.warn(`[tcgdex] No variants for ${id}:`, error instanceof Error ? error.message : error)
           }
         }
