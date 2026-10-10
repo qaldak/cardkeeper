@@ -173,5 +173,5 @@ export interface SetCardDto {
   name: string
   thumbnailUrl: string | null
   /** The prints of the card in this set: the code on the card and its rarity (Yu-Gi-Oh!). */
-  prints?: { setCode: string, rarity: string | null }[]
+  prints?: { setCode: string, rarity: string | null, edition?: string | null }[]
 }

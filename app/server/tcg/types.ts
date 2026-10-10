@@ -62,6 +62,11 @@ export interface CardAdapter {
   listSets?(language?: string): Promise<GameSet[]>
   /** Cards of one set; null if the set does not exist. */
   listSetCards?(setId: string, language?: string): Promise<SetCard[] | null>
+  /**
+   * The prints of cards (for Pokémon: their variants) for games whose list of the cards of a set does not carry them.
+   * One entry per card; a card that could not be loaded is left out.
+   */
+  listCardPrints?(cardIds: readonly string[], language?: string): Promise<Map<string, SetCardPrint[]>>
 }
 
 /** A set (expansion) as listed by a game's database. */
@@ -82,6 +87,8 @@ export interface GameSet {
 export interface SetCardPrint {
   setCode: string
   rarity: string | null
+  /** Pokémon: the variant of the card (normal, reverse, holo, ...); the print is that variant. */
+  edition?: string | null
 }
 
 /** A card in a set. */

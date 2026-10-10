@@ -217,6 +217,12 @@
       "use": "Use this card"
     },
     "setImport": {
+      "needsChoiceVariant": "{count} card(s) need your choice of variant.",
+      "setLanguage": "Language of the set list",
+      "searchPlaceholderPokemon": "e.g. Sword & Shield or swsh3",
+      "variant": "Variant",
+      "variantHint": "This variant is taken for every card that has it. You only choose for the others.",
+      "loadingVariants": "Loading cards and variants … this takes a moment for large sets.",
       "progressLabel": "Progress",
       "stepDone": "done",
       "noConflicts": "All cards are clear, there is nothing to decide.",
@@ -226,7 +232,7 @@
       "showConflicts": "Show only cards that need a choice",
       "mode": {
         "name": "Single card",
-        "set": "Whole set"
+        "import": "Whole set"
       },
       "steps": {
         "set": "Choose set",

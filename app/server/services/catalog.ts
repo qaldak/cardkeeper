@@ -67,6 +67,22 @@ export function createCatalogService({ registry, now = () => new Date() }: Catal
         }))
       })
     },
+
+    /**
+     * The cards of a set for adding the whole set: the list of the set with the prints of every card (Yu-Gi-Oh!: codes and
+     * rarities, Pokémon: the variants). Where the list of the set already has them, it is the same as `setCards`.
+     */
+    async setImport(gameSlug: string, setId: string, language?: string): Promise<SetCardDto[]> {
+      const adapter = registry.require(gameSlug)
+      const lang = language ?? adapter.defaultLanguage
+      const cards = await this.setCards(gameSlug, setId, language)
+      const listCardPrints = adapter.listCardPrints?.bind(adapter)
+      if (!listCardPrints || cards.every(card => card.prints)) {
+        return cards
+      }
+      const prints = await cached(`prints:${gameSlug}:${lang}:${setId}`, () => listCardPrints(cards.map(card => card.externalId), lang))
+      return cards.map(card => ({ ...card, prints: card.prints ?? prints.get(card.externalId) ?? [] }))
+    },
   }
 }
 
