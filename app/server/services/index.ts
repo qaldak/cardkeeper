@@ -6,6 +6,7 @@ import { createCardService } from './cards'
 import { createCatalogService } from './catalog'
 import { createImageService } from './images'
 import { createPriceRefreshService } from './prices'
+import { createExchangeRateService } from './rates'
 import { createThumbnailService } from './thumbnails'
 import { createUserService } from './users'
 
@@ -20,10 +21,12 @@ export interface ServiceDeps {
 }
 
 export function createServices(deps: ServiceDeps) {
+  const rates = createExchangeRateService({ baseUrl: deps.config.exchangeRateBaseUrl, fetchFn: deps.fetchFn, now: deps.now })
   return {
     config: deps.config,
     db: deps.db,
-    cards: createCardService(deps),
+    rates,
+    cards: createCardService({ ...deps, rates }),
     catalog: createCatalogService(deps),
     images: createImageService(deps),
     prices: createPriceRefreshService(deps),

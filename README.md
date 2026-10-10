@@ -54,8 +54,11 @@ Everything runs in containers: there is nothing to install on the host except Do
   language of the interface) is a one-click choice next to the printing; nothing chosen means Unlimited, which is not
   printed on the card. On the card page the same choice is a dropdown
 - Card images are downloaded once and stored on a volume, never hotlinked
-- Prices are stored per marketplace in the currency of that marketplace and are **not converted**
-  (Cardmarket in EUR, TCGplayer/eBay/Amazon/CoolStuffInc in USD); the list uses the marketplace set in `PRICE_SOURCE`
+- Prices are stored per marketplace in the currency of that marketplace (Cardmarket in EUR,
+  TCGplayer/eBay/Amazon/CoolStuffInc in USD); the list uses the marketplace set in `PRICE_SOURCE`. With `DISPLAY_CURRENCY`
+  (e.g. `CHF`) the overview shows the cards and the total in that currency and the card page shows both, e.g.
+  `CHF 0.08 (€0.09)`; the rates are the ECB's reference rates from [Frankfurter](https://frankfurter.dev), loaded when
+  first needed and then once a day. Without a rate, the price is shown as received
 - Prices are reloaded on a schedule, in small tranches, and every reload is kept in the price history, also when the price
   has not changed (see [Scheduled price reload](#scheduled-price-reload))
 - Changes made by users are written to an audit log, and the card page shows "modified on" next to the origin as soon
@@ -98,6 +101,7 @@ All settings are environment variables in `.env`:
 | `APP_PORT` | `3000` | Port published on the host |
 | `APP_BIND_ADDRESS` | `127.0.0.1` | Address the port is bound to; keep it on localhost when a reverse proxy runs on the same host |
 | `PRICE_SOURCE` | `cardmarket` | Marketplace for list prices and totals: `cardmarket`, `tcgplayer`, `ebay`, `amazon`, `coolstuffinc` |
+| `DISPLAY_CURRENCY` | – (not set: prices as received) | Currency the prices are shown in as well, e.g. `CHF` |
 | `MAX_UPLOAD_MB` | `5` | Maximum size of a manually uploaded image |
 | `SESSION_SECRET` | – (required) | At least 32 random characters (`openssl rand -hex 32`) that seal the login cookies; the app refuses to start with less. Changing it logs everybody out |
 | `USERS` | – (required) | Comma separated user names, e.g. `anna,max`; missing users are created at startup (see [Users and passwords](#users-and-passwords)) |
@@ -318,7 +322,9 @@ Differences from the original concept:
   (`normal`, `reverse`, ... translated through `variant.<key>`, see below).
 - `card_translations.details` (JSONB) holds further language dependent data of a card: for Pokémon the attack and
   ability texts and the localized names of types, stage and rarity. It is null for Yu-Gi-Oh!.
-- Prices keep their source currency instead of being shown in CHF.
+- Prices keep their source currency in the database; the conversion into `DISPLAY_CURRENCY` is done when they are read
+  (`server/services/rates.ts`, rates in memory, one request per currency pair and day) and uses today's rate also for the
+  price history.
 - The Nuxt app is the Nuxt 4 default layout, so its pages are in `app/app/`.
 
 ### Pokémon

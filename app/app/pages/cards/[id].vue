@@ -11,7 +11,7 @@ const { t } = useI18n()
 const route = useRoute()
 const toast = useToast()
 const apiError = useApiError()
-const { money, dateTime } = useFormat()
+const { moneyWithOriginal, dateTime } = useFormat()
 const labels = useGameLabels()
 
 const id = Number(route.params.id)
@@ -581,7 +581,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
               class="flex justify-between border-b border-default px-3.5 py-2.5 text-[13px] last:border-b-0"
             >
               <span class="text-muted">{{ dateTime(point.fetchedAt) }}</span>
-              <span>{{ money(point.price, point.currency) }}</span>
+              <span>{{ moneyWithOriginal(point.price, point.currency, point.converted) }}</span>
             </div>
           </div>
           <p v-else class="text-sm text-muted">

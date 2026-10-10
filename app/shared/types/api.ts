@@ -1,9 +1,17 @@
 import type { CardStatusValue } from '../utils/status'
 
+/** An amount converted into the display currency (DISPLAY_CURRENCY). */
+export interface ConvertedMoneyDto {
+  amount: number
+  currency: string
+}
+
 export interface MoneyDto {
   amount: number
   currency: string
   source: string
+  /** The amount in the display currency; `null` when none is set, the amount is in it already, or no rate is known. */
+  converted: ConvertedMoneyDto | null
 }
 
 export interface GameDto {
@@ -87,6 +95,8 @@ export interface PricePointDto {
   source: string
   price: number
   currency: string
+  /** The price in the display currency at today's rate, or `null` as for {@link MoneyDto.converted}. */
+  converted: ConvertedMoneyDto | null
   fetchedAt: string
 }
 

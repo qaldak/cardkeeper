@@ -20,6 +20,7 @@ import type { CreateCardInput, UpdateCardInput } from '../lib/schemas'
 import { normalizeStatusChange } from '../lib/status'
 import { mergeLanguageCards, primaryName, type MergedCard } from '../lib/translations'
 import type { AdapterRegistry } from '../tcg/registry'
+import type { Converter, ExchangeRateService } from './rates'
 import type { CardAdapter, CommonCard, CommonCardImage } from '../tcg/types'
 import { POKEMON_VARIANTS } from '../../shared/types/pokemon'
 import { detailInclude, listInclude, toDetail, toListItem } from './mappers'
@@ -28,6 +29,7 @@ export interface CardServiceDeps {
   db: PrismaClient
   registry: AdapterRegistry
   config: AppConfig
+  rates: ExchangeRateService
   fetchFn?: typeof fetch
   now?: () => Date
 }
@@ -45,6 +47,22 @@ interface FieldChange {
   field: string
   oldValue: unknown
   newValue: unknown
+}
+
+/**
+ * The total per currency. Where a display currency is set, the totals of the other currencies are converted into it and
+ * added to it; a currency without a known rate stays a total of its own.
+ */
+function totalsOf(centsByCurrency: Map<string, number>, convert: Converter): { currency: string, amount: number }[] {
+  const merged = new Map<string, number>()
+  for (const [currency, cents] of centsByCurrency) {
+    const converted = convert(fromCents(cents), currency)
+    const target = converted?.currency ?? currency
+    merged.set(target, (merged.get(target) ?? 0) + (converted ? toCents(converted.amount) : cents))
+  }
+  return [...merged.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([currency, cents]) => ({ currency, amount: fromCents(cents) }))
 }
 
 export function createCardService(deps: CardServiceDeps) {
@@ -82,7 +100,8 @@ export function createCardService(deps: CardServiceDeps) {
     if (!card) {
       throw notFound('card_not_found', 'Card not found')
     }
-    return toDetail(card, config.priceSource)
+    const convert = await deps.rates.converter(card.priceHistory.map(point => point.currency), config.displayCurrency)
+    return toDetail(card, config.priceSource, convert)
   }
 
   /**
@@ -227,9 +246,13 @@ export function createCardService(deps: CardServiceDeps) {
         include: listInclude(config.priceSource),
       })
       const byId = new Map(cards.map(card => [card.id, card]))
+      const convert = await deps.rates.converter(
+        [...centsByCurrency.keys(), ...cards.flatMap(card => card.priceHistory.map(point => point.currency))],
+        config.displayCurrency,
+      )
       const items = pageIds.flatMap((id) => {
         const card = byId.get(id)
-        return card ? [toListItem(card)] : []
+        return card ? [toListItem(card, convert)] : []
       })
 
       return {
@@ -239,9 +262,7 @@ export function createCardService(deps: CardServiceDeps) {
         summary: {
           count: rows.length,
           activeCount,
-          totals: [...centsByCurrency.entries()]
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([currency, cents]) => ({ currency, amount: fromCents(cents) })),
+          totals: totalsOf(centsByCurrency, convert),
         },
       }
     },

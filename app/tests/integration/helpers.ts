@@ -24,7 +24,13 @@ export interface Harness {
   anna: Actor
   sven: Actor
   /** The services again with another clock (and a pause that does not wait), to follow time: price reloads, ages. */
-  servicesAt: (now: () => Date, sleep?: (milliseconds: number) => Promise<void>, priceRefresh?: Partial<AppConfig['priceRefresh']>) => Services
+  servicesAt: (
+    now: () => Date,
+    sleep?: (milliseconds: number) => Promise<void>,
+    priceRefresh?: Partial<AppConfig['priceRefresh']>,
+    /** The display currency and the exchange-rate service behind it (https://rates.test). */
+    rates?: { currency: string, fetchFn: typeof fetch },
+  ) => Services
 }
 
 const TABLES = ['price_refresh_runs', 'audit_log', 'card_images', 'api_snapshots', 'status_history', 'price_history', 'card_sets', 'card_translations', 'cards', 'users', 'games']
@@ -49,6 +55,8 @@ export function useHarness(): Harness {
       users: [],
       ygoBaseUrl: 'https://ygo.test/api/v7',
       tcgdexBaseUrl: 'https://tcgdex.test/v2',
+      exchangeRateBaseUrl: 'https://rates.test/v1',
+      displayCurrency: null,
       priceRefresh: { after: 7 * 24 * 3_600_000, batchSize: 100, batchEvery: 24 * 3_600_000, delayMs: 500 },
     }
   })
@@ -73,11 +81,14 @@ export function useHarness(): Harness {
       fetchFn,
       now: () => new Date('2026-10-04T12:00:00Z'),
     })
-    harness.servicesAt = (now, sleep, priceRefresh) => createServices({
+    harness.servicesAt = (now, sleep, priceRefresh, rates) => createServices({
       db: harness.db,
       registry,
-      config: { ...harness.config, priceRefresh: { ...harness.config.priceRefresh, ...priceRefresh } },
-      fetchFn,
+      config: { ...harness.config, displayCurrency: rates?.currency ?? null, priceRefresh: { ...harness.config.priceRefresh, ...priceRefresh } },
+      fetchFn: ((input: URL | RequestInfo, init?: RequestInit) =>
+        rates && new URL(input instanceof Request ? input.url : String(input)).hostname === 'rates.test'
+          ? rates.fetchFn(input, init)
+          : fetchFn(input, init)) as typeof fetch,
       now,
       sleep,
     })
