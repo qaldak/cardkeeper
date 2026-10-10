@@ -216,6 +216,7 @@
       "found": "Card found by set and number",
       "use": "Use this card"
     },
+    "printedCodeNote": "The card says {code}: this set code is stored, the set and rarity come from the selected (English) printing.",
     "ownerNote": "The card is added to your collection ({name}). Only you can change it afterwards.",
     "edition": {
       "label": "Edition",
@@ -234,6 +235,7 @@
     "upstream_error": "The card database reported an error.",
     "upstream_invalid_response": "The card database returned unexpected data.",
     "invalid_set": "The selected printing is invalid.",
+    "invalid_set_code": "The set code does not belong to the selected printing.",
     "invalid_date": "Invalid date.",
     "unsupported_image": "Only PNG, JPEG and WebP images are supported.",
     "file_too_large": "The file is too large.",

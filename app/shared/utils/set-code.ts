@@ -29,3 +29,28 @@ export function setCodeSpellings(text: string): string[] {
   }
   return [code, `${set}-EN${rest.slice(region.length)}`]
 }
+
+/**
+ * The print to preselect for a typed set code: the print whose code is the typed one or, if there is none, the English
+ * one. Only a single print is preselected; with several (one code printed in several rarities) the choice is left to
+ * the person, who has the card in their hand. `null` if nothing is to be preselected.
+ */
+export function printToPreselect(prints: readonly { setCode: string }[], typed: string): number | null {
+  for (const code of setCodeSpellings(typed)) {
+    const found = prints.flatMap((print, index) => (print.setCode.toUpperCase() === code ? [index] : []))
+    if (found.length > 0) {
+      return found.length === 1 ? found[0]! : null
+    }
+  }
+  return null
+}
+
+/**
+ * The set code to store when a card was searched by the code printed on it ("L5DD-DEA15") but the print found is the
+ * English one ("L5DD-ENA15"): the printed code. `undefined` if the print already has the typed code or is another card.
+ */
+export function printedCodeFor(typed: string, printCode: string): string | undefined {
+  const code = normalizeSetCode(typed)
+  const print = printCode.toUpperCase()
+  return isSetCode(code) && code !== print && setCodeSpellings(code).includes(print) ? code : undefined
+}

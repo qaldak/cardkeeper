@@ -29,7 +29,9 @@ Everything runs in containers: there is nothing to install on the host except Do
 - "Add card" lookup by name or passcode against the card database, including the exact printing (set and rarity). For
   Yu-Gi-Oh! the set code of a print works as well ("LOB-EN005", "L5DD-ENA15"; asked at YGOPRODeck's
   `cardsetsinfo.php`): a code of another language ("L5DD-DEA15") that finds nothing is looked up with its English code
-  ("L5DD-ENA15") instead, and the print of the typed code is preselected in the form. There
+  ("L5DD-ENA15") instead. The print is preselected in the form when it is the only one with that code (several rarities
+  of one code leave the choice open), and the code typed, which is the one printed on the card, is stored as the set
+  code, while set and rarity come from the chosen print. There
   is no language to choose: the search looks for German first and falls back to English, and both languages are
   stored where available. For Yu-Gi-Oh! the edition printed on the card (1st Edition, Limited Edition, shown in the
   The search for Yu-Gi-Oh! and Pokémon (by name), the Pokémon set filter and the search in your own collection also find
