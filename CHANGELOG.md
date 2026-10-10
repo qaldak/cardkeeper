@@ -1,3 +1,9 @@
+## [0.13.0](https://github.com/qaldak/cardkeeper/compare/v0.12.0...v0.13.0) (2026-10-10)
+
+### Features
+
+* show the card image in the Yu-Gi-Oh! lookup ([c67cd7d](https://github.com/qaldak/cardkeeper/commit/c67cd7d37e1f558ff2a7de10b05b3f2adbb05c8c))
+
 ## [0.12.0](https://github.com/qaldak/cardkeeper/compare/v0.11.0...v0.12.0) (2026-10-09)
 
 ### Features
