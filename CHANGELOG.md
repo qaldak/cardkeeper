@@ -1,3 +1,13 @@
+## [0.19.0](https://github.com/qaldak/cardkeeper/compare/v0.18.0...v0.19.0) (2026-10-10)
+
+### Features
+
+* show prices in a configurable display currency (DISPLAY_CURRENCY) ([ef84737](https://github.com/qaldak/cardkeeper/commit/ef8473729f3fbed611b6decd88dceb55580c5602))
+
+### Bug Fixes
+
+* type the rate table of the Pokémon currency test ([518c1d4](https://github.com/qaldak/cardkeeper/commit/518c1d432718b2088a7cb5d61c675ed884369a99))
+
 ## [0.18.0](https://github.com/qaldak/cardkeeper/compare/v0.17.0...v0.18.0) (2026-10-10)
 
 ### Features
