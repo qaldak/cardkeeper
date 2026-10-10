@@ -168,7 +168,7 @@
     "title": "Karte hinzufügen",
     "game": "Spiel",
     "query": "Name oder Passcode",
-    "queryPlaceholder": "z. B. Dunkler Magier oder 46986414",
+    "queryPlaceholder": "z. B. Dunkler Magier, 46986414 oder LOB-DE005",
     "search": "Suchen",
     "results": "Treffer",
     "noResults": "Keine Karte gefunden.",
@@ -216,6 +216,7 @@
       "found": "Karte nach Set und Nummer gefunden",
       "use": "Diese Karte verwenden"
     },
+    "printedCodeNote": "Auf der Karte steht {code}: dieser Set-Code wird gespeichert, Set und Seltenheit stammen aus der gewählten (englischen) Ausgabe.",
     "ownerNote": "Die Karte wird deiner Sammlung ({name}) hinzugefügt. Nur du kannst sie danach ändern.",
     "edition": {
       "label": "Edition",
@@ -234,6 +235,7 @@
     "upstream_error": "Die Kartendatenbank hat einen Fehler gemeldet.",
     "upstream_invalid_response": "Die Kartendatenbank hat unerwartete Daten geliefert.",
     "invalid_set": "Die gewählte Ausgabe ist ungültig.",
+    "invalid_set_code": "Der Set-Code passt nicht zur gewählten Ausgabe.",
     "invalid_date": "Ungültiges Datum.",
     "unsupported_image": "Nur PNG-, JPEG- und WebP-Bilder werden unterstützt.",
     "file_too_large": "Die Datei ist zu groß.",

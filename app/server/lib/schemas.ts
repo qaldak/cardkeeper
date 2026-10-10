@@ -53,6 +53,9 @@ export const createCardSchema = z.object({
     rarity: z.string().trim().max(80).nullable().optional(),
     // Pokémon: the variant of the card (normal, reverse, holo, ...).
     edition: z.string().trim().max(80).nullable().optional(),
+    // Yu-Gi-Oh!: the set code printed on the card when it is the code of another language than the print that was
+    // chosen ("L5DD-DEA15" for the English print "L5DD-ENA15"). It is stored instead of the code of the print.
+    printedSetCode: z.string().trim().max(40).nullable().optional(),
   }).optional(),
   purchaseDate: dateOnly.nullable().optional(),
 })

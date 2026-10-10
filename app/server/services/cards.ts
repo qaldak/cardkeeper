@@ -3,6 +3,7 @@ import type { CardDetailDto, CardListResponseDto, FacetsDto, LookupCandidateDto 
 import { EDITION_KEYS } from '../../shared/utils/editions'
 import { eszettVariants } from '../../shared/utils/eszett'
 import { getGameConfig } from '../../shared/utils/game-config'
+import { isSetCode, normalizeSetCode, setCodeSpellings } from '../../shared/utils/set-code'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import { assertOwner, type Actor } from '../lib/actor'
 import type { AppConfig } from '../lib/config'
@@ -365,6 +366,14 @@ export function createCardService(deps: CardServiceDeps) {
           && (freeEdition || (set.edition ?? null) === (input.set!.edition ?? null)))
         if (!chosenSet) {
           throw badRequest('invalid_set', 'The selected printing does not exist for this card')
+        }
+        // The code printed on the card, when it is the code of another language than the print: it is the one stored.
+        if (input.set.printedSetCode) {
+          const printed = normalizeSetCode(input.set.printedSetCode)
+          if (!getGameConfig(input.game).setCodeEditable || !isSetCode(printed) || !setCodeSpellings(printed).includes(chosenSet.setCode.toUpperCase())) {
+            throw badRequest('invalid_set_code', 'The set code does not belong to the selected printing')
+          }
+          chosenSet = { ...chosenSet, setCode: printed }
         }
       }
       else if (getGameConfig(input.game).printingRequired) {

@@ -5,6 +5,7 @@ import { formatAttributeValue } from '#shared/utils/game-fields'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatPrintedNumber } from '#shared/utils/pokemon-number'
 import { initialGame, LAST_GAME_COOKIE } from '#shared/utils/last-game'
+import { isSetCode, normalizeSetCode, printedCodeFor, printToPreselect } from '#shared/utils/set-code'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -35,6 +36,8 @@ const searchError = ref('')
 const chosen = ref<LookupCandidateDto | null>(null)
 const choosing = ref<string | null>(null)
 const printing = ref(NONE)
+// The set code that was searched for, when it is a set code: the code printed on the card.
+const typedSetCode = ref<string | null>(null)
 // Yu-Gi-Oh!: the edition printed on the card (a key such as FIRST_EDITION), chosen with one click. None chosen means
 // Unlimited, which is not printed. The card database does not know the edition.
 const edition = ref<string | null>(null)
@@ -55,6 +58,11 @@ const gameItems = computed(() => (games.value ?? []).map(entry => ({ label: entr
 const printingLabel = (set: LookupCandidateDto['sets'][number]) => isPokemon.value
   ? [labels.variant(set.edition), set.rarity, set.setName].filter(Boolean).join(' · ')
   : [set.setCode, set.setName, set.rarity].filter(Boolean).join(' · ')
+// The code printed on the card, when it is stored instead of the code of the selected print.
+const printedSetCode = computed(() => {
+  const set = printing.value === NONE ? undefined : chosen.value?.sets[Number(printing.value)]
+  return set && typedSetCode.value ? printedCodeFor(typedSetCode.value, set.setCode) : undefined
+})
 const printingItems = computed(() => [
   ...(config.value.printingRequired ? [] : [{ label: t('add.noPrinting'), value: NONE }]),
   ...(chosen.value?.sets ?? []).map((set, index) => ({ label: printingLabel(set), value: String(index) })),
@@ -90,6 +98,15 @@ async function choose(externalId: string) {
       query: { game: gameSlug.value },
     })
     printing.value = config.value.printingRequired && chosen.value.sets.length > 0 ? '0' : NONE
+    // Found by the set code of a print ("L5DD-DEA15", or its English "L5DD-ENA15"): that print is preselected when it is
+    // the only one with that code. The typed code is kept: it is what is printed on the card, and it is what is stored.
+    typedSetCode.value = !isPokemon.value && isSetCode(query.value) ? normalizeSetCode(query.value) : null
+    if (typedSetCode.value) {
+      const index = printToPreselect(chosen.value.sets, typedSetCode.value)
+      if (index !== null) {
+        printing.value = String(index)
+      }
+    }
     edition.value = null
   }
   catch (error) {
@@ -112,7 +129,7 @@ async function submit() {
       body: {
         game: gameSlug.value,
         externalId: chosen.value.externalId,
-        set: set ? { setCode: set.setCode, rarity: set.rarity, edition: config.value.editions.length > 0 ? edition.value : set.edition } : undefined,
+        set: set ? { setCode: set.setCode, rarity: set.rarity, edition: config.value.editions.length > 0 ? edition.value : set.edition, printedSetCode: printedSetCode.value } : undefined,
         purchaseDate: purchaseDate.value || null,
       },
     })
@@ -273,6 +290,9 @@ const MAX_RESULTS = 50
       <UFormField :label="isPokemon ? t('add.variant') : t('add.printing')" :hint="config.printingRequired ? t('add.variantRequired') : undefined">
         <USelectMenu v-model="printing" :items="printingItems" value-key="value" class="w-full" />
       </UFormField>
+      <p v-if="printedSetCode" class="-mt-3 text-sm text-muted" data-test="printed-code-note">
+        {{ t('add.printedCodeNote', { code: printedSetCode }) }}
+      </p>
       <UFormField
         v-if="config.editions.length > 0"
         :label="t('add.edition.label')"

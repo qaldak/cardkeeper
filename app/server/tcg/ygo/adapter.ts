@@ -1,8 +1,9 @@
 import { eszettVariants } from '../../../shared/utils/eszett'
+import { isSetCode, normalizeSetCode, setCodeSpellings } from '../../../shared/utils/set-code'
 import { badRequest, HttpError } from '../../lib/errors'
 import type { CardAdapter, CommonCard } from '../types'
 import { mapYgoCard } from './mapper'
-import { ygoResponseSchema } from './schema'
+import { setPrintSchema, ygoResponseSchema } from './schema'
 
 export interface YgoAdapterOptions {
   baseUrl: string
@@ -30,14 +31,14 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
     return resolved
   }
 
-  /** Calls `cardinfo.php` and returns the raw card objects ([] when nothing matches). */
-  async function query(params: Record<string, string>, language: string): Promise<unknown[]> {
-    const url = new URL(`${baseUrl}/cardinfo.php`)
+  /** Calls an endpoint of the API; an unreachable server and the rate limit are errors, everything else is returned. */
+  async function call(endpoint: string, params: Record<string, string>, language?: string) {
+    const url = new URL(`${baseUrl}/${endpoint}`)
     for (const [key, value] of Object.entries(params)) {
       url.searchParams.set(key, value)
     }
     // English is the API default and has no language parameter.
-    if (language !== 'en') {
+    if (language && language !== 'en') {
       url.searchParams.set('language', language)
     }
 
@@ -59,6 +60,12 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
 
     const body = await response.json().catch(() => null) as { error?: unknown } | null
     const apiError = typeof body?.error === 'string' ? body.error : undefined
+    return { response, body, apiError }
+  }
+
+  /** Calls `cardinfo.php` and returns the raw card objects ([] when nothing matches). */
+  async function query(params: Record<string, string>, language: string): Promise<unknown[]> {
+    const { response, body, apiError } = await call('cardinfo.php', params, language)
 
     if (response.status === 400 && apiError !== undefined && NO_RESULT.test(apiError)) {
       return []
@@ -75,6 +82,55 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
       throw new HttpError(502, 'upstream_invalid_response', 'Unexpected response from YGOPRODeck')
     }
     return parsed.data.data
+  }
+
+  /** The card of one print: `cardsetsinfo.php` answers a set code with the print and the card it belongs to. */
+  async function cardOfSetCode(setCode: string): Promise<{ id: string, name: string | null } | null> {
+    const { response, body, apiError } = await call('cardsetsinfo.php', { setcode: setCode })
+    // A code that does not exist is an error of the API (HTTP 400), the same as an empty result of a card search.
+    if (response.status === 400 || response.status === 404) {
+      return null
+    }
+    if (!response.ok) {
+      const detail = apiError ? `: ${apiError.slice(0, MAX_ERROR_TEXT)}` : ''
+      throw new HttpError(502, 'upstream_error', `YGOPRODeck answered with status ${response.status}${detail}`)
+    }
+    // The print itself, or a list of them: either way only the card (passcode and name) is wanted.
+    const entry = Array.isArray((body as { data?: unknown } | null)?.data) ? (body as { data: unknown[] }).data[0] : body
+    const parsed = setPrintSchema.safeParse(entry)
+    if (!parsed.success) {
+      if (entry !== undefined && entry !== null && apiError === undefined) {
+        throw new HttpError(502, 'upstream_invalid_response', 'Unexpected response from YGOPRODeck')
+      }
+      return null
+    }
+    return { id: String(parsed.data.id), name: parsed.data.name ?? null }
+  }
+
+  // The card of a set code does not change: asking for it once per language of the lookup is enough.
+  const setCodeCards = new Map<string, { at: number, card: { id: string, name: string | null } | null }>()
+  const SET_CODE_CACHE_MS = 5 * 60_000
+  const SET_CODE_CACHE_SIZE = 200
+
+  /** The card of a set code; a code of another language falls back to the English print of the same card. */
+  async function findBySetCode(text: string): Promise<{ id: string, name: string | null } | null> {
+    const key = normalizeSetCode(text)
+    const cached = setCodeCards.get(key)
+    if (cached && Date.now() - cached.at < SET_CODE_CACHE_MS) {
+      return cached.card
+    }
+    let card: { id: string, name: string | null } | null = null
+    for (const spelling of setCodeSpellings(key)) {
+      card = await cardOfSetCode(spelling)
+      if (card) {
+        break
+      }
+    }
+    if (setCodeCards.size >= SET_CODE_CACHE_SIZE) {
+      setCodeCards.clear()
+    }
+    setCodeCards.set(key, { at: Date.now(), card })
+    return card
   }
 
   const adapter: CardAdapter = {
@@ -114,6 +170,16 @@ export function createYgoAdapter(options: YgoAdapterOptions): CardAdapter {
       const trimmed = text.trim()
       if (trimmed === '') {
         return []
+      }
+      // The set code of a print ("L5DD-ENA15"): the card it belongs to, in the language asked for. A text that only looks
+      // like a set code and finds nothing is searched as a name, too.
+      if (isSetCode(trimmed)) {
+        const hit = await findBySetCode(trimmed)
+        if (hit) {
+          const card = await adapter.fetchCardById(hit.id, lang)
+            ?? (lang === 'en' && hit.name ? await adapter.fetchCardByName(hit.name, lang) : null)
+          return card ? [card] : []
+        }
       }
       // A numeric query is a passcode, everything else is a fuzzy name search.
       const params: Record<string, string> = /^\d{3,12}$/.test(trimmed) ? { id: trimmed } : { fname: trimmed }

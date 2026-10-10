@@ -170,6 +170,89 @@ describe('YGO adapter: Link monsters and unexpected values', () => {
   })
 })
 
+describe('YGO adapter: search by set code', () => {
+  const urlOf = (call: unknown[]) => call[0] as URL
+  const endpointAndQuery = (fetchFn: ReturnType<typeof vi.fn>) =>
+    fetchFn.mock.calls.map(call => `${urlOf(call).pathname.split('/').pop()}?${urlOf(call).searchParams.toString()}`)
+  const noSet = () => json({ error: 'No card set found matching your query.' }, 400)
+  const print = { id: 46986414, name: 'Dark Magician', set_name: 'Legendary 5D Duelists', set_code: 'L5DD-ENA15', set_rarity: 'Common' }
+
+  it('finds the card of a set code', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(json(print)).mockResolvedValueOnce(json(fixture))
+    const results = await adapterWith(fetchFn).searchCards('L5DD-ENA15', 'en')
+    expect(results.map(card => card.externalId)).toEqual(['46986414'])
+    expect(endpointAndQuery(fetchFn)).toEqual(['cardsetsinfo.php?setcode=L5DD-ENA15', 'cardinfo.php?id=46986414'])
+  })
+
+  it('writes the code in capitals and takes the card in the language asked for', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(json(print)).mockResolvedValueOnce(json(fixture))
+    const results = await adapterWith(fetchFn).searchCards(' l5dd-ena15 ', 'de')
+    expect(results[0]!.language).toBe('de')
+    expect(endpointAndQuery(fetchFn)).toEqual(['cardsetsinfo.php?setcode=L5DD-ENA15', 'cardinfo.php?id=46986414&language=de'])
+  })
+
+  it('looks for the English code when the code of another language finds nothing', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(noSet()).mockResolvedValueOnce(json(print)).mockResolvedValueOnce(json(fixture))
+    const results = await adapterWith(fetchFn).searchCards('L5DD-DEA15', 'de')
+    expect(results.map(card => card.externalId)).toEqual(['46986414'])
+    expect(endpointAndQuery(fetchFn)).toEqual([
+      'cardsetsinfo.php?setcode=L5DD-DEA15',
+      'cardsetsinfo.php?setcode=L5DD-ENA15',
+      'cardinfo.php?id=46986414&language=de',
+    ])
+  })
+
+  it('does not look for the English code when the typed one is found', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(json({ ...print, set_code: 'L5DD-DEA15' })).mockResolvedValueOnce(json(fixture))
+    await adapterWith(fetchFn).searchCards('L5DD-DEA15', 'de')
+    expect(endpointAndQuery(fetchFn)[0]).toBe('cardsetsinfo.php?setcode=L5DD-DEA15')
+    expect(endpointAndQuery(fetchFn)).toHaveLength(2)
+  })
+
+  it('asks for a set code once for the German and the English search of one lookup', async () => {
+    const fetchFn = vi.fn()
+      .mockResolvedValueOnce(json(print))
+      .mockResolvedValueOnce(json({ error: 'No card matching your query was found in the database.' }, 400))
+      .mockResolvedValueOnce(json(fixture))
+    const adapter = adapterWith(fetchFn)
+    expect(await adapter.searchCards('L5DD-ENA15', 'de')).toEqual([])
+    expect((await adapter.searchCards('L5DD-ENA15', 'en')).map(card => card.externalId)).toEqual(['46986414'])
+    expect(endpointAndQuery(fetchFn).filter(entry => entry.startsWith('cardsetsinfo'))).toHaveLength(1)
+  })
+
+  it('accepts a list of prints and a passcode as text', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(json({ data: [{ ...print, id: '46986414' }] })).mockResolvedValueOnce(json(fixture))
+    expect((await adapterWith(fetchFn).searchCards('NEWSET-EN001', 'en')).map(card => card.externalId)).toEqual(['46986414'])
+  })
+
+  it('searches the text as a name when it looks like a set code but there is no such print', async () => {
+    const fetchFn = vi.fn().mockResolvedValueOnce(noSet()).mockResolvedValueOnce(noSet()).mockResolvedValueOnce(json(fixture))
+    const results = await adapterWith(fetchFn).searchCards('XXXX-DE999', 'en')
+    expect(endpointAndQuery(fetchFn)).toEqual([
+      'cardsetsinfo.php?setcode=XXXX-DE999',
+      'cardsetsinfo.php?setcode=XXXX-EN999',
+      'cardinfo.php?fname=XXXX-DE999',
+    ])
+    expect(results).toHaveLength(1)
+  })
+
+  it('does not ask for a set code when the text is a name or a passcode', async () => {
+    const fetchFn = vi.fn().mockImplementation(() => Promise.resolve(json(fixture)))
+    await adapterWith(fetchFn).searchCards('Dark Magician', 'en')
+    await adapterWith(fetchFn).searchCards('46986414', 'en')
+    expect(endpointAndQuery(fetchFn).some(entry => entry.startsWith('cardsetsinfo'))).toBe(false)
+  })
+
+  it('reports errors of the API instead of finding nothing', async () => {
+    await expect(adapterWith(vi.fn().mockResolvedValue(new Response('', { status: 500 }))).searchCards('LOB-EN005', 'en'))
+      .rejects.toMatchObject({ status: 502, code: 'upstream_error' })
+    await expect(adapterWith(vi.fn().mockResolvedValue(new Response('', { status: 429 }))).searchCards('LOB-EN005', 'en'))
+      .rejects.toMatchObject({ status: 429 })
+    await expect(adapterWith(vi.fn().mockResolvedValue(json({ unexpected: true }))).searchCards('LOB-EN005', 'en'))
+      .rejects.toMatchObject({ status: 502, code: 'upstream_invalid_response' })
+  })
+})
+
 describe('YGO adapter: requests', () => {
   it('fetches a card by passcode', async () => {
     const fetchFn = vi.fn().mockResolvedValue(json(fixture))

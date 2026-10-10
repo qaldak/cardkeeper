@@ -122,6 +122,48 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect(h.ygo.apiCalls() - before).toBeLessThanOrEqual(4)
     })
 
+    it('finds a card by the set code of a print, and by its English code when the code of another language is typed', async () => {
+      // The typed code first, then the English one.
+      await h.services.cards.lookup('ygo', 'SDLS-DE043')
+      expect(h.ygo.requestedSetCodes).toEqual(['SDLS-DE043', 'SDLS-EN043'])
+      for (const typed of ['SDLS-EN043', 'sdls-en043', 'SDLS-DE043', 'SDLS-FR043']) {
+        const found = await h.services.cards.lookup('ygo', typed)
+        expect(found.map(card => [card.externalId, card.name]), typed).toEqual([[String(LINK_MONSTER.id), 'Link-Spinne']])
+      }
+    })
+
+    it('finds nothing for a set code that does not exist, and adds the card of a set code with its prints', async () => {
+      expect(await h.services.cards.lookup('ygo', 'SDLS-EN999')).toEqual([])
+      const details = await h.services.cards.lookupDetails('ygo', String(LINK_MONSTER.id))
+      expect(details.sets.map(set => set.setCode)).toContain('SDLS-EN043')
+      const card = await h.services.cards.create({ game: 'ygo', externalId: String(LINK_MONSTER.id), set: { setCode: 'SDLS-EN043', rarity: 'Common', edition: null } }, h.anna)
+      expect(card.sets[0]).toMatchObject({ setCode: 'SDLS-EN043', rarity: 'Common' })
+    })
+
+    it('stores the code printed on the card when it is the code of another language than the chosen print', async () => {
+      const add = (printedSetCode: string | null, extra: Record<string, unknown> = {}) =>
+        h.services.cards.create({
+          game: 'ygo',
+          externalId: String(LINK_MONSTER.id),
+          set: { setCode: 'SDLS-EN043', rarity: 'Common', edition: null, printedSetCode, ...extra },
+        }, h.anna)
+
+      const german = await add(' sdls-de043 ')
+      expect(german.sets[0]).toMatchObject({ setCode: 'SDLS-DE043', setName: 'Starter Deck: Link Strike', rarity: 'Common' })
+      expect((await add('SDLS-EN043')).sets[0]!.setCode).toBe('SDLS-EN043')
+      expect((await add(null)).sets[0]!.setCode).toBe('SDLS-EN043')
+      expect((await add('SDLS-FR043')).sets[0]!.setCode).toBe('SDLS-FR043')
+    })
+
+    it('refuses a printed set code that does not belong to the chosen print', async () => {
+      const add = (printedSetCode: string, game = 'ygo', externalId = String(LINK_MONSTER.id)) =>
+        h.services.cards.create({ game, externalId, set: { setCode: 'SDLS-EN043', rarity: 'Common', printedSetCode } }, h.anna)
+      for (const wrong of ['LOB-DE005', 'SDLS-DE044', 'no code', 'SDLS-EN999']) {
+        await expect(add(wrong), wrong).rejects.toMatchObject({ status: 400, code: 'invalid_set_code' })
+      }
+      expect(await h.db.card.count()).toBe(0)
+    })
+
     it('does not block creation when the image download fails', async () => {
       h.ygo.failImages = true
       const card = await addDarkMagician()
