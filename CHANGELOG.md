@@ -1,3 +1,9 @@
+## [0.19.2](https://github.com/qaldak/cardkeeper/compare/v0.19.1...v0.19.2) (2026-10-12)
+
+### Maintenance
+
+* npm: Bump vue-router from 5.3.1 to 5.4.0 in /app ([f801592](https://github.com/qaldak/cardkeeper/commit/f8015921f931b8b3d78847e6289b8275e1343fda))
+
 ## [0.19.1](https://github.com/qaldak/cardkeeper/compare/v0.19.0...v0.19.1) (2026-10-12)
 
 ### Maintenance
