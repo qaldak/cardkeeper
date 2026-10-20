@@ -1,3 +1,10 @@
+## [0.19.4](https://github.com/qaldak/cardkeeper/compare/v0.19.3...v0.19.4) (2026-10-20)
+
+### Maintenance
+
+* npm: Bump the prisma group in /app with 3 updates ([ae6747d](https://github.com/qaldak/cardkeeper/commit/ae6747d70adf47535143bcd78534b5b993a80079))
+* npm: Bump vue from 3.5.43 to 3.5.44 in /app ([8f12e07](https://github.com/qaldak/cardkeeper/commit/8f12e07b647887de708cd40a54ffa1dc30fb8107))
+
 ## [0.19.3](https://github.com/qaldak/cardkeeper/compare/v0.19.2...v0.19.3) (2026-10-12)
 
 ### Maintenance
