@@ -1,3 +1,9 @@
+## [0.19.5](https://github.com/qaldak/cardkeeper/compare/v0.19.4...v0.19.5) (2026-10-20)
+
+### Maintenance
+
+* npm: Bump zod from 4.6.5 to 4.6.7 in /app ([225ec35](https://github.com/qaldak/cardkeeper/commit/225ec358a6b2105f0870ae2e40b7ac7f7e5bc0f8))
+
 ## [0.19.4](https://github.com/qaldak/cardkeeper/compare/v0.19.3...v0.19.4) (2026-10-20)
 
 ### Maintenance
