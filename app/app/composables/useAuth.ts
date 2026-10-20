@@ -1,10 +1,13 @@
 import type { SessionUserDto } from '#shared/types/api'
+import { OVERVIEW_QUERY_COOKIE } from '#shared/utils/overview-query'
 
 /** The logged in user of this browser. `undefined` means "not asked yet", `null` "not logged in". */
 export function useAuth() {
   const user = useState<SessionUserDto | null | undefined>('auth-user', () => undefined)
   // On the server the request's own cookies have to be forwarded to the API.
   const requestFetch = useRequestFetch()
+  // The overview starts with the defaults again after a login or logout.
+  const forgetOverview = () => { useCookie(OVERVIEW_QUERY_COOKIE).value = null }
 
   async function load(force = false): Promise<SessionUserDto | null> {
     if (user.value !== undefined && !force) {
@@ -21,6 +24,7 @@ export function useAuth() {
 
   async function login(name: string, password: string) {
     user.value = await $fetch<SessionUserDto>('/api/auth/login', { method: 'POST', body: { name, password } })
+    forgetOverview()
     return user.value
   }
 
@@ -30,6 +34,7 @@ export function useAuth() {
     }
     finally {
       user.value = null
+      forgetOverview()
     }
   }
 
