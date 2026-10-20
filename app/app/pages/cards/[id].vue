@@ -526,7 +526,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
         </section>
 
         <UFormField :label="t('card.fields.description')">
-          <UTextarea :model-value="translation?.description ?? ''" readonly :rows="3" class="w-full" :ui="readonlyUi" />
+          <UTextarea :model-value="translation?.description ?? ''" readonly autoresize :rows="3" :maxrows="6" class="w-full" :ui="readonlyUi" />
         </UFormField>
 
         <section>

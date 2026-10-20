@@ -2,6 +2,7 @@
 import type { CardListResponseDto, FacetsDto, GameDto, UserDto } from '#shared/types/api'
 import { defaultDirection, isCardSort, isSortDirection, sortsForGame } from '#shared/utils/sorting'
 import { ALL_GAMES, overviewGame, OVERVIEW_GAME_COOKIE } from '#shared/utils/last-game'
+import { ALL_OWNERS, overviewOwner, OVERVIEW_QUERY_COOKIE } from '#shared/utils/overview-query'
 import { CARD_STATUSES, isCardStatus } from '#shared/utils/status'
 
 const { t } = useI18n()
@@ -32,7 +33,9 @@ const status = computed(() => {
   const value = one(route.query.status)
   return isCardStatus(value) ? value : undefined
 })
-const owner = computed(() => one(route.query.owner))
+// Without an owner in the url the cards of the logged in user are shown; "all owners" is `owner=all`.
+const { user: me } = useAuth()
+const owner = computed(() => overviewOwner(one(route.query.owner), me.value?.id))
 const q = computed(() => one(route.query.q))
 const page = computed(() => Math.max(1, Number(one(route.query.page)) || 1))
 
@@ -83,6 +86,16 @@ const apiQuery = computed(() => ({
   page: page.value,
 }))
 
+// What the overview shows is remembered until the next login or logout (see the overview-query middleware).
+const remembered = useCookie<Record<string, string> | null>(OVERVIEW_QUERY_COOKIE, { sameSite: 'lax', default: () => null })
+watch(() => route.query, (query) => {
+  if (route.path !== '/') {
+    return // on the way to another page the query is already the other page's
+  }
+  const flat = Object.fromEntries(Object.entries(query).flatMap(([key, value]) => typeof value === 'string' && value !== '' ? [[key, value]] : []))
+  remembered.value = Object.keys(flat).length > 0 ? flat : null
+}, { immediate: true })
+
 const { data, error } = await useFetch<CardListResponseDto>('/api/cards', { query: apiQuery })
 const { data: facets } = await useFetch<FacetsDto>('/api/facets', { query: computed(() => ({ game: game.value })) })
 
@@ -116,7 +129,8 @@ function setGame(slug: string | undefined) {
 }
 
 const filterValue = (value: string | undefined) => value ?? ALL
-const setFilter = (key: string, value: string) => setQuery({ [key]: value === ALL ? undefined : value })
+// "All owners" is written to the url, because no owner there means the logged in user.
+const setFilter = (key: string, value: string) => setQuery({ [key]: value === ALL ? (key === 'owner' ? ALL_OWNERS : undefined) : value })
 
 const statusItems = computed(() => [
   { label: t('overview.allStatus'), value: ALL },
@@ -185,9 +199,9 @@ const hasFilters = computed(() => Boolean(
   || levelMin.value !== undefined || levelMax.value !== undefined || hpMin.value !== undefined || hpMax.value !== undefined,
 ))
 
-// The game and the sort order are not filters and stay when the filters are reset.
+// The game and the sort order are not filters and stay when the filters are reset, which includes the owner: "all owners".
 function resetFilters() {
-  const keep = { game: one(route.query.game), sort: one(route.query.sort), dir: one(route.query.dir) }
+  const keep = { game: one(route.query.game), sort: one(route.query.sort), dir: one(route.query.dir), owner: ALL_OWNERS }
   router.push({ query: Object.fromEntries(Object.entries(keep).filter(([, value]) => value !== undefined)) as Record<string, string> })
 }
 </script>

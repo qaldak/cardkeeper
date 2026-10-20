@@ -17,7 +17,8 @@ Everything runs in containers: there is nothing to install on the host except Do
 - Light and dark appearance: follows the device by default (light if the device says nothing); a switch in the header
   chooses light, dark or system and is remembered in the browser
 - Collection overview with filters for status, owner, card type, monster type, attribute, rarity and a level range
-  (dropdowns are filled from the collection); the search box matches names in every language, set code and set name;
+  (dropdowns are filled from the collection); after a login the owner filter is the logged in user, and the filters, sort
+  order and page are kept when going to a card and back, until the next login or logout; the search box matches names in every language, set code and set name;
   sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come
   last); total value of the active cards
 - Card detail page: texts in German and English with a language switch (German first, a language the card does not
