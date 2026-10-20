@@ -1,3 +1,9 @@
+## [0.20.0](https://github.com/qaldak/cardkeeper/compare/v0.19.5...v0.20.0) (2026-10-20)
+
+### Features
+
+* own cards as default filter, keep the overview filters, taller description ([b6b547d](https://github.com/qaldak/cardkeeper/commit/b6b547dbaeb392ca442630dd6f9f52541901f5d7))
+
 ## [0.19.5](https://github.com/qaldak/cardkeeper/compare/v0.19.4...v0.19.5) (2026-10-20)
 
 ### Maintenance
