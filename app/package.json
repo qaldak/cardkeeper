@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.17.0",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "@types/pg": "^8.23.1",
     "eslint": "^10.12.0",
     "prisma": "7.10.1",
