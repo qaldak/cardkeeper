@@ -1,3 +1,9 @@
+## [0.21.0](https://github.com/qaldak/cardkeeper/compare/v0.20.0...v0.21.0) (2026-10-21)
+
+### Features
+
+* page through the cards on the card page in the order of the overview ([c18785e](https://github.com/qaldak/cardkeeper/commit/c18785e71c75d30248b4ee0032d8ed820698fa60))
+
 ## [0.20.0](https://github.com/qaldak/cardkeeper/compare/v0.19.5...v0.20.0) (2026-10-20)
 
 ### Features
