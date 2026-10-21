@@ -323,6 +323,22 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect((await h.services.cards.list({ game: 'pokemon' }, all)).summary.count).toBe(0)
     })
 
+    it('applies the other filters to a search in any language', async () => {
+      const { anna, sven, magician, dragon, spare } = await seed()
+      // The English title finds the card exactly where the German one does, with and without a further filter.
+      for (const text of ['Dark Magician', 'Dunkler Magier']) {
+        expect(await ids({ q: text })).toEqual([magician.id, spare.id])
+        expect(await ids({ q: text, owner: anna.id })).toEqual([magician.id])
+        expect(await ids({ q: text, owner: sven.id })).toEqual([])
+        expect(await ids({ q: text, owner: 'none' })).toEqual([spare.id])
+        expect(await ids({ q: text, status: 'SOLD' })).toEqual([spare.id])
+        expect(await ids({ q: text, game: 'ygo', rarity: 'Ultra Rare' })).toEqual([magician.id, spare.id])
+        expect(await ids({ q: text, game: 'pokemon' })).toEqual([])
+      }
+      expect(await ids({ q: 'Blue-Eyes White', owner: sven.id })).toEqual([dragon.id])
+      expect(await ids({ q: 'Blue-Eyes White', owner: anna.id })).toEqual([])
+    })
+
     it('searches names in every language, set code, set name and passcode', async () => {
       const { dragon, magician, spare, spell } = await seed()
       expect(await ids({ q: 'blue-eyes' })).toEqual([dragon.id])
