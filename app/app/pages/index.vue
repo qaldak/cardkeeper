@@ -2,7 +2,7 @@
 import type { CardListResponseDto, FacetsDto, GameDto, UserDto } from '#shared/types/api'
 import { defaultDirection, isCardSort, isSortDirection, sortsForGame } from '#shared/utils/sorting'
 import { ALL_GAMES, overviewGame, OVERVIEW_GAME_COOKIE } from '#shared/utils/last-game'
-import { ALL_OWNERS, overviewOwner, OVERVIEW_QUERY_COOKIE } from '#shared/utils/overview-query'
+import { ALL_OWNERS, cardLinkQuery, overviewOwner, OVERVIEW_QUERY_COOKIE } from '#shared/utils/overview-query'
 import { CARD_STATUSES, isCardStatus } from '#shared/utils/status'
 
 const { t } = useI18n()
@@ -95,6 +95,9 @@ watch(() => route.query, (query) => {
   const flat = Object.fromEntries(Object.entries(query).flatMap(([key, value]) => typeof value === 'string' && value !== '' ? [[key, value]] : []))
   remembered.value = Object.keys(flat).length > 0 ? flat : null
 }, { immediate: true })
+
+// A card opened from here pages through the cards in this order (see the card page).
+const linkQuery = computed(() => cardLinkQuery(apiQuery.value))
 
 const { data, error } = await useFetch<CardListResponseDto>('/api/cards', { query: apiQuery })
 const { data: facets } = await useFetch<FacetsDto>('/api/facets', { query: computed(() => ({ game: game.value })) })
@@ -321,7 +324,7 @@ function resetFilters() {
     <UAlert v-if="error" color="error" variant="subtle" :title="t('errors.unknown')" class="mb-4" />
 
     <div v-if="data && data.items.length > 0" class="flex flex-wrap gap-5">
-      <CardTile v-for="card in data.items" :key="card.id" :card="card" :show-game="game === undefined" />
+      <CardTile v-for="card in data.items" :key="card.id" :card="card" :show-game="game === undefined" :link-query="linkQuery" />
     </div>
 
     <div v-else-if="data" class="rounded-xl border border-dashed border-accented bg-default px-6 py-12 text-center">

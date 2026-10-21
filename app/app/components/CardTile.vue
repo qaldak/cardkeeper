@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CardListItemDto } from '#shared/types/api'
 
-const props = defineProps<{ card: CardListItemDto, showGame?: boolean }>()
+const props = defineProps<{ card: CardListItemDto, showGame?: boolean, linkQuery?: Record<string, string> }>()
 const { t } = useI18n()
 const { money } = useFormat()
 
@@ -17,7 +17,7 @@ const subtitle = computed(() =>
 
 <template>
   <NuxtLink
-    :to="`/cards/${card.id}`"
+    :to="{ path: `/cards/${card.id}`, query: linkQuery }"
     class="flex w-[220px] flex-col overflow-hidden rounded-xl border border-default bg-default transition-shadow hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary"
   >
     <div class="flex h-[140px] items-center justify-center bg-(--app-art) text-[13px] text-primary">

@@ -163,6 +163,14 @@
     "readOnly": {
       "owned": "Diese Karte gehört {owner}. Du kannst sie ansehen, ändern kann sie aber nur {owner}.",
       "noOwner": "Diese Karte hat keinen Besitzer und kann nicht geändert werden. Der Besitzer muss in der Datenbank gesetzt werden."
+    },
+    "paging": {
+      "previous": "Vorherige Karte",
+      "next": "Nächste Karte",
+      "position": "{position} / {total}",
+      "unsavedTitle": "Änderungen speichern?",
+      "unsavedText": "Diese Karte hat Änderungen, die noch nicht gespeichert sind. Soll vor dem Wechsel gespeichert werden?",
+      "discard": "Verwerfen"
     }
   },
   "add": {

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { CardDetailDto, CardImageDto, UserDto } from '#shared/types/api'
+import type { CardDetailDto, CardImageDto, CardNeighborsDto, UserDto } from '#shared/types/api'
 import { POKEMON_VARIANTS, type PokemonDetails } from '#shared/types/pokemon'
 import { isEditionKey } from '#shared/utils/editions'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
 import { preferredLanguage } from '#shared/utils/languages'
+import { hasCardNavigation, navApiQuery, overviewQueryOf } from '#shared/utils/overview-query'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
 
 const { t } = useI18n()
@@ -14,12 +15,30 @@ const apiError = useApiError()
 const { moneyWithOriginal, dateTime } = useFormat()
 const labels = useGameLabels()
 
+// Paging to another card shows this page for the other card from scratch.
+definePageMeta({ key: route => String(route.params.id) })
+
 const id = Number(route.params.id)
 const { data: card, error } = await useFetch<CardDetailDto>(`/api/cards/${id}`)
 if (error.value || !card.value) {
   throw createError({ statusCode: error.value?.statusCode ?? 404, fatal: true })
 }
 const { data: users } = await useFetch<UserDto[]>('/api/users')
+
+// --- Paging through the cards -----------------------------------------------------------------
+
+// A card opened from the overview carries the filters and the sort order of the overview in its url (`nav=1`); the cards
+// before and after it in that order are asked for here. Opened any other way (a link, a new card) there is no paging.
+const paging = hasCardNavigation(route.query)
+const { data: neighbors, refresh: refreshNeighbors } = await useFetch<CardNeighborsDto>(`/api/cards/${id}/neighbors`, {
+  query: navApiQuery(route.query),
+  immediate: paging,
+  watch: false,
+})
+const canPage = computed(() => paging && neighbors.value?.position != null)
+const pagingPosition = computed(() => t('card.paging.position', { position: neighbors.value?.position ?? 0, total: neighbors.value?.total ?? 0 }))
+// "Back to overview" leads to the page of the overview that shows this card, with the filters it had.
+const overviewLink = computed(() => paging ? { path: '/', query: overviewQueryOf(route.query, neighbors.value?.page) } : '/')
 
 // Everybody sees every card, but only the owner changes it (the server enforces this, the form only reflects it).
 const { user: me } = useAuth()
@@ -162,10 +181,11 @@ function buildPatch(current: CardDetailDto): Record<string, unknown> {
   return patch
 }
 
-async function save() {
+/** Saves the changed fields; `true` when there was nothing to save or it worked. */
+async function save(): Promise<boolean> {
   const patch = buildPatch(card.value!)
   if (Object.keys(patch).length === 0) {
-    return
+    return true
   }
   saving.value = true
   try {
@@ -173,12 +193,52 @@ async function save() {
     card.value = updated
     Object.assign(form, toForm(updated))
     toast.add({ title: t('common.saved'), color: 'success' })
+    if (paging) {
+      await refreshNeighbors() // the change can move the card (or take it out of the list)
+    }
+    return true
   }
   catch (e) {
     toast.add({ title: apiError(e), color: 'error' })
+    return false
   }
   finally {
     saving.value = false
+  }
+}
+
+// --- Going to the card before or after --------------------------------------------------------
+
+const hasUnsavedChanges = computed(() => canEdit.value && Object.keys(buildPatch(card.value!)).length > 0)
+// The card the user wants to go to while there are unsaved changes (the dialog asks what to do with them).
+const pendingCardId = ref<number | null>(null)
+const unsavedOpen = ref(false)
+
+const openCard = (targetId: number) => navigateTo({ path: `/cards/${targetId}`, query: route.query })
+
+function goToCard(targetId: number | null | undefined) {
+  if (targetId == null) {
+    return
+  }
+  if (hasUnsavedChanges.value) {
+    pendingCardId.value = targetId
+    unsavedOpen.value = true
+    return
+  }
+  return openCard(targetId)
+}
+
+async function saveAndGo() {
+  if (pendingCardId.value !== null && await save()) {
+    unsavedOpen.value = false
+    await openCard(pendingCardId.value)
+  }
+}
+
+async function discardAndGo() {
+  unsavedOpen.value = false
+  if (pendingCardId.value !== null) {
+    await openCard(pendingCardId.value)
   }
 }
 
@@ -327,9 +387,38 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
 
 <template>
   <div v-if="card" class="mx-auto max-w-[1040px] px-8 pb-12 pt-6">
-    <NuxtLink to="/" class="mb-4 inline-block text-[13px] text-muted no-underline">
-      {{ t('common.back') }}
-    </NuxtLink>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <NuxtLink :to="overviewLink" class="text-[13px] text-muted no-underline" data-test="back-to-overview">
+        {{ t('common.back') }}
+      </NuxtLink>
+      <div v-if="canPage" class="flex items-center gap-2" data-test="card-paging">
+        <UButton
+          type="button"
+          color="neutral"
+          variant="outline"
+          size="sm"
+          icon="i-lucide-chevron-left"
+          :disabled="neighbors?.previousId == null"
+          :aria-label="t('card.paging.previous')"
+          :title="t('card.paging.previous')"
+          data-test="card-previous"
+          @click="goToCard(neighbors?.previousId)"
+        />
+        <span class="min-w-16 text-center text-[13px] text-muted" data-test="card-position">{{ pagingPosition }}</span>
+        <UButton
+          type="button"
+          color="neutral"
+          variant="outline"
+          size="sm"
+          icon="i-lucide-chevron-right"
+          :disabled="neighbors?.nextId == null"
+          :aria-label="t('card.paging.next')"
+          :title="t('card.paging.next')"
+          data-test="card-next"
+          @click="goToCard(neighbors?.nextId)"
+        />
+      </div>
+    </div>
 
     <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
@@ -636,6 +725,25 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             {{ t('card.image.download') }}
           </UButton>
         </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="unsavedOpen" :title="t('card.paging.unsavedTitle')">
+      <template #body>
+        <p class="text-sm">
+          {{ t('card.paging.unsavedText') }}
+        </p>
+      </template>
+      <template #footer>
+        <UButton color="neutral" variant="outline" data-test="unsaved-cancel" @click="unsavedOpen = false">
+          {{ t('common.cancel') }}
+        </UButton>
+        <UButton color="neutral" variant="outline" data-test="unsaved-discard" @click="discardAndGo">
+          {{ t('card.paging.discard') }}
+        </UButton>
+        <UButton :loading="saving" data-test="unsaved-save" @click="saveAndGo">
+          {{ t('common.save') }}
+        </UButton>
       </template>
     </UModal>
 
