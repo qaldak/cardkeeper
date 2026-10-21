@@ -100,6 +100,20 @@ export interface PricePointDto {
   fetchedAt: string
 }
 
+/** The neighbours of a card in the order of the overview, for paging through the cards. */
+export interface CardNeighborsDto {
+  /** 1-based place of the card in the list; `null` when it is not in the list (any more). */
+  position: number | null
+  /** How many cards the list has. */
+  total: number
+  /** The card before (the last one at the start of the list); `null` when there is no other card. */
+  previousId: number | null
+  /** The card after (the first one at the end of the list); `null` when there is no other card. */
+  nextId: number | null
+  /** The page of the overview that shows the card. */
+  page: number | null
+}
+
 export interface CardDetailDto {
   id: number
   game: { slug: string, displayName: string }

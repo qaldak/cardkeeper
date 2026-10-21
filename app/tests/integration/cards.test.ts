@@ -323,6 +323,51 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect((await h.services.cards.list({ game: 'pokemon' }, all)).summary.count).toBe(0)
     })
 
+    describe('neighbours for paging', () => {
+      const pageSize = 48
+      const order = { sort: 'name' as const, dir: 'asc' as const }
+
+      it('finds the cards before and after in the order of the list, wrapping around at both ends', async () => {
+        const { magician, dragon, spell } = await seed()
+        // By name: Blauäugiger (dragon), Dunkler Magier (magician, spare), Obscure Spell (spell).
+        const first = await h.services.cards.neighbors(dragon.id, {}, order, pageSize)
+        const last = await h.services.cards.neighbors(spell.id, {}, order, pageSize)
+        const sorted = (await h.services.cards.list({}, all, order)).items.map(item => item.id)
+        expect(sorted[0]).toBe(dragon.id)
+        expect(first).toMatchObject({ position: 1, total: 4, previousId: sorted[3], nextId: sorted[1], page: 1 })
+        expect(last).toMatchObject({ position: 4, total: 4, previousId: sorted[2], nextId: sorted[0] })
+        const middle = await h.services.cards.neighbors(magician.id, {}, order, pageSize)
+        expect(middle.position).toBe(sorted.indexOf(magician.id) + 1)
+        expect([middle.previousId, middle.nextId]).toEqual([sorted[sorted.indexOf(magician.id) - 1], sorted[sorted.indexOf(magician.id) + 1]])
+      })
+
+      it('follows the sort order and its direction', async () => {
+        const { dragon } = await seed()
+        const asc = await h.services.cards.neighbors(dragon.id, {}, { sort: 'name', dir: 'asc' }, pageSize)
+        const desc = await h.services.cards.neighbors(dragon.id, {}, { sort: 'name', dir: 'desc' }, pageSize)
+        expect(asc.position).toBe(1)
+        expect(desc.position).toBe(4)
+        expect(desc.nextId).toBe(asc.previousId)
+      })
+
+      it('only pages through the cards that match the filters', async () => {
+        const { anna, magician, sven, dragon } = await seed()
+        const mine = await h.services.cards.neighbors(magician.id, { owner: anna.id }, order, pageSize)
+        // Anna owns the Dark Magician only (the sold copy and the spell have no owner any more).
+        expect(mine).toEqual({ position: 1, total: 1, previousId: null, nextId: null, page: 1 })
+        const searched = await h.services.cards.neighbors(dragon.id, { q: 'Dark Magician' }, order, pageSize)
+        expect(searched).toMatchObject({ position: null, total: 2, previousId: null, nextId: null, page: null })
+        expect((await h.services.cards.neighbors(dragon.id, { owner: sven.id }, order, pageSize)).position).toBe(1)
+      })
+
+      it('says on which page of the overview the card is', async () => {
+        const { dragon, spell } = await seed()
+        expect((await h.services.cards.neighbors(dragon.id, {}, order, 2)).page).toBe(1)
+        expect((await h.services.cards.neighbors(spell.id, {}, order, 2)).page).toBe(2)
+        expect((await h.services.cards.neighbors(spell.id, {}, order, 3)).page).toBe(2)
+      })
+    })
+
     it('applies the other filters to a search in any language', async () => {
       const { anna, sven, magician, dragon, spare } = await seed()
       // The English title finds the card exactly where the German one does, with and without a further filter.

@@ -1,5 +1,5 @@
 import { Prisma, type PrismaClient } from '../generated/prisma/client'
-import type { CardDetailDto, CardListResponseDto, FacetsDto, LookupCandidateDto } from '../../shared/types/api'
+import type { CardDetailDto, CardListResponseDto, CardNeighborsDto, FacetsDto, LookupCandidateDto } from '../../shared/types/api'
 import { EDITION_KEYS } from '../../shared/utils/editions'
 import { eszettVariants } from '../../shared/utils/eszett'
 import { getGameConfig } from '../../shared/utils/game-config'
@@ -184,6 +184,36 @@ export function createCardService(deps: CardServiceDeps) {
   const priceRows = (merged: MergedCard) =>
     merged.prices.map(price => ({ source: price.source, price: price.price, currency: price.currency }))
 
+  /** What is loaded of every card to filter, sort and summarize the overview. */
+  const sortSelect = () => ({
+    id: true,
+    name: true,
+    createdAt: true,
+    purchaseDate: true,
+    status: true,
+    gameSpecificAttributes: true,
+    priceHistory: {
+      where: { source: config.priceSource },
+      orderBy: [{ fetchedAt: 'desc' }, { id: 'desc' }],
+      take: 1,
+      select: { price: true, currency: true },
+    },
+  }) satisfies Prisma.CardSelect
+
+  const toSortRow = (row: Prisma.CardGetPayload<{ select: ReturnType<typeof sortSelect> }>): SortRow => {
+    const latest = row.priceHistory[0]
+    const attributes = row.gameSpecificAttributes as Record<string, unknown>
+    return {
+      id: row.id,
+      name: row.name,
+      createdAt: row.createdAt,
+      purchaseDate: row.purchaseDate,
+      level: typeof attributes.level === 'number' ? attributes.level : null,
+      hp: typeof attributes.hp === 'number' ? attributes.hp : null,
+      priceCents: latest ? toCents(Number(latest.price)) : null,
+    }
+  }
+
   return {
     get,
 
@@ -197,39 +227,14 @@ export function createCardService(deps: CardServiceDeps) {
       // Loads what is needed to sort and to summarize every matching card, not just the current
       // page. Level and latest price cannot be sorted by the database (JSON attribute, related
       // table), and a personal collection is small enough that this is cheap.
-      const rows = await db.card.findMany({
-        where,
-        select: {
-          id: true,
-          name: true,
-          createdAt: true,
-          purchaseDate: true,
-          status: true,
-          gameSpecificAttributes: true,
-          priceHistory: {
-            where: { source: config.priceSource },
-            orderBy: [{ fetchedAt: 'desc' }, { id: 'desc' }],
-            take: 1,
-            select: { price: true, currency: true },
-          },
-        },
-      })
+      const rows = await db.card.findMany({ where, select: sortSelect() })
 
       const centsByCurrency = new Map<string, number>()
       let activeCount = 0
       const sortRowsInput: SortRow[] = []
       for (const row of rows) {
         const latest = row.priceHistory[0]
-        const attributes = row.gameSpecificAttributes as Record<string, unknown>
-        sortRowsInput.push({
-          id: row.id,
-          name: row.name,
-          createdAt: row.createdAt,
-          purchaseDate: row.purchaseDate,
-          level: typeof attributes.level === 'number' ? attributes.level : null,
-          hp: typeof attributes.hp === 'number' ? attributes.hp : null,
-          priceCents: latest ? toCents(Number(latest.price)) : null,
-        })
+        sortRowsInput.push(toSortRow(row))
         if (row.status === 'ACTIVE') {
           activeCount += 1
           if (latest) {
@@ -264,6 +269,33 @@ export function createCardService(deps: CardServiceDeps) {
           activeCount,
           totals: totalsOf(centsByCurrency, convert),
         },
+      }
+    },
+
+    /**
+     * The cards before and after one card in the order of the overview (same filters and sort order), for paging through
+     * the cards on the card page. After the last card comes the first, before the first the last. `position` is `null`
+     * when the card is not in the list (any more), e.g. after a change that no longer matches the filters.
+     */
+    async neighbors(
+      id: number,
+      filters: CardFilters,
+      order: { sort: CardSort, dir?: SortDirection },
+      pageSize: number,
+    ): Promise<CardNeighborsDto> {
+      const rows = await db.card.findMany({ where: buildCardWhere(filters), select: sortSelect() })
+      const ids = sortRows(rows.map(toSortRow), order.sort, order.dir).map(row => row.id)
+      const index = ids.indexOf(id)
+      const total = ids.length
+      if (index === -1) {
+        return { position: null, total, previousId: null, nextId: null, page: null }
+      }
+      return {
+        position: index + 1,
+        total,
+        previousId: total > 1 ? ids[(index - 1 + total) % total]! : null,
+        nextId: total > 1 ? ids[(index + 1) % total]! : null,
+        page: Math.floor(index / pageSize) + 1,
       }
     },
 

@@ -28,3 +28,59 @@ export function rememberedQuery(value: unknown): Record<string, string> | null {
   const entries = Object.entries(value).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1] !== '')
   return entries.length > 0 ? Object.fromEntries(entries) : null
 }
+
+/**
+ * The parts of the overview that a card page needs to page through the cards in the order of the overview: the url of a
+ * card opened from the overview carries them (and `nav=1`).
+ */
+const NAV_KEYS = [
+  'game', 'status', 'owner', 'q', 'cardType', 'race', 'attribute', 'category', 'pokemonType', 'stage', 'variant', 'rarity',
+  'levelMin', 'levelMax', 'hpMin', 'hpMax', 'sort', 'dir',
+] as const
+
+type Params = Record<string, unknown>
+
+const text = (value: unknown): string | undefined =>
+  typeof value === 'string' && value !== '' ? value : typeof value === 'number' ? String(value) : undefined
+
+/** The url query of a card opened from the overview; `state` is what the overview asks the list for (all games and all owners are `undefined`). */
+export function cardLinkQuery(state: Params): Record<string, string> {
+  const query: Record<string, string> = { nav: '1' }
+  for (const key of NAV_KEYS) {
+    const value = text(state[key]) ?? (key === 'game' || key === 'owner' ? 'all' : undefined)
+    if (value !== undefined) {
+      query[key] = value
+    }
+  }
+  return query
+}
+
+/** Whether a card page was opened from the overview, so that it can page through the cards. */
+export const hasCardNavigation = (query: Params): boolean => query.nav === '1'
+
+/** The filters and sort order of a card link as the list API takes them. */
+export function navApiQuery(query: Params): Record<string, string> {
+  const result: Record<string, string> = {}
+  for (const key of NAV_KEYS) {
+    const value = text(query[key])
+    if (value !== undefined && !((key === 'game' || key === 'owner') && value === ALL_OWNERS)) {
+      result[key] = value
+    }
+  }
+  return result
+}
+
+/** The url query of the overview a card link came from, at the page that shows the card (`page` is omitted for the first). */
+export function overviewQueryOf(query: Params, page: number | null | undefined): Record<string, string> {
+  const result: Record<string, string> = {}
+  for (const key of NAV_KEYS) {
+    const value = text(query[key])
+    if (value !== undefined) {
+      result[key] = value
+    }
+  }
+  if (page && page > 1) {
+    result.page = String(page)
+  }
+  return result
+}

@@ -163,6 +163,14 @@
     "readOnly": {
       "owned": "This card belongs to {owner}. You can look at it, but only {owner} can change it.",
       "noOwner": "This card has no owner and cannot be changed. The owner has to be set in the database."
+    },
+    "paging": {
+      "previous": "Previous card",
+      "next": "Next card",
+      "position": "{position} / {total}",
+      "unsavedTitle": "Save changes?",
+      "unsavedText": "This card has changes that are not saved yet. Save them before switching?",
+      "discard": "Discard"
     }
   },
   "add": {
