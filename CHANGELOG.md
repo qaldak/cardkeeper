@@ -1,3 +1,9 @@
+## [0.23.0](https://github.com/qaldak/cardkeeper/compare/v0.22.0...v0.23.0) (2026-10-21)
+
+### Features
+
+* refuse cross-site writes, add security headers and a coverage script ([d08fa8c](https://github.com/qaldak/cardkeeper/commit/d08fa8c6fe86c6286dce42497f27c0fa96cefb89))
+
 ## [0.22.0](https://github.com/qaldak/cardkeeper/compare/v0.21.0...v0.22.0) (2026-10-21)
 
 ### Features
