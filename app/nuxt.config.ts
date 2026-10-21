@@ -33,6 +33,19 @@ export default defineNuxtConfig({
     preset: 'node-server',
   },
 
+  // Headers of every response (pages, API, images): no guessing of file types, no framing by other sites, no address of
+  // a card page in the Referer of a link to another site. A content security policy needs the inline scripts of Nuxt
+  // to be allowed and is left to the reverse proxy; so is HSTS.
+  routeRules: {
+    '/**': {
+      headers: {
+        'x-content-type-options': 'nosniff',
+        'x-frame-options': 'DENY',
+        'referrer-policy': 'same-origin',
+      },
+    },
+  },
+
   i18n: {
     strategy: 'no_prefix',
     defaultLocale: 'de',
