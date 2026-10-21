@@ -162,7 +162,10 @@ over to another user, after which only that user can change it.
 
 - **Safeguards:** a user name is blocked for 15 minutes after 10 failed logins (the initial password is public, so it
   could otherwise be guessed for every name); a login lasts 30 days; changing or resetting a password logs the other
-  browsers out. Removing a user in the database leaves their cards without an owner.
+  browsers out. Removing a user in the database leaves their cards without an owner. The login cookie is `SameSite=Lax`,
+  and a write request that a browser marks as coming from another site is refused; every response carries
+  `X-Content-Type-Options`, `X-Frame-Options` and `Referrer-Policy`. HTTPS, HSTS and a content security policy are for
+  the reverse proxy.
 
 Upgrading from a version without logins: add `SESSION_SECRET` and `USERS` to the `.env` file (the stack does not start
 without them). The existing players become users with the initial password and keep their cards; add everybody else to
@@ -237,6 +240,8 @@ releases, not for branches.
 - **Integration tests** (`app/tests/integration`) run the services against a real PostgreSQL with a fake card API and
   a temporary image directory. They need `TEST_DATABASE_URL` and are skipped without it. They truncate all tables, which is
   why they never use `DATABASE_URL`.
+- `npm run test:coverage` (in `app/`) shows how much of the server and shared code the tests reach (about 86 % of the lines at
+  the time of writing) and writes an HTML report to `app/coverage/`.
 
 The GitHub workflow [`tests.yml`](.github/workflows/tests.yml) runs lint, type check and all tests (with a PostgreSQL
 service), a Docker build check and a Compose validation on every pull request, and as the first stage of every release.

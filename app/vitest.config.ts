@@ -2,6 +2,13 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
+    // `npm run test:coverage`: what the tests reach of the server code and the shared helpers (the Prisma client is generated).
+    coverage: {
+      provider: 'v8',
+      include: ['server/**/*.ts', 'shared/**/*.ts'],
+      exclude: ['server/generated/**'],
+      reporter: ['text-summary', 'html'],
+    },
     projects: [
       {
         test: {

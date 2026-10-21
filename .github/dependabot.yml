@@ -15,6 +15,11 @@ updates:
         patterns:
           - "prisma"
           - "@prisma/*"
+      # The coverage provider must have the same version as vitest.
+      vitest:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
     ignore:
       # vue-tsc needs to support a new TypeScript major first.
       - dependency-name: "typescript"
