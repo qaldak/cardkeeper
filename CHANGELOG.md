@@ -1,3 +1,9 @@
+## [0.22.0](https://github.com/qaldak/cardkeeper/compare/v0.21.0...v0.22.0) (2026-10-21)
+
+### Features
+
+* page through the cards with the arrow keys ([9976578](https://github.com/qaldak/cardkeeper/commit/9976578a14bb460bd1684e1d679bd28070d9153c))
+
 ## [0.21.0](https://github.com/qaldak/cardkeeper/compare/v0.20.0...v0.21.0) (2026-10-21)
 
 ### Features
