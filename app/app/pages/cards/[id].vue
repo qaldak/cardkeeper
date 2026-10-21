@@ -274,19 +274,32 @@ const zoomOpen = ref(false)
 const imagePosition = computed(() => images.value.findIndex(image => image.id === selectedImage.value?.id) + 1)
 
 // Left and right arrow key switch the image while the dialog is open.
-function onZoomKey(event: KeyboardEvent) {
-  if (!zoomOpen.value || images.value.length < 2) {
+// The arrow keys step through the images while the zoom is open, otherwise through the cards (when the page was opened
+// from the overview). They leave alone what is typed or chosen in a field or a list, any dialog, and keys with a
+// modifier (Alt+← is the browser's own "back").
+const KEY_STEPS: Record<string, -1 | 1> = { ArrowLeft: -1, ArrowRight: 1 }
+const OWN_KEYS = 'input, textarea, select, [contenteditable], [role=combobox], [role=listbox], [role=option], [role=menu], [role=dialog]'
+
+function onArrowKey(event: KeyboardEvent) {
+  const step = KEY_STEPS[event.key]
+  if (!step || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
     return
   }
-  if (event.key === 'ArrowLeft') {
-    stepImage(-1)
+  if (zoomOpen.value) {
+    if (images.value.length >= 2) {
+      stepImage(step)
+    }
+    return
   }
-  else if (event.key === 'ArrowRight') {
-    stepImage(1)
+  const target = event.target instanceof Element ? event.target : null
+  if (!canPage.value || unsavedOpen.value || deleteOpen.value || target?.closest(OWN_KEYS)) {
+    return
   }
+  event.preventDefault()
+  goToCard(step < 0 ? neighbors.value?.previousId : neighbors.value?.nextId)
 }
-onMounted(() => window.addEventListener('keydown', onZoomKey))
-onBeforeUnmount(() => window.removeEventListener('keydown', onZoomKey))
+onMounted(() => window.addEventListener('keydown', onArrowKey))
+onBeforeUnmount(() => window.removeEventListener('keydown', onArrowKey))
 
 function stepImage(delta: number) {
   const list = images.value
