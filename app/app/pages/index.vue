@@ -195,6 +195,47 @@ const summaryText = computed(() => {
   return `${count} · ${t('overview.totalValue', { value: total })}`
 })
 
+// --- Export -----------------------------------------------------------------------------------
+
+const { locale, locales } = useI18n()
+const exportOpen = ref(false)
+const exportItems = computed(() => [[
+  { label: t('export.menu.table'), icon: 'i-lucide-table', onSelect: () => { exportOpen.value = true } },
+], [
+  // The copy for an AI and the printable list come later; the menu shows where they will be.
+  { label: t('export.menu.ai'), icon: 'i-lucide-sparkles', disabled: true },
+  { label: t('export.menu.print'), icon: 'i-lucide-printer', disabled: true },
+]])
+// The download address: the filters and the sort order of the overview (every page), and the language of the interface.
+const exportHref = computed(() => {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(apiQuery.value)) {
+    if (value !== undefined && value !== '' && key !== 'page') {
+      params.set(key, String(value))
+    }
+  }
+  params.set('lang', locale.value)
+  return `/api/export/cards?${params.toString()}`
+})
+const exportSummary = computed(() => {
+  const parts = [
+    game.value ? (games.value ?? []).find(entry => entry.slug === game.value)?.displayName ?? game.value : t('overview.allGames'),
+    ownerItems.value.find(item => item.value === (owner.value ?? ALL))?.label ?? t('overview.allOwners'),
+    statusItems.value.find(item => item.value === (status.value ?? ALL))?.label ?? t('overview.allStatus'),
+    t('export.sortedBy', { sort: t(`overview.sort.${sort.value}`), direction: direction.value === 'asc' ? '↑' : '↓' }),
+  ]
+  if (q.value) {
+    parts.push(`„${q.value}“`)
+  }
+  const furtherFilters = [cardType, race, attribute, category, pokemonType, stage, variant, rarity].some(filter => filter.value)
+    || [levelMin, levelMax, hpMin, hpMax].some(range => range.value !== undefined)
+  if (furtherFilters) {
+    parts.push(t('export.filtersActive'))
+  }
+  return parts
+})
+const exportLanguage = computed(() => locales.value.find(entry => entry.code === locale.value)?.name ?? locale.value)
+
 const pageCount = computed(() => Math.max(1, Math.ceil((data.value?.summary.count ?? 0) / (data.value?.pageSize ?? 48))))
 const hasFilters = computed(() => Boolean(
   status.value || owner.value || q.value || cardType.value || race.value || attribute.value || category.value
@@ -231,6 +272,11 @@ function resetFilters() {
           :title="direction === 'asc' ? t('overview.sort.ascending') : t('overview.sort.descending')"
           @click="flipDirection"
         />
+        <UDropdownMenu :items="exportItems" :content="{ align: 'end' }">
+          <UButton color="primary" icon="i-lucide-download" trailing-icon="i-lucide-chevron-down" data-test="export-menu">
+            {{ t('export.menu.label') }}
+          </UButton>
+        </UDropdownMenu>
       </div>
     </div>
 
@@ -355,5 +401,6 @@ function resetFilters() {
         {{ t('common.next') }}
       </UButton>
     </nav>
-  </div>
+      <ExportDialog v-model:open="exportOpen" :summary="exportSummary" :count="data?.summary.count ?? 0" :href="exportHref" :language="exportLanguage" />
+</div>
 </template>
