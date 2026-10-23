@@ -12,7 +12,8 @@ Format je Eintrag: ID – Kurzbeschreibung | Quelle(n) | Herkunft (`User-Vorgabe
 |---|---|---|
 | A | README.md, docs/KONZEPT.md (Quellen a) | fertig, siehe Abschnitt „Block A" |
 | B | Code, Tests, Konfiguration (Quelle b) | fertig, siehe Abschnitt „Block B“ |
-| C | Chat-Transkript (Quelle c) | offen |
+| C1 | Chat 2026-10-04 bis 2026-10-05 19:57 (Turns 0–141) | fertig |
+| C2 | Chat ab Turn 142 (2026-10-05 19:59) | offen |
 
 Herkunft in Block A ist vorläufig `Abgeleitet` (README/Konzept); der Chat-Abgleich (Block C) hebt Einträge auf `User-Vorgabe`, wo der Chat die Forderung belegt.
 
@@ -214,4 +215,55 @@ Alle R-001…R-061 haben im Code eine Entsprechung (Module siehe Spalte „Quell
 
 ## Block C – Chat
 
-_noch nicht begonnen_
+Quelle: Session-Transkript `~/.claude/projects/-home-user-cardkeeper/8bedf9ba-7343-59cc-8b34-0d701a3efbd5.jsonl` (2026-10-04 bis 2026-10-23, eine durchgehende Session). Ausgewertet werden die Nachrichten des Benutzers, die Fragerunden (AskUserQuestion) und die Antworten/Vorschläge des Assistenten, soweit der Benutzer sie bestätigt hat. Zeitangaben: UTC-Zeitstempel des Transkripts. „Turn“ = laufende Nummer der Textbeiträge in der ausgewerteten Datei (nur zur Orientierung beim Wiederaufnehmen).
+
+Format der Bestätigungen: `ID | Chat-Beleg (Zeitpunkt, Zitat ≤ 15 Wörter) | Wirkung` (Wirkung: Herkunft → `User-Vorgabe`, neuer Eintrag, Zustandsänderung).
+
+### C1 – 2026-10-04 (Erstauftrag bis erste Erweiterungen) bis 2026-10-05 19:57 (Pokémon, Set-Browser-Idee)
+
+| ID | Chat-Beleg | Wirkung |
+|---|---|---|
+| R-001, D-006 | 2026-10-04 09:59 Erstauftrag: „Wir starten mal rein mit yu-gi-oh… andere tcg games können später folgen“ | → User-Vorgabe |
+| R-036 | 2026-10-04 09:59: „keine lokale Installation auf dem Host sondern alles via docker/container“ | → User-Vorgabe |
+| R-051, D-018 | 2026-10-04 09:59: nur minor/patch, „ausser wenn breaking changes mittels feat! … major“ | → User-Vorgabe |
+| R-052, R-035 | 2026-10-04 09:59: „github workflows für die automatischen updates von abhängigkeiten“ und semantic-release | → User-Vorgabe |
+| R-049, R-050 | 2026-10-04 09:59: Unit-Tests „bei einem neuen pr und release“ | → User-Vorgabe |
+| R-034 | 2026-10-04 10:00 Fragerunde „UI-Sprache“: Antwort „i18n Deutsch + Englisch“ | → User-Vorgabe |
+| R-035 | 2026-10-04 10:00 Fragerunde „Docker-Images“: Antwort „Ja, GHCR multi-arch“ | → User-Vorgabe |
+| R-028 | 2026-10-04 10:00 Fragerunde „Währung“: Antwort „Quelle + Originalwährung“ | → User-Vorgabe; später ergänzt durch R-029 (2026-10-10), siehe history |
+| R-201 (neu) | 2026-10-04 09:59: „Bitte verwende für kommentare ausschliesslich englisch. auch für das readme.“ | Anforderung: Code-Kommentare und README auf Englisch (User-Vorgabe, aktiv) |
+| R-202 (neu) | 2026-10-04 09:59: „Falls du fragen hast, stelle die fragen vorzeitig, bevor du code ausführst.“ | Arbeitsweise: Rückfragen vor der Ausführung (User-Vorgabe, aktiv) |
+| R-203 (neu) | 2026-10-04 09:59: „du kannst meine anderen repo (… docker-volume-backup … unbound-publisher) verwenden“ | Hinweis auf Referenz-Repos für Workflows/Release (User-Vorgabe; nur Quelle für D-018/D-035) |
+| R-204 (neu) | 2026-10-04 10:00 Fragerunde „Scope“: Antwort „Kern-MVP“ (ohne Scheduler, Export, `/admin`, Login) | Umfang der ersten Version (User-Vorgabe); später erweitert, siehe history |
+| D-035 (neu) | 2026-10-04 10:43 Assistent: Abweichungen vom Konzept (Node 24 statt 20, Nuxt 4 statt 3, Status-Enum, Tag `v0.0.0`) | Entscheid des Assistenten, vom Benutzer nicht beanstandet (Herkunft: Abgeleitet); erklärt K-001/K-003 |
+| D-033 | 2026-10-04 14:09–14:41: Image-Job hing (QEMU-Build arm64), Fix-PR #4 des Assistenten; Benutzer: „alles geklappt“ | Entscheid: Build-Stufen auf der Plattform des Builders; Herkunft Abgeleitet (vom Benutzer akzeptiert) |
+| R-205 (neu) | 2026-10-04 10:57–14:41: PR-Squash-Merge mit Titel `feat: …` bestimmt die Version; Image-Paket entsteht erst beim ersten Release | Betriebswissen (Abgeleitet), siehe README §Releases |
+| (kein Eintrag) | 2026-10-04 14:55–15:06: Docker-Container ohne Internet auf Fedora 44 (firewalld) | Umgebungsproblem des Benutzers, keine Anforderung |
+| R-023 | 2026-10-04 19:40 (1): „Beim Erfassen einer neuen Karte soll die Sprache nicht mehr gewählt werden… primär DE“ | → User-Vorgabe |
+| D-012, R-025 | 2026-10-04 19:40 (2): „Die erfassten Daten sollen in DE und EN runtergeladen und gespeichert werden.“ | → User-Vorgabe |
+| R-014 | 2026-10-04 19:40 (3): Sprache umstellbar, „primär DE… nicht verfügbar… nicht ausgewählt werden“ | → User-Vorgabe |
+| R-033 | 2026-10-04 19:40 (4): „Aktuell steht ‚von API übernommen‘. Dahinter soll dann ‚geändert am‘ + Datum stehen.“ | → User-Vorgabe |
+| R-015, D-013 | 2026-10-04 19:40 (5): „nur der SET-Code und die Edition geändert werden können… in allen Sprachen“ | → User-Vorgabe |
+| R-022 | 2026-10-04 19:40 (6): Daten neu abrufen, Ausnahmen „Edition und Set Code sowie die Status und Zuweisungsinformationen“ | → User-Vorgabe |
+| R-004, R-006, R-010 | 2026-10-04 19:40 (7): Übersicht nach Kartentyp, Typ, Set, Attribut, Seltenheit, Set-Code, Level einschränken; „Genaue Umsetzung ist freigestellt“ | → User-Vorgabe |
+| R-206 (neu) | 2026-10-06 08:00: „Verwende immer sprechende Namen für einen Branch.“ (auch 2026-10-04 19:40) | Arbeitsweise: sprechende Branch-Namen (User-Vorgabe, aktiv) |
+| R-059 | 2026-10-04 20:47: Fehlerabfang gem. YGOPRODeck-API (HTTP 400 mit Fehler) prüfen | → User-Vorgabe; Assistent: nur „No card matching“ = leer, andere 400 als 502 mit Text |
+| R-207 (neu) | 2026-10-05 17:18: Hinweis „änderbar“ an Set-Code/Edition entfernen („bereits durch das beschreibbare Feld ersichtlich“) | UI: keine Textmarke „änderbar“ an editierbaren Feldern (User-Vorgabe, aktiv) |
+| R-011 | 2026-10-05 17:18: Sortierung Name, Level, Kaufdatum, Preis, auf-/absteigend | → User-Vorgabe |
+| R-208 (neu) | 2026-10-05 17:18: Kartentyp/Typ/Attribut sollen „immer der gleiche Wert“ sein, unabhängig von der Sprache | Anforderung: sprachunabhängige, einheitliche Filterwerte (User-Vorgabe); Umsetzung: Attribute stets aus der englischen Antwort (Assistent 17:22) |
+| R-011 (Detail) | 2026-10-05 17:18: „Ein Patch sollte dafür ausreichen.“ → Assistent wählt `fix:`, weist auf `feat:` hin | Release-Wahl pro Änderung liegt beim Benutzer (PR-Titel) |
+| R-001, D-036 (neu) | 2026-10-05 18:57: Pokémon über TCGdex (kostenlos, kein API-Key, REST) als neuer Adapter, vom Benutzer mit Recherche-Text vorgegeben | Entscheid TCGdex als Pokémon-Quelle (User-Vorgabe) |
+| R-002 | 2026-10-05 18:57: „beim Hinzufügen… vorauswählen, ob Yu-Gi-Oh oder Pokemon“ | → User-Vorgabe |
+| R-053 | 2026-10-05 18:57: „Explizites Datenmodell für Pokemon Karten“ | → User-Vorgabe |
+| R-025 (Pokémon) | 2026-10-05 18:57: „SST ruft sowohl DE als auch EN ab. Falls eine Sprache nicht verfügbar… weggelassen“ | → User-Vorgabe |
+| R-003, R-014 | 2026-10-05 18:57: Sprache umstellbar; „zwischen YGO und Pokemon unterschieden“ | → User-Vorgabe |
+| R-004 | 2026-10-05 18:57: „Filter und Sortierung soll ähnlich YGO umgesetzt werden“; Fragerunde 18:58: Filter/Sort „Standard“ | → User-Vorgabe |
+| R-053 | 2026-10-05 18:58 Fragerunde „Variante“: „Variante, beim Hinzufügen wählbar“ (Gegenstück zu Edition) | → User-Vorgabe |
+| R-055 | 2026-10-05 18:58 Fragerunde „Suche“: Trefferliste „Mit Vorschaubildern“ | → User-Vorgabe |
+| R-048 | 2026-10-05 18:57: „ist es möglich die Version eines Branches zu testen?“ → README §Trying out a branch | → User-Vorgabe (Frage), Antwort als Doku |
+| R-056 | 2026-10-05 19:48: Set vorab wählen, Japanisch nicht tippbar; 19:54: „hippoterus“ 040/088 muss `me03-040` ergeben | → User-Vorgabe |
+| R-057 | 2026-10-05 19:48: japanische Karten nicht über Text suchbar → Set-Auswahl; Vorschlag des Assistenten: Japanisch als dritte gespeicherte Sprache | → User-Vorgabe (Bedarf), Lösung vom Benutzer bestätigt mit „Ich nehme Ihre Bedingung als Anforderung“ (19:55) |
+
+### C2 – (wird fortgesetzt ab Turn 142)
+
+_noch nicht ausgewertet_
