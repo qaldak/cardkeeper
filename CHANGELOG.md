@@ -1,3 +1,15 @@
+## [0.24.0](https://github.com/qaldak/cardkeeper/compare/v0.23.3...v0.24.0) (2026-10-23)
+
+### Features
+
+* export the selection of the overview as a CSV table ([51dfb34](https://github.com/qaldak/cardkeeper/commit/51dfb347e87e826cdffb4f39e79775a0dcb56f9e))
+* show the export notes in an info popover ([9cbbe63](https://github.com/qaldak/cardkeeper/commit/9cbbe63c332731bb9cc81e345bbe0db77b6a365b))
+
+### Bug Fixes
+
+* CSV export dialog wording, button order and a test for the locale files ([447eeac](https://github.com/qaldak/cardkeeper/commit/447eeac3f108776ae6fa95d37406f74105e8b43d))
+* the CSV download no longer opens the 404 page ([45d3580](https://github.com/qaldak/cardkeeper/commit/45d358077c596cfef89c065270316505dd239862))
+
 ## [0.23.3](https://github.com/qaldak/cardkeeper/compare/v0.23.2...v0.23.3) (2026-10-23)
 
 ### Maintenance
