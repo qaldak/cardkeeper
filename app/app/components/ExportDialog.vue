@@ -51,11 +51,11 @@ const { t } = useI18n()
     <template #footer>
       <!-- On the right, the main action first. -->
       <div class="flex w-full justify-end gap-2">
-        <!-- A link that downloads; without cards a button that cannot be pressed (a link cannot be disabled). -->
+        <!-- A link that downloads (`external`: a plain link, the router must not take it for a page of the app); without cards a button that cannot be pressed (a link cannot be disabled). -->
         <UButton v-if="count === 0" icon="i-lucide-download" disabled data-test="export-download">
           {{ t('export.download') }}
         </UButton>
-        <UButton v-else as="a" :href="href" download icon="i-lucide-download" data-test="export-download" @click="open = false">
+        <UButton v-else :to="href" external download icon="i-lucide-download" data-test="export-download" @click="open = false">
           {{ t('export.download') }}
         </UButton>
         <UButton color="neutral" variant="outline" data-test="export-cancel" @click="open = false">
