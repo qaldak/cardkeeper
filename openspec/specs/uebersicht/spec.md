@@ -48,8 +48,8 @@ Quelle: Chat 2026-10-05 17:18; Assistent 2026-10-05 17:22; README §Pokémon; Te
 - THEN sind die gespeicherten Werte die englischen
 
 ### Requirement: Suche über Namen aller Sprachen, Codes und Sets
-Das System MUSS die Suche der Übersicht gegen Kartennamen in allen gespeicherten Sprachen, die Kartenkennung (genau), den Set-Code und den Set-Namen laufen lassen, ohne Beachtung der Gross-/Kleinschreibung. [OFFEN Q-001] Annahme: Fehlerfall nicht reproduzierbar, Suche prüft alle Sprachen.
-Quelle: Chat 2026-10-04 19:40, 2026-10-21 04:40; README §Features; Test cards.test.ts | Herkunft: User-Vorgabe | Inventar: R-010, R-086 | MUSS=SHALL
+Das System MUSS die Suche der Übersicht gegen Kartennamen in allen gespeicherten Sprachen, die Kartenkennung (genau), den Set-Code und den Set-Namen laufen lassen, ohne Beachtung der Gross-/Kleinschreibung.
+Quelle: Chat 2026-10-04 19:40, 2026-10-21 04:40; Antwort Q-001 (2026-10-23: kein Fehler, Besitzerfilter); README §Features; Test cards.test.ts | Herkunft: User-Vorgabe | Inventar: R-010, R-086 | MUSS=SHALL
 
 #### Scenario: Englischer Titel
 - GIVEN eine Karte „Dunkler Magier“ / „Dark Magician“

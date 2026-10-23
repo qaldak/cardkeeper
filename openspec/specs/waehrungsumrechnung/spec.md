@@ -1,7 +1,7 @@
 # Währungsumrechnung Specification
 
 ## Purpose
-Anzeige der Preise in einer konfigurierbaren Währung (z. B. CHF) zusätzlich zur Quellwährung, mit Tageskursen der Europäischen Zentralbank über Frankfurter. Entscheid: [ADR 0012](../../../docs/adr/0012-preise-in-quellwaehrung.md). Verlauf: H-01. Offene Fragen: Q-004, Q-005.
+Anzeige der Preise in einer konfigurierbaren Währung (z. B. CHF) zusätzlich zur Quellwährung, mit Tageskursen der Europäischen Zentralbank über Frankfurter. Entscheid: [ADR 0012](../../../docs/adr/0012-preise-in-quellwaehrung.md). Verlauf: H-01.
 
 ## Requirements
 
@@ -20,8 +20,8 @@ Quelle: Chat 2026-10-10 22:14; README §Features, §Configuration; Code app/serv
 - THEN zeigen Karten und Total CHF
 
 ### Requirement: Ohne Anzeigewährung
-Das System SOLL ohne `DISPLAY_CURRENCY` die Preise unverändert in der Quellwährung (EUR bzw. USD) zeigen und nicht umrechnen. [OFFEN Q-004] Annahme: Preise bleiben in der Quellwährung.
-Quelle: Chat 2026-10-10 22:14 („Wenn nicht definiert, wird weiterhin EUR verwendet wie jetzt“), Auslegung Assistent 22:25; README §Features | Herkunft: Abgeleitet | Inventar: R-029 | MUSS=SHALL
+Das System SOLL ohne `DISPLAY_CURRENCY` die Preise unverändert in der Quellwährung (EUR bzw. USD) zeigen und nicht umrechnen.
+Quelle: Chat 2026-10-10 22:14 („Wenn nicht definiert, wird weiterhin EUR verwendet wie jetzt“); Antwort Q-004 (2026-10-23: Quellwährung bleibt); README §Features | Herkunft: User-Vorgabe | Inventar: R-029, K-012 | MUSS=SHALL
 
 #### Scenario: Nicht gesetzt
 - GIVEN `DISPLAY_CURRENCY` ist nicht gesetzt
@@ -47,8 +47,8 @@ Quelle: Chat 2026-10-10 22:14; Code app/server/services/rates.ts; Test rates.tes
 - THEN wird kein neuer Abruf gemacht
 
 ### Requirement: Ausfall des Kursdienstes
-Das System MUSS nach einem Fehler 10 Minuten lang keine neue Anfrage stellen, bei Ausfall den Kurs eines früheren Tages verwenden und ohne solchen Kurs den Originalpreis ohne Umrechnung zeigen. [OFFEN Q-005] Annahme: Früherer Kurs, sonst Originalpreis.
-Quelle: Chat 2026-10-10 22:14 („nur den Originalwert“), Auslegung Assistent 22:25; Code app/server/services/rates.ts | Herkunft: Abgeleitet | Inventar: R-096 | MUSS=SHALL
+Das System MUSS nach einem Fehler 10 Minuten lang keine neue Anfrage stellen, bei Ausfall den Kurs eines früheren Tages verwenden und ohne solchen Kurs den Originalpreis ohne Umrechnung zeigen.
+Quelle: Chat 2026-10-10 22:14 („nur den Originalwert“), 22:25; Antwort Q-005 (2026-10-23: früherer Kurs, sonst Originalpreis); Code app/server/services/rates.ts | Herkunft: User-Vorgabe | Inventar: R-096, K-013 | MUSS=SHALL
 
 #### Scenario: Ausfall ohne Kurs
 - GIVEN der Dienst ist nicht erreichbar und kein früherer Kurs bekannt

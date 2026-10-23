@@ -12,7 +12,7 @@ Das Konzept nennt den YGO-Adapter (YGOPRODeck) als ersten und als spätere Kandi
 
 ## Entscheid
 
-Yu-Gi-Oh!-Daten kommen von YGOPRODeck, Pokémon-Daten von TCGdex (Deutsch, Englisch und eine eigene Datenbank für Japanisch). Die Basis-URLs sind über `YGOPRODECK_API_URL` und `TCGDEX_API_URL` einstellbar.
+Yu-Gi-Oh!-Daten kommen von YGOPRODeck, Pokémon-Daten von TCGdex (Deutsch, Englisch und eine eigene Datenbank für Japanisch). Die Basis-URLs lassen sich über `YGOPRODECK_API_URL` und `TCGDEX_API_URL` im Container-Umfeld überschreiben.
 
 ## Betrachtete Alternativen
 
@@ -22,7 +22,7 @@ Yu-Gi-Oh!-Daten kommen von YGOPRODeck, Pokémon-Daten von TCGdex (Deutsch, Engli
 
 - Beide Dienste haben Begrenzungen; die App meldet sie dem Benutzer (Spec `spiele-adapter`, `preise`).
 - Magic ist nicht umgesetzt.
-- `YGOPRODECK_API_URL`, `TCGDEX_API_URL` stehen nicht in der README-Konfigurationstabelle (K-007).
+- Die Basis-URLs werden nur aus dem Container-Umfeld gelesen; `docker-compose.yml` reicht sie nicht aus `.env` weiter, die Entwicklungsdatei nur `YGOPRODECK_API_URL` (K-007, README §Configuration).
 
 ## Quellen
 

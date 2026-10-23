@@ -1,5 +1,7 @@
 # YGO/TCG-Sammlungs-App – Konzept & Architektur
 
+> **Historisches Ausgangskonzept (2026-10-03).** Dieses Dokument beschreibt den geplanten Stand zu Projektbeginn und wird nicht mehr nachgeführt. Gültig sind `openspec/specs/` (Anforderungen) und `docs/adr/` (Entscheide). Überholt sind u. a.: Nuxt 3 und Node 20 (heute Nuxt 4, Node 24), der Scheduler-Container (heute ein Plugin im App-Prozess, ADR 0007), der Pfad `/admin` mit Basic-Auth (heute eigenes Login, ADR 0008), PDF- und Markdown-Export (heute nur CSV, Spec `export`), ein automatisches Backup per Cron (heute nur manuell, Spec `betrieb`) sowie deutsche Status-Werte (heute ein Enum, ADR 0010).
+
 Oct 3, 2026 · @Qaldak
 
 Empfehlung: Variante 1 (Raspberry Pi, rein intern/VPN, DB lokal), Nuxt 3 (Vue) + PostgreSQL in Docker Compose, Datenmodell von Beginn an multi-TCG-fähig über ein Adapter-Pattern pro Kartenspiel.

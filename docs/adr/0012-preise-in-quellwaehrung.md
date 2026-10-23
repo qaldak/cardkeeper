@@ -1,8 +1,8 @@
 # ADR 0012: Preise in Quellwährung speichern, bei der Anzeige umrechnen; Kurse nur im Speicher
 
-- **Status:** Akzeptiert (Auslegungen offen: Q-004, Q-005)
+- **Status:** Akzeptiert
 - **Datum:** 2026-10-04 und 2026-10-10
-- **Herkunft:** User-Vorgabe (Fragerunde „Währung“ 2026-10-04 10:00 und Anforderung CHF 2026-10-10 22:14); Auslegungen bei Ausfall und Preisverlauf: Abgeleitet, vom Benutzer nicht beanstandet.
+- **Herkunft:** User-Vorgabe (Fragerunde „Währung“ 2026-10-04 10:00 und Anforderung CHF 2026-10-10 22:14); Die Auslegungen „ohne `DISPLAY_CURRENCY` bleibt die Quellwährung“ und „bei Ausfall früherer Kurs, sonst Originalpreis“ bestätigte der Benutzer am 2026-10-23 (Q-004, Q-005); die Umrechnung des Preisverlaufs mit dem heutigen Kurs ist ein Entscheid des Assistenten, nicht beanstandet.
 - **Inventar:** D-015, D-025, D-034, R-028, R-029, R-096, R-097
 - **Specs:** [`waehrungsumrechnung`](../../openspec/specs/waehrungsumrechnung/spec.md), [`preise`](../../openspec/specs/preise/spec.md)
 
@@ -24,7 +24,6 @@ Preise bleiben in der Währung ihres Marktplatzes in der Datenbank. Eine optiona
 
 - Die Umrechnung ändert keine gespeicherten Preise.
 - Ein Neustart leert den Kurs-Zwischenspeicher; der erste Aufruf holt wieder einen Kurs.
-- Die Auslegung „ohne `DISPLAY_CURRENCY` bleibt der Originalpreis“ (Q-004) und „früherer Kurs bei Ausfall“ (Q-005) sind nicht ausdrücklich bestätigt.
 
 ## Quellen
 

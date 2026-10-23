@@ -16,21 +16,21 @@ Status: OFFEN | BEANTWORTET.
 
 ---
 
-### Q-001 – Status: OFFEN
+### Q-001 – Status: BEANTWORTET
 - Betrifft: Spec `uebersicht` › Requirement „Suche über alle Sprachen“; K-020; R-010
 - Frage: Welche konkrete Karte und welcher Suchbegriff haben beim Bug „Suche findet nur DE“ nicht getroffen (2026-10-21)? Optionen: (a) Karte war von einem anderen Besitzer (Besitzerfilter seit 0.20.0 standardmässig auf dem eigenen Benutzer), (b) Spiel-Registerkarte/anderer Filter aktiv, (c) englische Übersetzung der Karte fehlt in `card_translations`, (d) Akzentunterschied (z. B. „Pokémon“ vs. „pokemon“).
 - Evidenz: Chat 2026-10-21 04:40 (Bug, Anforderung bestätigt: alle Sprachen, Filter berücksichtigt); Assistent: Code durchsucht `cards.name` und alle `card_translations.name`, Browser-Test und Test `applies the other filters to a search in any language` bestanden, Fehler nicht reproduziert; Benutzer antwortete mit „Ok.“ und neuer Anforderung, ohne den Fall zu nennen.
 - Arbeitsannahme bis zur Antwort: Die Anforderung „Suche in allen Sprachen, zusätzliche Filter gelten“ ist erfüllt; der gemeldete Fall war kein Fehler der Sprachlogik.
-- Antwort:
-- Beantwortet am:
+- Antwort: Besitzerfilter, kein Fehler (Option a: Karte eines anderen Besitzers; Standardfilter ist der eigene Benutzer).
+- Beantwortet am: 2026-10-23
 
-### Q-002 – Status: OFFEN
+### Q-002 – Status: BEANTWORTET
 - Betrifft: Spec `preise` › Requirement „Geplanter Preis-Reload“; ADR 0007 (Scheduler im App-Prozess); K-002
 - Frage: Soll der Preis-Scheduler im App-Prozess (Nitro-Plugin, Zustand in `price_refresh_runs`) bleiben, oder soll er wie im Konzept ein eigener Container (`scheduler`, node-cron, `CRON_SCHEDULE`) werden? Optionen: (a) bleibt im App-Prozess (aktueller Stand), (b) eigener Container.
 - Evidenz: KONZEPT §Komponenten/§Tech-Stack/§Deployment nennt einen Scheduler-Container; `docker-compose.yml` hat nur `db` und `app`; Chat 2026-10-10 20:40 fordert den Reload „via API… gestaffelt“, ohne den Ort festzulegen; die Umsetzung als Plugin wurde vom Assistenten gewählt und nicht beanstandet.
 - Arbeitsannahme bis zur Antwort: Scheduler im App-Prozess ist der gültige Stand.
-- Antwort:
-- Beantwortet am:
+- Antwort: Plugin im App-Prozess gilt; der Scheduler-Container des Konzepts ist verworfen.
+- Beantwortet am: 2026-10-23
 
 ### Q-003 – Status: OFFEN
 - Betrifft: ADR 0018 (Schutz des `main`-Branches); D-037
@@ -40,29 +40,29 @@ Status: OFFEN | BEANTWORTET.
 - Antwort:
 - Beantwortet am:
 
-### Q-004 – Status: OFFEN
+### Q-004 – Status: BEANTWORTET
 - Betrifft: Spec `waehrungsumrechnung` › Requirement „Anzeigewährung“; K-012; R-029
 - Frage: Was soll gelten, wenn `DISPLAY_CURRENCY` nicht gesetzt ist? Optionen: (a) Preise bleiben in der Quellwährung (EUR bei Cardmarket, USD bei TCGplayer u. a.), wie heute, (b) alle Preise werden nach EUR umgerechnet.
 - Evidenz: Chat 2026-10-10 22:14: „Wenn nicht definiert, wird weiterhin EUR verwendet wie jetzt.“; Assistent 22:25: gelesen als „unverändert“, mit Bitte um Rückmeldung; Benutzer bestätigte nur die Pokémon-Umsetzung („Pokemon bereits umgesetzt. Richtig.“) und äusserte sich nicht zur Auslegung.
 - Arbeitsannahme bis zur Antwort: (a): ohne Parameter bleiben die Preise in der Quellwährung.
-- Antwort:
-- Beantwortet am:
+- Antwort: Quellwährung bleibt; ohne `DISPLAY_CURRENCY` keine Umrechnung.
+- Beantwortet am: 2026-10-23
 
-### Q-005 – Status: OFFEN
+### Q-005 – Status: BEANTWORTET
 - Betrifft: Spec `waehrungsumrechnung` › Requirement „Wechselkurse“; K-013; R-096
 - Frage: Soll bei Ausfall des Kursdienstes ein früher geholter Kurs weiterverwendet werden, oder soll immer der Originalpreis ohne Umrechnung angezeigt werden? Optionen: (a) früherer Kurs, sonst Originalpreis (aktuell), (b) sofort Originalpreis.
 - Evidenz: Chat 2026-10-10 22:14: „sollte der Umrechnungskurs nicht abgefragt werden können oder fehler geben, dann… nur den Originalwert“; im Beispielcode des Benutzers: „bei Fehler lieber alter Kurs als keiner“. Assistent 22:25 wählte (a) und erklärte es; nicht beanstandet.
 - Arbeitsannahme bis zur Antwort: (a).
-- Antwort:
-- Beantwortet am:
+- Antwort: Früherer Kurs, sonst Originalpreis (Ist-Stand).
+- Beantwortet am: 2026-10-23
 
-### Q-006 – Status: OFFEN
+### Q-006 – Status: BEANTWORTET
 - Betrifft: README §Roadmap (Pokémon-Punkte, nicht in den Specs); K-018
 - Frage: Sind die Pokémon-Roadmap-Punkte (variantenabhängiger Listenpreis, Blättern in den Suchergebnissen, weitere Filter Set/Illustrator/Regulationsmarke) vom Benutzer gewünscht, oder nur Vorschläge des Assistenten? Optionen: (a) gewünscht, (b) nur Idee, (c) streichen.
 - Evidenz: README §Roadmap; im Chat nur als „Mögliche Optimierungen (noch nicht gemacht)“ des Assistenten (2026-10-05 19:22); keine Reaktion des Benutzers darauf.
 - Arbeitsannahme bis zur Antwort: (b): nur Idee, nicht verbindlich.
-- Antwort:
-- Beantwortet am:
+- Antwort: Nicht gewünscht; die Pokémon-Roadmap-Punkte sind aus der README gestrichen.
+- Beantwortet am: 2026-10-23
 
 ### Q-007 – Status: OFFEN
 - Betrifft: ADRs 0001–0006 (Hosting, Stack, Datenmodell aus dem Konzept); K-019
@@ -80,13 +80,13 @@ Status: OFFEN | BEANTWORTET.
 - Antwort:
 - Beantwortet am:
 
-### Q-009 – Status: OFFEN
+### Q-009 – Status: BEANTWORTET
 - Betrifft: Spec `betrieb` › Requirement „Backup“; K-009
 - Frage: Soll es ein automatisches Backup (z. B. Cron mit `pg_dump`, Zweitablage) geben, oder genügen die dokumentierten manuellen Befehle? Optionen: (a) nur manuell (aktuell), (b) automatisch gewünscht.
 - Evidenz: KONZEPT §Sicherheitskonzept: „Regelmässiges pg_dump-Backup via Cron“; README §Backup: nur Befehle; Chat 2026-10-04 14:49–14:51: Benutzer fragt nach Volumes „für Backup“, kein Auftrag für Automatik.
 - Arbeitsannahme bis zur Antwort: (a): nur manuelle Befehle.
-- Antwort:
-- Beantwortet am:
+- Antwort: Nur manuelles Backup gilt.
+- Beantwortet am: 2026-10-23
 
 ### Q-010 – Status: OFFEN
 - Betrifft: Spec `kartenstatus` › Requirement „Status mit Datum und Person“; R-078

@@ -120,7 +120,7 @@ All settings are environment variables in `.env`:
 
 Further variables are read by the app but not passed on by `docker-compose.yml`, so they have no effect in `.env`: `IMAGE_DIR`
 (fixed to `/data/card-images` in the image), the base URLs `YGOPRODECK_API_URL`, `TCGDEX_API_URL` and `EXCHANGE_RATE_API_URL`
-(used by tests; the development overlay passes on `YGOPRODECK_API_URL`) and `SKIP_MIGRATIONS=1` (skips the migrations at start).
+(they replace the API addresses; the development overlay passes on `YGOPRODECK_API_URL`) and `SKIP_MIGRATIONS=1` (skips the migrations at start).
 `BUILD_KIND` is a build argument that only the release workflow sets; it decides what the start banner says.
 
 The database role is created by [`db/init/10-create-app-role.sh`](db/init/10-create-app-role.sh) when the data directory is

@@ -1,7 +1,7 @@
 # Betrieb Specification
 
 ## Purpose
-Betrieb der Anwendung: Container-Stack, Konfiguration, Prüfung beim Start, Health-Endpunkt, Härtung, Reverse Proxy und Backup. Entscheide: [ADR 0001](../../../docs/adr/0001-hosting-selbst-gehostet.md), [ADR 0016](../../../docs/adr/0016-multi-arch-image-nativer-build.md), [ADR 0018](../../../docs/adr/0018-main-branch-schutz.md), [ADR 0022](../../../docs/adr/0022-container-namen-mit-prefix.md). Verlauf: H-07. Offene Fragen: Q-009.
+Betrieb der Anwendung: Container-Stack, Konfiguration, Prüfung beim Start, Health-Endpunkt, Härtung, Reverse Proxy und Backup. Entscheide: [ADR 0001](../../../docs/adr/0001-hosting-selbst-gehostet.md), [ADR 0016](../../../docs/adr/0016-multi-arch-image-nativer-build.md), [ADR 0018](../../../docs/adr/0018-main-branch-schutz.md), [ADR 0022](../../../docs/adr/0022-container-namen-mit-prefix.md). Verlauf: H-07.
 
 ## Requirements
 
@@ -113,11 +113,25 @@ Quelle: README §Users and passwords | Herkunft: Abgeleitet | Inventar: R-044 | 
 - WHEN die neue Version startet
 - THEN ist Anna Benutzerin mit ihren 5 Karten
 
-### Requirement: Backup
-Das System MUSS in der README Datenbank (`pg_dump`) und Bild-Volume als zu sichernde Daten dokumentieren. [OFFEN Q-009] Annahme: Ein automatisches Backup ist nicht Teil der Anforderungen.
-Quelle: README §Backup; KONZEPT §Sicherheitskonzept | Herkunft: Abgeleitet | Inventar: R-046 | MUSS=SHALL
+### Requirement: Backup nur manuell
+Das System MUSS Datenbank (`pg_dump`) und Bild-Volume manuell sichern lassen; die README dokumentiert die Befehle, ein automatisches Backup ist nicht Teil der Anwendung.
+Quelle: Antwort Q-009 (2026-10-23: nur manuell); README §Backup; KONZEPT (Cron-Backup, überholt) | Herkunft: User-Vorgabe | Inventar: R-046, R-068, K-009 | MUSS=SHALL
 
 #### Scenario: Anleitung
 - GIVEN die README
 - WHEN §Backup gelesen wird
 - THEN nennt sie `pg_dump` und den Bild-Volume
+
+#### Scenario: Kein Cron
+- GIVEN der Stack läuft
+- WHEN die Dienste geprüft werden
+- THEN gibt es keinen Dienst für ein automatisches Backup
+
+### Requirement: Weitere Variablen der App
+Das System SOLL `IMAGE_DIR`, `YGOPRODECK_API_URL`, `TCGDEX_API_URL`, `EXCHANGE_RATE_API_URL` und `SKIP_MIGRATIONS` auswerten; `docker-compose.yml` reicht sie nicht aus `.env` weiter (die Entwicklungsdatei nur `YGOPRODECK_API_URL`).
+Quelle: Code app/server/lib/config.ts, app/docker-entrypoint.sh, docker-compose.yml, docker-compose.dev.yml; README §Configuration | Herkunft: Abgeleitet | Inventar: R-037, K-007 | MUSS=SHALL
+
+#### Scenario: Eintrag in .env
+- GIVEN `TCGDEX_API_URL` steht in `.env`
+- WHEN der Stack startet
+- THEN erhält die App den Wert nicht

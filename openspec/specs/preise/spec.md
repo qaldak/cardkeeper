@@ -1,7 +1,7 @@
 # Preise Specification
 
 ## Purpose
-Preise der Karten: Speicherung je Marktplatz in dessen Währung, Preisverlauf und geplante Aktualisierung in kleinen Tranchen. Der Scheduler läuft im App-Prozess ([ADR 0007](../../../docs/adr/0007-preis-scheduler-im-app-prozess.md)offen: Q-002). Umrechnung in eine Anzeigewährung: Spec waehrungsumrechnung ([ADR 0012](../../../docs/adr/0012-preise-in-quellwaehrung.md)). Verlauf: H-01, H-15.
+Preise der Karten: Speicherung je Marktplatz in dessen Währung, Preisverlauf und geplante Aktualisierung in kleinen Tranchen. Der Scheduler läuft im App-Prozess ([ADR 0007](../../../docs/adr/0007-preis-scheduler-im-app-prozess.md)). Umrechnung in eine Anzeigewährung: Spec waehrungsumrechnung ([ADR 0012](../../../docs/adr/0012-preise-in-quellwaehrung.md)). Verlauf: H-01, H-15.
 
 ## Requirements
 
@@ -93,8 +93,8 @@ Quelle: Chat 2026-10-10 21:15 („muss bis an den User gehen“); README §Sched
 - THEN erscheint die Meldung, dass es später wieder versucht werden soll
 
 ### Requirement: Ausführung im App-Prozess
-Das System MUSS 60 Sekunden nach dem Start und danach alle 10 Minuten prüfen, ob eine Tranche fällig ist, und diese im App-Prozess ausführen; der Zustand wird in der Datenbank aufgezeichnet. [OFFEN Q-002] Annahme: Der Scheduler im App-Prozess gilt als gültiger Stand.
-Quelle: Code app/server/plugins/price-refresh.ts; Test price-refresh.test.ts; KONZEPT §Komponenten weicht ab (K-002) | Herkunft: Abgeleitet | Inventar: R-094 | MUSS=SHALL
+Das System MUSS 60 Sekunden nach dem Start und danach alle 10 Minuten prüfen, ob eine Tranche fällig ist, und diese im App-Prozess ausführen; der Zustand wird in der Datenbank aufgezeichnet.
+Quelle: Chat 2026-10-10 20:40; Antwort Q-002 (2026-10-23: Plugin im App-Prozess gilt); Code app/server/plugins/price-refresh.ts; Test price-refresh.test.ts | Herkunft: User-Vorgabe | Inventar: R-094, K-002 | MUSS=SHALL
 
 #### Scenario: Start
 - GIVEN die Anwendung wurde gestartet

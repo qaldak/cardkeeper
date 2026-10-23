@@ -150,7 +150,7 @@ Quelle: Code server/services/cards.ts (update); Test cards.test.ts | Herkunft: A
 
 ### Requirement: Beschreibungsfeld wächst mit dem Text
 Das System MUSS das Beschreibungsfeld mit dem Text von 3 bis höchstens 6 Zeilen wachsen lassen und danach scrollen.
-Quelle: Chat 2026-10-20 09:09; Code app/app/pages/cards/[id].vue (autoresize, maxrows) | Herkunft: User-Vorgabe | Inventar: R-091 | MUSS=SHALL
+Quelle: Chat 2026-10-20 09:09 (Yu-Gi-Oh!); Ausweitung auf beide Spiele am 2026-10-23 bestätigt (K-014); Code app/app/pages/cards/[id].vue | Herkunft: User-Vorgabe | Inventar: R-091 | MUSS=SHALL
 
 #### Scenario: Langer Text
 - GIVEN eine Beschreibung mit 30 Zeilen

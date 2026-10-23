@@ -1,8 +1,8 @@
 # ADR 0007: Preis-Reload als Plugin im App-Prozess, Zustand in der Datenbank
 
-- **Status:** Akzeptiert als gültiger Stand; Bestätigung durch den Benutzer offen (Q-002)
+- **Status:** Akzeptiert (vom Benutzer am 2026-10-23 bestätigt, Q-002)
 - **Datum:** 2026-10-10
-- **Herkunft:** Abgeleitet: Der Benutzer verlangte den gestaffelten Preis-Reload (Chat 2026-10-10 20:40), den Ort der Ausführung wählte der Assistent; der Benutzer hat ihn nicht beanstandet. Das Konzept sah einen eigenen Scheduler-Container vor.
+- **Herkunft:** User-Vorgabe: Der Benutzer verlangte den gestaffelten Preis-Reload (Chat 2026-10-10 20:40); den Ort der Ausführung wählte der Assistent, der Benutzer bestätigte ihn am 2026-10-23 (Antwort Q-002).
 - **Inventar:** D-026, R-030, R-031, R-094, K-002
 - **Specs:** [`preise`](../../openspec/specs/preise/spec.md), [`betrieb`](../../openspec/specs/betrieb/spec.md)
 
@@ -16,7 +16,8 @@ Ein Nitro-Plugin im App-Prozess prüft 60 Sekunden nach dem Start und danach all
 
 ## Betrachtete Alternativen
 
-- Eigener Scheduler-Container mit node-cron (Konzept); im Chat nicht verworfen oder besprochen, aber nicht umgesetzt (K-002, Q-002).
+- Eigener Scheduler-Container mit node-cron (Konzept): am 2026-10-23 verworfen (Antwort Q-002, K-002).
+- Beides erlauben: nicht gewählt.
 
 ## Konsequenzen
 

@@ -48,7 +48,7 @@ Spec-Pfade: `openspec/specs/<domain>/spec.md`; ADRs: `docs/adr/`. Verweise von d
 
 ## 3. Inventareinträge
 
-Abgedeckt: **166**; nicht oder nur teilweise abgedeckt (mit Begründung): **5** von 171 Einträgen mit R-/D-Nummer. Die Konflikte K-001…K-021 und die Chat-Belege stehen in `00-inventory.md`, die geänderten Anforderungen in `history.md`, die offenen Fragen in `OPEN-QUESTIONS.md`.
+Abgedeckt: **167**; nicht oder nur teilweise abgedeckt (mit Begründung): **4** von 171 Einträgen mit R-/D-Nummer. Die Konflikte K-001…K-021 und die Chat-Belege stehen in `00-inventory.md`, die geänderten Anforderungen in `history.md`, die offenen Fragen in `OPEN-QUESTIONS.md`.
 
 | ID | Kurzbeschreibung (aus dem Inventar) | Abgedeckt in |
 |---|---|---|
@@ -164,7 +164,7 @@ Abgedeckt: **166**; nicht oder nur teilweise abgedeckt (mit Begründung): **5** 
 | R-065 | Mehrere Bilder pro Karte, lokales Volume, kein DB-Blob | [`bilder`](../../openspec/specs/bilder/spec.md) |
 | R-066 | Konzept: Scheduler als eigener Node-Worker-Container (node-cron) | durch Entscheid ersetzt: Scheduler läuft im App-Prozess, siehe ADR 0007, Q-002, K-002 |
 | R-067 | Konzept: Export PDF (pdfkit), CSV, Markdown | teilweise umgesetzt: CSV siehe Spec `export`; PDF und Markdown nicht umgesetzt (K-019, H-02) |
-| R-068 | Konzept: regelmässiges `pg_dump`-Backup per Cron, zweiter Ort | nicht umgesetzt: nur manuelle Befehle dokumentiert, siehe Spec `betrieb` › Backup, Q-009, K-009 |
+| R-068 | Konzept: regelmässiges `pg_dump`-Backup per Cron, zweiter Ort | [`betrieb`](../../openspec/specs/betrieb/spec.md); nicht umgesetzt: nur manuelle Befehle dokumentiert, siehe Spec `betrieb` › Backup, Q-009, K-009 |
 | R-070 | Login: Name wird ohne Beachtung von Gross-/Kleinschreibung und Leerzeichen gefunden; falscher Name und falsche… | [`benutzer-zugriff`](../../openspec/specs/benutzer-zugriff/spec.md), [ADR 0009](../adr/0009-login-sperre-pro-benutzername.md) |
 | R-071 | Sitzung: versiegeltes (verschlüsselt+signiert) Cookie `cardkeeper-session`, httpOnly, SameSite=Lax, `secure` n… | [`benutzer-zugriff`](../../openspec/specs/benutzer-zugriff/spec.md) |
 | R-072 | API-Zugriff: alles unter `/api/` braucht ein Login (401 `unauthenticated`) ausser `/api/health`, `/api/auth/lo… | [`benutzer-zugriff`](../../openspec/specs/benutzer-zugriff/spec.md) |
