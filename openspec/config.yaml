@@ -1,32 +1,36 @@
 schema: spec-driven
 
-# Project context (optional)
-# Add only constraints that should guide OpenSpec artifacts and workflows.
-# Include constraints an agent cannot infer by reading the code.
-# Keep general project documentation and discoverable codebase facts out.
-# Example:
-#   context: |
-#     Designs and tasks must cover Windows, macOS, and Linux
-#     Write all artifacts in Spanish
+# Projektkontext. Jede Angabe ist belegt; Quellen stehen in Klammern.
+context: |
+  Projekt: CardKeeper, selbst gehostete Sammlung für Yu-Gi-Oh!- und Pokémon-Karten (README §Intro).
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always state what is out of scope
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  Stack (README §Architecture, docs/adr/):
+  - Nuxt 4 (TypeScript, Vue 3, Nitro) als eine Codebasis für Oberfläche und API, Nuxt UI + Tailwind CSS
+  - Prisma 7 mit PostgreSQL 16, Vitest, Node 24 (Alpine), Docker Compose (Dienste `db` und `app`)
+  - Kartendaten: YGOPRODeck (Yu-Gi-Oh!), TCGdex (Pokémon), je ein Adapter hinter einer Registry
 
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+  Prinzipien (README, docs/adr/):
+  - Ein neues Spiel braucht keine Schemaänderung: spielspezifische Werte stehen als JSONB (ADR 0004, 0005).
+  - Namen, Texte und Attribute der Karten sind schreibgeschützt; editierbar sind nur Set-Code und Edition bzw. Variante (README §Data model).
+  - Nur der Besitzer ändert eine Karte; alle angemeldeten Benutzer sehen alle Karten (ADR 0008).
+  - Preise bleiben in der Währung ihres Marktplatzes; die Umrechnung geschieht erst bei der Anzeige (ADR 0012).
+  - Konfiguration über Umgebungsvariablen in `.env`, nicht über die Oberfläche (Chat 2026-10-10, siehe Spec `betrieb`).
+  - Neue Einstellungen sind optional mit Standardwert und abschaltbar (Spec `entwicklung-release`).
+  - Jede Oberflächen-Zeichenkette steht in `app/i18n/locales/de.json` und `en.json` (Spec `oberflaeche`).
+
+  Konventionen:
+  - Code-Kommentare und README auf Englisch (ADR 0024); Specs, ADRs und Migrationsdokumente auf Deutsch.
+  - Commits nach Conventional Commits; der Pull-Request-Titel bestimmt bei Squash-Merge die Version; Major-Version nur bei ausdrücklichem Breaking Change (ADR 0015).
+  - Sprechende Branch-Namen; Rückfragen vor der Ausführung (Spec `entwicklung-release`).
+  - Tests: Unit-Tests für reine Logik, Integrationstests gegen eine echte PostgreSQL über `TEST_DATABASE_URL` (README §Tests).
+
+  Dokumentation der Entscheide und ihrer Herkunft:
+  - Architekturentscheide: docs/adr/ (ADR 0001–0024)
+  - Anforderungen: openspec/specs/<domain>/spec.md; jede Anforderung nennt Quelle, Herkunft und Inventar-ID
+  - Inventar, Verlauf geänderter Anforderungen und offene Fragen: docs/spec-migration/ (00-inventory.md, history.md, OPEN-QUESTIONS.md)
+
+rules:
+  specs:
+    - "Anforderungen mit MUSS/SOLL formulieren und Szenarien als GIVEN/WHEN/THEN."
+    - "Jede Anforderung enthält eine Zeile `Quelle: … | Herkunft: User-Vorgabe|Abgeleitet|Unklar | Inventar: … | MUSS=SHALL`; nichts ohne Quelle erfinden."
+    - "Anforderungstext inklusive Quelle-Zeile höchstens 500 Zeichen (Grenze des OpenSpec-Validators)."
