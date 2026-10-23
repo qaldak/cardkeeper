@@ -26,7 +26,7 @@ Everything runs in containers: there is nothing to install on the host except Do
   the language of the interface (English where a card has none), the latest price of the price source and, with
   `DISPLAY_CURRENCY`, in that currency as well. Semicolon separated, UTF-8 with a byte order mark; the same file is at
   `GET /api/export/cards`
-- Card detail page: texts in German and English with a language switch (German first, a language the card does not
+- Card detail page: texts in German and English (Pokémon cards also in Japanese) with a language switch (German first, a language the card does not
   have is disabled), the set code (always capitals) and edition can be corrected (e.g. German or Japanese prints, applies to all
   languages), manual image upload, click on the image to see it enlarged (a click on the enlarged image closes it, wide areas beside it and the arrow keys go through several images, a button downloads it; "Save image as" in the right-click menu works as well and suggests the card name), status handling (active, sold, traded, gifted, lost) with date and counterpart,
   the owner (who can hand the card over to another user), price history
@@ -117,6 +117,11 @@ All settings are environment variables in `.env`:
 | `PRICE_REFRESH_DELAY_MS` | `500` | Pause between two requests to a card database (at least `100`) |
 | `CONTAINER_PREFIX` | `cardkeeper` | Prefix of the container names (`cardkeeper_app`, `cardkeeper_db`) |
 | `APP_IMAGE` | `ghcr.io/qaldak/cardkeeper:latest` | Image to run, e.g. to pin a version |
+
+Further variables are read by the app but not passed on by `docker-compose.yml`, so they have no effect in `.env`: `IMAGE_DIR`
+(fixed to `/data/card-images` in the image), the base URLs `YGOPRODECK_API_URL`, `TCGDEX_API_URL` and `EXCHANGE_RATE_API_URL`
+(used by tests; the development overlay passes on `YGOPRODECK_API_URL`) and `SKIP_MIGRATIONS=1` (skips the migrations at start).
+`BUILD_KIND` is a build argument that only the release workflow sets; it decides what the start banner says.
 
 The database role is created by [`db/init/10-create-app-role.sh`](db/init/10-create-app-role.sh) when the data directory is
 initialized for the first time. Changing the passwords later does not alter an existing database.
@@ -240,7 +245,7 @@ releases, not for branches.
 
 ### Tests
 
-- **Unit tests** (`app/tests/unit`) cover the pure logic: status rules, filters, manual override tracking, image
+- **Unit tests** (`app/tests/unit`) cover the pure logic: status rules, filters, image
   validation and download safety, request validation, and the Yu-Gi-Oh! adapter against a fixture of the documented API shape.
 - **Integration tests** (`app/tests/integration`) run the services against a real PostgreSQL with a fake card API and
   a temporary image directory. They need `TEST_DATABASE_URL` and are skipped without it. They truncate all tables, which is
@@ -420,8 +425,6 @@ No schema change and no change in the core services is required.
 ## Roadmap
 
 - Export: copy the cards for an AI prompt (deck building), printable list as PDF or Word
-- Pokémon: a list price that depends on the variant (holo and reverse holo have their own prices), paging through the search
-  results, more filters (set, illustrator, regulation mark)
 
 ## License
 
