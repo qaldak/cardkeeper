@@ -19,16 +19,32 @@ const { t } = useI18n()
     <template #body>
       <div class="flex flex-col gap-4 text-sm">
         <div class="rounded-lg bg-elevated px-3 py-2.5" data-test="export-selection">
-          <p class="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+          <p class="mb-1 flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-muted">
             {{ t('export.selection') }}
+            <!-- What the export contains: a click opens it (a hover tooltip does not work on a phone). -->
+            <UPopover :content="{ side: 'bottom', align: 'start' }">
+              <UButton
+                type="button"
+                color="neutral"
+                variant="ghost"
+                size="xs"
+                icon="i-lucide-info"
+                class="-my-1"
+                :aria-label="t('export.info')"
+                data-test="export-info"
+              />
+              <template #content>
+                <div class="max-w-72 space-y-2 p-3 text-sm text-muted" data-test="export-info-text">
+                  <p>{{ t('export.details.content') }}</p>
+                  <p>{{ t('export.details.language') }}</p>
+                </div>
+              </template>
+            </UPopover>
           </p>
-          <p>{{ summary.join(' · ') }} · <strong>{{ t('export.cards', { n: count }, count) }}</strong></p>
+          <p>
+            {{ summary.join(' · ') }} · {{ t('export.textLanguage', { language }) }} · <strong>{{ t('export.cards', { n: count }, count) }}</strong>
+          </p>
         </div>
-        <ul class="list-disc space-y-1 pl-5 text-muted">
-          <li>{{ t('export.details.format') }}</li>
-          <li>{{ t('export.details.content') }}</li>
-          <li>{{ t('export.details.language', { language }) }}</li>
-        </ul>
         <UAlert v-if="count === 0" color="warning" variant="subtle" :title="t('export.empty')" />
       </div>
     </template>

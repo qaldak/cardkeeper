@@ -447,9 +447,8 @@
     "allStatus": "Alle Status",
     "filtersActive": "mit weiteren Filtern",
     "details": {
-      "format": "CSV-Datei, Trennzeichen Semikolon, UTF-8 (Excel zeigt die Umlaute richtig an).",
-      "content": "Alle Daten der Karte ohne Bilder, Reihenfolge wie auf der Kartenseite; Preis: der letzte der Preisquelle.",
-      "language": "Texte in der gewählten Sprache ({language}), Englisch wo sie fehlt."
+      "content": "Alle Daten der Karte ohne Bilder, in der Reihenfolge der Kartenseite. Preis: der letzte der Preisquelle.",
+      "language": "Texte in der gewählten Sprache, Englisch wo sie fehlt."
     },
     "empty": "Die Auswahl enthält keine Karten.",
     "download": "Herunterladen",
@@ -512,6 +511,8 @@
       "currency": "Währung",
       "priceIn": "Preis in {currency}",
       "priceDate": "Preis-Datum"
-    }
+    },
+    "info": "Hinweise zum Export",
+    "textLanguage": "Texte: {language}"
   }
 }

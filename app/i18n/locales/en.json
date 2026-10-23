@@ -447,9 +447,8 @@
     "allStatus": "All statuses",
     "filtersActive": "with further filters",
     "details": {
-      "format": "CSV file, semicolon separated, UTF-8 (Excel shows umlauts correctly).",
-      "content": "All data of the card without images, in the order of the card page; price: the latest of the price source.",
-      "language": "Texts in the selected language ({language}), English where it is missing."
+      "content": "All data of the card without images, in the order of the card page. Price: the latest of the price source.",
+      "language": "Texts in the selected language, English where it is missing."
     },
     "empty": "The selection contains no cards.",
     "download": "Download",
@@ -512,6 +511,8 @@
       "currency": "Currency",
       "priceIn": "Price in {currency}",
       "priceDate": "Price date"
-    }
+    },
+    "info": "About the export",
+    "textLanguage": "Texts: {language}"
   }
 }
