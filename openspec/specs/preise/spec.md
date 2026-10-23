@@ -1,7 +1,7 @@
 # Preise Specification
 
 ## Purpose
-Preise der Karten: Speicherung je Marktplatz in dessen Währung, Preisverlauf und geplante Aktualisierung in kleinen Tranchen. Der Scheduler läuft im App-Prozess (ADR 0007, offen: Q-002). Umrechnung in eine Anzeigewährung: Spec waehrungsumrechnung (ADR 0012). Verlauf: H-01, H-15.
+Preise der Karten: Speicherung je Marktplatz in dessen Währung, Preisverlauf und geplante Aktualisierung in kleinen Tranchen. Der Scheduler läuft im App-Prozess ([ADR 0007](../../../docs/adr/0007-preis-scheduler-im-app-prozess.md)offen: Q-002). Umrechnung in eine Anzeigewährung: Spec waehrungsumrechnung ([ADR 0012](../../../docs/adr/0012-preise-in-quellwaehrung.md)). Verlauf: H-01, H-15.
 
 ## Requirements
 

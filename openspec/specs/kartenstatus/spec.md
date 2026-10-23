@@ -1,7 +1,7 @@
 # Kartenstatus Specification
 
 ## Purpose
-Lebenszyklus einer Karte (aktiv, verkauft, getauscht, verschenkt, verloren) mit Datum, Gegenpartei und Verlauf. Entscheid: ADR 0010 (sprachneutrales Enum). Offene Frage zu „verloren“: Q-010.
+Lebenszyklus einer Karte (aktiv, verkauft, getauscht, verschenkt, verloren) mit Datum, Gegenpartei und Verlauf. Entscheid: [ADR 0010](../../../docs/adr/0010-status-als-enum.md) (sprachneutrales Enum). Offene Frage zu „verloren“: Q-010.
 
 ## Requirements
 

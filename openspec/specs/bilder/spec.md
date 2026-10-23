@@ -1,7 +1,7 @@
 # Bilder Specification
 
 ## Purpose
-Kartenbilder: lokale Speicherung, Hochladen, Hauptbild, Vergrösserung und Auslieferung. Bilder werden nie von den Karten-Datenbanken eingebunden, ausser den kleinen Bildern der Trefferliste bei Pokémon. Entscheid: ADR 0019. Verlauf: H-09.
+Kartenbilder: lokale Speicherung, Hochladen, Hauptbild, Vergrösserung und Auslieferung. Bilder werden nie von den Karten-Datenbanken eingebunden, ausser den kleinen Bildern der Trefferliste bei Pokémon. Entscheid: [ADR 0019](../../../docs/adr/0019-bilder-lokal-speichern.md). Verlauf: H-09.
 
 ## Requirements
 

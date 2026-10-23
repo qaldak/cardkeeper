@@ -1,7 +1,7 @@
 # Entwicklung und Release Specification
 
 ## Purpose
-Entwicklung und Veröffentlichung: lokale Entwicklung in Containern, Tests, CI, automatische Releases, Abhängigkeits-Updates, Lizenz und Arbeitsabsprachen des Benutzers. Entscheide: ADR 0015, 0016, 0017, 0018, 0024. Verlauf: H-11.
+Entwicklung und Veröffentlichung: lokale Entwicklung in Containern, Tests, CI, automatische Releases, Abhängigkeits-Updates, Lizenz und Arbeitsabsprachen des Benutzers. Entscheide: [ADR 0015](../../../docs/adr/0015-semantic-release-und-versionen.md), [ADR 0016](../../../docs/adr/0016-multi-arch-image-nativer-build.md), [ADR 0017](../../../docs/adr/0017-lizenz-polyform-noncommercial.md), [ADR 0018](../../../docs/adr/0018-main-branch-schutz.md), [ADR 0024](../../../docs/adr/0024-englisch-fuer-code-und-doku.md). Verlauf: H-11.
 
 ## Requirements
 

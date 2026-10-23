@@ -1,7 +1,7 @@
 # Währungsumrechnung Specification
 
 ## Purpose
-Anzeige der Preise in einer konfigurierbaren Währung (z. B. CHF) zusätzlich zur Quellwährung, mit Tageskursen der Europäischen Zentralbank über Frankfurter. Entscheid: ADR 0012. Verlauf: H-01. Offene Fragen: Q-004, Q-005.
+Anzeige der Preise in einer konfigurierbaren Währung (z. B. CHF) zusätzlich zur Quellwährung, mit Tageskursen der Europäischen Zentralbank über Frankfurter. Entscheid: [ADR 0012](../../../docs/adr/0012-preise-in-quellwaehrung.md). Verlauf: H-01. Offene Fragen: Q-004, Q-005.
 
 ## Requirements
 

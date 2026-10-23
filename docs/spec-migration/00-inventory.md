@@ -385,3 +385,15 @@ Format der Bestätigungen: `ID | Chat-Beleg (Zeitpunkt, Zitat ≤ 15 Wörter) | 
 | K-019 | Konzept ist ein Dokument des Benutzers (Anhang vom 2026-10-04); mehrere seiner Aussagen sind durch spätere Entscheide überholt (Scheduler-Container, Nuxt 3, Node 20, `/admin`, Export PDF/Markdown) | KONZEPT; Chat | Herkunft der Konzept-Entscheide: User-Vorgabe (Konzeptdokument), Zustand teils „später geändert“ → Q-007 |
 | K-020 | Chat 2026-10-21 04:40: Bug „Suche berücksichtigt nur DE“; Code durchsucht alle Sprachen, Fehler nicht reproduzierbar | Chat; `server/lib/card-filters.ts`; `tests/integration/cards.test.ts` | offen → Q-001 |
 | K-021 | Initiale `LICENSE` des Repositories war AGPL v3 (Initial commit des Benutzers, nicht aus dem Chat); später PolyForm Noncommercial 1.0.0 | Git `27da236`, `8032a94`; README §License | dokumentiert (D-020) |
+
+## Nachträge aus Phase 4 (Entscheide, die erst bei den ADRs als eigene Einträge geführt werden)
+
+Diese Einträge fassen Angaben zusammen, die bereits oben an anderer Stelle (R-/D-Einträge, Chat-Belege, `history.md`) stehen. Sie erhalten eine eigene ID, damit jede ADR auf genau einen Entscheid verweisen kann.
+
+| ID | Entscheid | Quelle | Herkunft | Zustand | Bemerkung |
+|---|---|---|---|---|---|
+| D-042 | Gemerkter Zustand im Browser über Cookies: letztes Spiel beim Erfassen (`cardkeeper-last-game`), Spiel der Übersicht (`cardkeeper-overview-game`), Filter/Sortierung/Seite der Übersicht (Session-Cookie `cardkeeper-overview-query`, bei Login/Logout gelöscht), Sprache (`cardkeeper_locale`); Erscheinungsbild im Browser | Chat 2026-10-06 07:31, 13:08; 2026-10-20 09:09; Code `shared/utils/overview-query.ts`, `app/nuxt.config.ts`; `history.md` H-04, H-05, H-16 | User-Vorgabe (Verhalten); Cookie als Mittel: Abgeleitet | aktiv | Speicherart (Cookie statt Server) im Chat nicht ausdrücklich besprochen |
+| D-043 | Sicherheits-Header auf jeder Antwort und Schutz vor schreibenden Cross-Site-Anfragen (`Sec-Fetch-Site`) | Code `app/nuxt.config.ts`, `server/lib/cross-site.ts`; Chat 2026-10-21 14:27 (externes Review prüfen und umsetzen), 14:37 ff. | User-Vorgabe (Auftrag); Umsetzung Abgeleitet | aktiv | siehe R-106 |
+| D-044 | Yu-Gi-Oh!-Kartendaten von YGOPRODeck | KONZEPT §Multi-TCG-Konzept („Der YGO-Adapter (YGOPRODeck) wird zuerst implementiert“); Code `server/tcg/ygo/` | Abgeleitet | aktiv | Konzept ist ein Dokument des Benutzers (K-019) |
+| D-045 | Code-Kommentare und README auf Englisch | Chat 2026-10-04 09:59 | User-Vorgabe | aktiv | gleicher Sachverhalt wie R-201 |
+| D-046 | Kartenbilder lokal im Volume `card-images` speichern, nicht in der Datenbank und nicht von den Karten-DBs einbinden | KONZEPT §Datenmodell („lokales Docker-Volume, kein DB-Blob“); README §Features, §Notes on the card API; Chat 2026-10-09 20:52, 20:58 | Abgeleitet (Konzept); Einbindung nicht per Hotlink: Entscheid des Assistenten, nicht beanstandet | aktiv | siehe R-027, R-058, R-100 |

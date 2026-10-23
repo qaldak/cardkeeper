@@ -1,7 +1,7 @@
 # Kartendetail Specification
 
 ## Purpose
-Die Detailseite einer Karte: Texte in mehreren Sprachen, die wenigen änderbaren Felder, Aktualisieren aus der Karten-Datenbank, Löschen und Anzeige der Änderungen. Status steht in `kartenstatus`, Bilder in `bilder`, Preisverlauf in `preise`, Blättern in `karten-blaettern`. Entscheide: ADR 0006 (Texte pro Sprache), ADR 0011 (Editionen). Verlauf: H-08, H-14.
+Die Detailseite einer Karte: Texte in mehreren Sprachen, die wenigen änderbaren Felder, Aktualisieren aus der Karten-Datenbank, Löschen und Anzeige der Änderungen. Status steht in `kartenstatus`, Bilder in `bilder`, Preisverlauf in `preise`, Blättern in `karten-blaettern`. Entscheide: [ADR 0006](../../../docs/adr/0006-texte-pro-sprache.md) (Texte pro Sprache), [ADR 0011](../../../docs/adr/0011-editionen-als-schluessel.md) (Editionen). Verlauf: H-08, H-14.
 
 ## Requirements
 

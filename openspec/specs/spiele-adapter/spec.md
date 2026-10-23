@@ -1,7 +1,7 @@
 # Spiele-Adapter Specification
 
 ## Purpose
-Kartenspiele als austauschbare Adapter: Registrierung, Vertrag, Daten und Sprachen von Yu-Gi-Oh! (YGOPRODeck) und Pokémon (TCGdex) sowie das Verhalten bei Fehlern der Karten-DBs. Entscheide: ADR 0004, 0005, 0023. Verlauf: H-09, H-10.
+Kartenspiele als austauschbare Adapter: Registrierung, Vertrag, Daten und Sprachen von Yu-Gi-Oh! (YGOPRODeck) und Pokémon (TCGdex) sowie das Verhalten bei Fehlern der Karten-DBs. Entscheide: [ADR 0004](../../../docs/adr/0004-adapter-pattern-pro-spiel.md), [ADR 0005](../../../docs/adr/0005-spielattribute-als-jsonb.md), [ADR 0023](../../../docs/adr/0023-kartendatenquellen-ygoprodeck-tcgdex.md). Verlauf: H-09, H-10.
 
 ## Requirements
 

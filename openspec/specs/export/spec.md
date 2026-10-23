@@ -1,7 +1,7 @@
 # Export Specification
 
 ## Purpose
-Export der Karten als Tabelle zur Weiterverarbeitung (Excel). Der Export folgt der Auswahl der Übersicht. Die Kopie für KI-Prompts und die druckbare Liste sind als eigene Anforderungen geplant und im Menü als deaktivierte Platzhalter sichtbar. Entscheid: ADR 0013 (serverseitig). Verlauf: H-12, H-13. Offene Fragen: Q-008.
+Export der Karten als Tabelle zur Weiterverarbeitung (Excel). Der Export folgt der Auswahl der Übersicht. Die Kopie für KI-Prompts und die druckbare Liste sind als eigene Anforderungen geplant und im Menü als deaktivierte Platzhalter sichtbar. Entscheid: [ADR 0013](../../../docs/adr/0013-csv-export-serverseitig.md) (serverseitig). Verlauf: H-12, H-13. Offene Fragen: Q-008.
 
 ## Requirements
 

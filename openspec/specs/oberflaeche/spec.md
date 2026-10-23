@@ -1,7 +1,7 @@
 # Oberfläche Specification
 
 ## Purpose
-Übergreifende Merkmale der Oberfläche: Hell/Dunkel, Sprache, Seitentitel, Kopf- und Fusszeile, stabile Kopfzeile, Fehlerübersetzung und App-Symbole. Entscheide: ADR 0006 (Texte pro Sprache), 0020 (gemerkter Zustand in Cookies). Verlauf: H-14.
+Übergreifende Merkmale der Oberfläche: Hell/Dunkel, Sprache, Seitentitel, Kopf- und Fusszeile, stabile Kopfzeile, Fehlerübersetzung und App-Symbole. Entscheide: [ADR 0006](../../../docs/adr/0006-texte-pro-sprache.md) (Texte pro Sprache), 0020 (gemerkter Zustand in Cookies). Verlauf: H-14.
 
 ## Requirements
 

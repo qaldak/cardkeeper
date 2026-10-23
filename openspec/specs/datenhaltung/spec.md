@@ -1,7 +1,7 @@
 # Datenhaltung Specification
 
 ## Purpose
-Datenmodell-Invarianten der Sammlung: schreibgeschützte Kartendaten, Übersetzungen, Rohdaten-Snapshots, Audit-Log und Editionsschlüssel samt Startprüfung. Entscheide: ADR 0003, 0005, 0006, 0010, 0011. Verlauf: H-08.
+Datenmodell-Invarianten der Sammlung: schreibgeschützte Kartendaten, Übersetzungen, Rohdaten-Snapshots, Audit-Log und Editionsschlüssel samt Startprüfung. Entscheide: [ADR 0003](../../../docs/adr/0003-postgresql-prisma.md), [ADR 0005](../../../docs/adr/0005-spielattribute-als-jsonb.md), [ADR 0006](../../../docs/adr/0006-texte-pro-sprache.md), [ADR 0010](../../../docs/adr/0010-status-als-enum.md), [ADR 0011](../../../docs/adr/0011-editionen-als-schluessel.md). Verlauf: H-08.
 
 ## Requirements
 

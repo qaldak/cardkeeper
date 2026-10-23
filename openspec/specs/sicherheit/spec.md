@@ -1,7 +1,7 @@
 # Sicherheit Specification
 
 ## Purpose
-Härtung der Antworten und Downloads: Sicherheits-Header, Schutz vor schreibenden Cross-Site-Anfragen und Beschränkung der Hosts, von denen Bilder geladen werden. Anmeldung und Besitzer-Rechte stehen in `benutzer-zugriff`. HTTPS, HSTS und eine Content-Security-Policy überlässt das System dem Reverse Proxy. Entscheid: ADR 0021.
+Härtung der Antworten und Downloads: Sicherheits-Header, Schutz vor schreibenden Cross-Site-Anfragen und Beschränkung der Hosts, von denen Bilder geladen werden. Anmeldung und Besitzer-Rechte stehen in `benutzer-zugriff`. HTTPS, HSTS und eine Content-Security-Policy überlässt das System dem Reverse Proxy. Entscheid: [ADR 0021](../../../docs/adr/0021-sicherheits-header-und-cross-site-schutz.md).
 
 ## Requirements
 

@@ -1,7 +1,7 @@
 # Übersicht Specification
 
 ## Purpose
-Die Übersicht der Sammlung: Liste der Karten mit Spielwahl, Filtern, Suche, Sortierung, Summen und dem gemerkten Zustand. Blättern auf der Detailseite steht in `karten-blaettern`, Export in `export`, Preise in `preise`. Entscheide: ADR 0014 (im Speicher filtern), ADR 0020 (Cookies). Verlauf: H-04, H-10, H-16.
+Die Übersicht der Sammlung: Liste der Karten mit Spielwahl, Filtern, Suche, Sortierung, Summen und dem gemerkten Zustand. Blättern auf der Detailseite steht in `karten-blaettern`, Export in `export`, Preise in `preise`. Entscheide: [ADR 0014](../../../docs/adr/0014-uebersicht-im-speicher-filtern.md) (im Speicher filtern), [ADR 0020](../../../docs/adr/0020-gemerkter-zustand-in-cookies.md) (Cookies). Verlauf: H-04, H-10, H-16.
 
 ## Requirements
 

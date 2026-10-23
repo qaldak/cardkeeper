@@ -1,7 +1,7 @@
 # Kartenerfassung Specification
 
 ## Purpose
-Neue Karten einzeln erfassen: Spielwahl, Suche in der Karten-Datenbank (Name, ID, Set-Code, bei Pokémon Set und Nummer), Wahl von Druck, Edition oder Variante und Anlegen der Karte. Das Hinzufügen eines ganzen Sets steht in `set-import`, Daten und Fehler der Karten-Datenbanken in `spiele-adapter`. Entscheide: ADR 0023 (Datenquellen), ADR 0020 (gemerkter Zustand in Cookies). Verlauf: H-05, H-06, H-20.
+Neue Karten einzeln erfassen: Spielwahl, Suche in der Karten-Datenbank (Name, ID, Set-Code, bei Pokémon Set und Nummer), Wahl von Druck, Edition oder Variante und Anlegen der Karte. Das Hinzufügen eines ganzen Sets steht in `set-import`, Daten und Fehler der Karten-Datenbanken in `spiele-adapter`. Entscheide: [ADR 0023](../../../docs/adr/0023-kartendatenquellen-ygoprodeck-tcgdex.md) (Datenquellen), [ADR 0020](../../../docs/adr/0020-gemerkter-zustand-in-cookies.md) (gemerkter Zustand in Cookies). Verlauf: H-05, H-06, H-20.
 
 ## Requirements
 

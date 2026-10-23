@@ -3,7 +3,7 @@
 Jede Unsicherheit wird hier festgehalten, bevor sie gestellt wird. Format:
 
 ```
-### Q-007 – Status: OFFEN
+### Q-xxx – Status: OFFEN
 - Betrifft: <Datei/Domain › Requirement oder ADR>
 - Frage: <eine präzise Frage, möglichst mit 2–4 Antwortoptionen>
 - Evidenz: <was in Chat/README/Code dafür oder dagegen spricht>
@@ -33,7 +33,7 @@ Status: OFFEN | BEANTWORTET.
 - Beantwortet am:
 
 ### Q-003 – Status: OFFEN
-- Betrifft: ADR 0011 (Schutz des `main`-Branches); D-037
+- Betrifft: ADR 0018 (Schutz des `main`-Branches); D-037
 - Frage: Wie ist der Schutz von `main` auf GitHub tatsächlich eingerichtet (Ruleset-Name, geforderte Statusprüfungen, Admin-Ausnahme für den Release-Push)? Optionen: (a) wie in der Chat-Anleitung vom 2026-10-06, (b) abweichend, bitte Einstellungen nennen.
 - Evidenz: Chat 2026-10-06 14:49 (Frage des Benutzers) und 14:50 (Anleitung des Assistenten); 2026-10-07 10:51 Assistent: Release lief „auch mit dem neuen Branch-Schutz“. Die Einstellungen liegen nur auf GitHub, nicht im Repository.
 - Arbeitsannahme bis zur Antwort: Schutz wie in der Anleitung beschrieben (Ruleset „Protect main“, PR nötig mit 0 Freigaben, drei Statusprüfungen, Admin-Bypass).

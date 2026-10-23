@@ -1,7 +1,7 @@
 # Betrieb Specification
 
 ## Purpose
-Betrieb der Anwendung: Container-Stack, Konfiguration, Prüfung beim Start, Health-Endpunkt, Härtung, Reverse Proxy und Backup. Entscheide: ADR 0001, 0016, 0018, 0022. Verlauf: H-07. Offene Fragen: Q-009.
+Betrieb der Anwendung: Container-Stack, Konfiguration, Prüfung beim Start, Health-Endpunkt, Härtung, Reverse Proxy und Backup. Entscheide: [ADR 0001](../../../docs/adr/0001-hosting-selbst-gehostet.md), [ADR 0016](../../../docs/adr/0016-multi-arch-image-nativer-build.md), [ADR 0018](../../../docs/adr/0018-main-branch-schutz.md), [ADR 0022](../../../docs/adr/0022-container-namen-mit-prefix.md). Verlauf: H-07. Offene Fragen: Q-009.
 
 ## Requirements
 

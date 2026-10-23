@@ -1,7 +1,7 @@
 # Benutzer und Zugriff Specification
 
 ## Purpose
-Anmeldung, Benutzerverwaltung über die Konfiguration, Passwortregeln, Sitzungen und Besitzer-Rechte an Karten. Alle angemeldeten Benutzer sehen alle Karten, ändern darf nur der Besitzer. Header und Cross-Site-Schutz stehen in `sicherheit`. Entscheide: ADR 0008 (Login mit versiegeltem Cookie), ADR 0009 (Sperre pro Benutzername). Verlauf: `docs/spec-migration/history.md` H-03.
+Anmeldung, Benutzerverwaltung über die Konfiguration, Passwortregeln, Sitzungen und Besitzer-Rechte an Karten. Alle angemeldeten Benutzer sehen alle Karten, ändern darf nur der Besitzer. Header und Cross-Site-Schutz stehen in `sicherheit`. Entscheide: [ADR 0008](../../../docs/adr/0008-eigenes-login-versiegeltes-cookie.md) (Login mit versiegeltem Cookie), [ADR 0009](../../../docs/adr/0009-login-sperre-pro-benutzername.md) (Sperre pro Benutzername). Verlauf: `docs/spec-migration/history.md` H-03.
 
 ## Requirements
 
