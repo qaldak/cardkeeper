@@ -9,8 +9,8 @@ Branch: `docs/openspec-baseline` (lokal, nicht gepusht). Basis: `origin/main` @ 
 |---|---|---|---|---|
 | 0 | Vorprüfung, OpenSpec-Setup, Branch, Arbeitsverzeichnis | fertig | 2026-10-23 | Node v22.22.0, npm 10.9.4, OpenSpec 1.14.3 (verlangt Node >=20.19.0). `openspec init --tools claude` lief nicht-interaktiv. |
 | 1 | Quellen sichten, Inventar | fertig | 2026-10-23 | README + Konzept (Block A), Code/Tests/Konfiguration (Block B), Chat-Transkript vollständig vorhanden und in 5 Blöcken ausgewertet (C1–C5). Details: `00-inventory.md`, `history.md` (21 Einträge), `OPEN-QUESTIONS.md` (10 offene Fragen). |
-| 2 | Domains festlegen | offen | | |
-| 3 | Specs schreiben | offen | | |
+| 2 | Domains festlegen | fertig | 2026-10-23 | 17 Domains, Zuordnung der R-IDs und Zweifelsfälle in `02-domains.md`. Kein eigener Roadmap-Bereich (Roadmap-Punkte stehen als „Geplante Funktionen“ bzw. in `OPEN-QUESTIONS.md`). Aufteilung nach fachlichem Thema statt nach Code-Schicht, damit eine Anforderung genau einer Spec gehört und Specs unabhängig änderbar sind. |
+| 3 | Specs schreiben | fertig | 2026-10-23 | 17 Specs in `openspec/specs/<domain>/spec.md`, alle bestehen `openspec validate --specs --strict`. Jede Anforderung trägt eine Zeile `Quelle: … \| Herkunft: … \| Inventar: … \| MUSS=SHALL`. Abweichungen vom vorgegebenen Format, durch den Validator erzwungen: (1) Abschnitt `## Purpose` (≥ 50 Zeichen) ergänzt; (2) der Validator verlangt das englische Wort SHALL/MUST, daher steht `MUSS=SHALL` am Ende der Quelle-Zeile; (3) Anforderungstext inkl. Quelle-Zeile ≤ 500 Zeichen, längere Anforderungen wurden gekürzt oder aufgeteilt. |
 | 4 | ADRs | offen | | |
 | 5 | Projektkontext (`openspec/config.yaml`) | offen | | |
 | 6 | Prüfung, `COVERAGE.md`, Zahlen | offen | | |
