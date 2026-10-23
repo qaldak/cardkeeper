@@ -13,7 +13,8 @@ Format je Eintrag: ID – Kurzbeschreibung | Quelle(n) | Herkunft (`User-Vorgabe
 | A | README.md, docs/KONZEPT.md (Quellen a) | fertig, siehe Abschnitt „Block A" |
 | B | Code, Tests, Konfiguration (Quelle b) | fertig, siehe Abschnitt „Block B“ |
 | C1 | Chat 2026-10-04 bis 2026-10-05 19:57 (Turns 0–141) | fertig |
-| C2 | Chat ab Turn 142 (2026-10-05 19:59) | offen |
+| C2 | Chat 2026-10-05 20:00 bis 2026-10-07 17:11 (Turns 142–245) | fertig |
+| C3 | Chat ab Turn 246 (2026-10-07 17:18) | offen |
 
 Herkunft in Block A ist vorläufig `Abgeleitet` (README/Konzept); der Chat-Abgleich (Block C) hebt Einträge auf `User-Vorgabe`, wo der Chat die Forderung belegt.
 
@@ -264,6 +265,37 @@ Format der Bestätigungen: `ID | Chat-Beleg (Zeitpunkt, Zitat ≤ 15 Wörter) | 
 | R-056 | 2026-10-05 19:48: Set vorab wählen, Japanisch nicht tippbar; 19:54: „hippoterus“ 040/088 muss `me03-040` ergeben | → User-Vorgabe |
 | R-057 | 2026-10-05 19:48: japanische Karten nicht über Text suchbar → Set-Auswahl; Vorschlag des Assistenten: Japanisch als dritte gespeicherte Sprache | → User-Vorgabe (Bedarf), Lösung vom Benutzer bestätigt mit „Ich nehme Ihre Bedingung als Anforderung“ (19:55) |
 
-### C2 – (wird fortgesetzt ab Turn 142)
+### C2 – 2026-10-05 20:00 bis 2026-10-07 17:11 (Set-Browser, Spielwahl merken, Login, Lizenz, Darkmode)
+
+| ID | Chat-Beleg | Wirkung |
+|---|---|---|
+| R-056, R-057 | 2026-10-05 20:07 Assistent: Set-Browser + Japanisch umgesetzt (Branch `feature/pokemon-set-browser-and-japanese`); 20:47 Frage nach Branch-Beziehung (Info) | bestätigt Umsetzung der Anforderung von 19:48 |
+| R-002 | 2026-10-06 07:31: „soll das vom user zuletzt gewählte Spiel beibehalten werden… default ist User (Browser Session) abhängig“ | → User-Vorgabe; Umsetzung Cookie `cardkeeper-last-game` (1 Jahr), Assistent 07:35 |
+| R-206 | 2026-10-06 08:00: „Verwende immer sprechende Namen für einen Branch.“ | bestätigt |
+| R-056 (Detail) | 2026-10-06 13:08 (1): Set-Symbol im Set-Picker streichen, Logo bleibt und lädt verzögert („verschwendet nur ressourcen“) | → User-Vorgabe; Symbol aus API/Typen entfernt (Assistent 13:12) |
+| R-003 | 2026-10-06 13:08 (2): Übersicht „soll der Default ‚Alle Spiele‘ sein… letzte Einstellung… (cookie)“ | → User-Vorgabe; Cookie `cardkeeper-overview-game` (Assistent 13:12) |
+| R-037 (CONTAINER_PREFIX) | 2026-10-06 13:08 (3): „im Docker compose jeweils einen container-namen angeben“ (`cardkeeper_app`, `cardkeeper_db`) | → User-Vorgabe; später Präfix per `CONTAINER_PREFIX` (siehe history) |
+| D-037 (neu) | 2026-10-06 14:49–14:50: Frage nach Schutz des `main`-Branches; Assistent: Ruleset „Protect main“ (Löschen sperren, Force-Push sperren, PR nötig mit 0 Freigaben, drei Statusprüfungen, Admin-Bypass für den Release-Push mit `RELEASE_TOKEN`); 2026-10-07 10:51: Release lief „auch mit dem neuen Branch-Schutz“ | Entscheid: `main` geschützt mit Admin-Ausnahme für den Release-Workflow (Herkunft: Abgeleitet; Benutzer hat umgesetzt, Detail der Einstellungen nur in der Chat-Anleitung belegt); in GitHub konfiguriert, nicht im Repo |
+| R-056 (Detail) | 2026-10-07 10:47: „Bei der Pokemon SST ist defaultmässig Englisch… auf Deutsch ändern (default)“ | → User-Vorgabe; Standardsprache Deutsch, Wahl wird nicht gemerkt (Assistent 10:51) |
+| R-056 (Detail) | 2026-10-07 11:02: Kartennummer mit oder ohne Schrägstrich; `040088` → `040/088`, Slash spätestens beim Verlassen des Feldes | → User-Vorgabe; nur Ziffernzahlen 3+3 oder 4+4 werden geteilt (Assistent 11:05) |
+| R-045 | 2026-10-07 13:47: Frage zur nginx-Einstellung (https/http, Cache, WebSocket); „muss nicht ins Git“ | Information; Antwort: Scheme http, Cache Assets aus, WebSockets aus, `client_max_body_size`; README-Abschnitt später auf wenige Sätze gekürzt (2026-10-07 15:31–15:32) |
+| R-039 | 2026-10-07 14:46: „User dürfen nur die eigenen Karten erfassen, ändern oder löschen“; „alle Karten einsehen“; „nicht die Karte eines anderen“ | → User-Vorgabe |
+| R-039 | 2026-10-07 14:46: Zuweisung Pflicht, default angemeldeter User | → User-Vorgabe |
+| R-040 | 2026-10-07 14:46: „initiales Password ‚cardkeeper‘… der User kann das ändern“; Fragerunde 14:51: Änderung beim ersten Login „Ja, erzwungen“ | → User-Vorgabe |
+| R-041 | 2026-10-07 14:46: „via DB Script kann der App Admin das Passwort… zurücksetzen“; Fragerunde 14:47: „SQL: Hash auf NULL“ | → User-Vorgabe |
+| R-040 (USERS) | Fragerunde 2026-10-07 14:47: „Wer legt Benutzer an?“ → „Liste in der .env“; „Spieler und Benutzer zusammenführen“ | → User-Vorgabe; D-038 (neu): `players` und `users` zu einer Tabelle |
+| R-042 | Fragerunde 2026-10-07 14:47: unzugewiesene Karten „einfach übersprungen… nachträglich manuell gesetzt“; 14:51: ohne Besitzer ändert „Niemand“ | → User-Vorgabe |
+| R-018 | Fragerunde 2026-10-07 14:51: Besitzer darf Karte an einen anderen Benutzer übergeben „Ja“ | → User-Vorgabe |
+| R-045, D-008 | Fragerunde 2026-10-07 14:51: nginx-Basic-Auth und Header `X-Remote-User` „Entfernen“ | → User-Vorgabe; ersetzt die Idee `/admin` mit nginx-Basic-Auth |
+| D-039 (neu) | 2026-10-07 14:46 Benutzer schlägt `nuxt-auth-utils` und `is_admin` vor; Assistent 15:18: eigene Session mit eingebautem h3 und `scrypt`, kein `is_admin` | Abweichung vom Vorschlag des Benutzers, nicht beanstandet (Herkunft: Abgeleitet); siehe D-022, D-023 |
+| R-209 (neu) | 2026-10-07 15:31: README „Admin area“ aus der Roadmap entfernen („User werden im .env verwaltet“) | Es gibt keinen Admin-Bereich in der App (User-Vorgabe, aktiv) |
+| R-045 | 2026-10-07 15:31: Reverse-Proxy-Abschnitt der README auf das Nötigste kürzen | → User-Vorgabe (Dokumentationsumfang), Assistent 15:32: vier Sätze |
+| D-020 | 2026-10-07 15:31: „Lizenz… nachträglich auf PolyForm Noncommercial 1.0.0 ändern… korrekte Texte“; 15:53: „Aktuell ist polyform-noncommercial wohl das richtige.“ | → User-Vorgabe; eigener Branch (Assistent 15:32) |
+| R-210 (neu) | 2026-10-07 15:51–15:53: Frage nach „contribution welcome“; Benutzer: „dann lassen wir’s mal weg“ | Entscheid: kein Beitragshinweis/CLA in der Lizenz-Änderung (verworfen); Herkunft User-Vorgabe |
+| R-040 (SESSION_SECRET) | 2026-10-07 15:43: Frage, ob `SESSION_SECRET` aufbewahrt werden muss; Antwort: darf neu gesetzt werden, beendet nur alle Logins | Information (Doku in README) |
+| R-005 | 2026-10-07 16:46: „Die App soll zusätzlich in einem Darkmode verfügbar sein… zeige zuerst ein Muster“; 17:06: „Design passt. Voreinstellungen: System folgt dem Gerät, wenn nicht erkannt: hell. Einstellungen merken.“ | → User-Vorgabe; Muster-Artefakt vor der Umsetzung |
+| D-040 (neu) | 2026-10-07 17:11 Assistent: Farben aus Nuxt UI, eigene Variablen in `main.css`; Text auf Blau mit `text-inverted` wegen Kontrast | Entscheid des Assistenten (Abgeleitet) |
+
+### C3 – (wird fortgesetzt ab Turn 246)
 
 _noch nicht ausgewertet_
