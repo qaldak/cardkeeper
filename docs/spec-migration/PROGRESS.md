@@ -7,8 +7,8 @@ Branch: `docs/openspec-baseline` (lokal, nicht gepusht). Basis: `origin/main` @ 
 
 | Phase | Inhalt | Status | Datum | Notizen |
 |---|---|---|---|---|
-| 0 | Vorprüfung, OpenSpec-Setup, Branch, Arbeitsverzeichnis | in Arbeit | 2026-10-23 | Node v22.22.0, npm 10.9.4, OpenSpec 1.14.3 (verlangt Node >=20.19.0). `openspec init --tools claude` lief nicht-interaktiv. |
-| 1 | Quellen sichten, Inventar | offen | | |
+| 0 | Vorprüfung, OpenSpec-Setup, Branch, Arbeitsverzeichnis | fertig | 2026-10-23 | Node v22.22.0, npm 10.9.4, OpenSpec 1.14.3 (verlangt Node >=20.19.0). `openspec init --tools claude` lief nicht-interaktiv. |
+| 1 | Quellen sichten, Inventar | fertig | 2026-10-23 | README + Konzept (Block A), Code/Tests/Konfiguration (Block B), Chat-Transkript vollständig vorhanden und in 5 Blöcken ausgewertet (C1–C5). Details: `00-inventory.md`, `history.md` (21 Einträge), `OPEN-QUESTIONS.md` (10 offene Fragen). |
 | 2 | Domains festlegen | offen | | |
 | 3 | Specs schreiben | offen | | |
 | 4 | ADRs | offen | | |
