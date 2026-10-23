@@ -88,12 +88,21 @@ Quelle: Code docker-compose.yml, app/Dockerfile; KONZEPT §Deployment (teilweise
 
 ### Requirement: Reverse Proxy
 Das System SOLL hinter einem Reverse Proxy betrieben werden, der nur weiterleitet und TLS beendet; `client_max_body_size` MUSS etwas über `MAX_UPLOAD_MB` liegen, `X-Forwarded-Proto` MUSS gesetzt sein.
-Quelle: Chat 2026-10-07 13:47, 15:31; README §Reverse proxy | Herkunft: User-Vorgabe | Inventar: R-045 | MUSS=SHALL
+Quelle: Chat 2026-10-07 13:47, 15:31; README §Reverse proxy | Herkunft: User-Vorgabe | Inventar: R-045, D-010 | MUSS=SHALL
 
 #### Scenario: HTTPS
 - GIVEN TLS am Proxy mit `X-Forwarded-Proto https`
 - WHEN ein Login erfolgt
 - THEN ist das Sitzungs-Cookie `secure`
+
+### Requirement: Keine Telemetrie in den Containern
+Das System SOLL in den Containern Telemetrie und Update-Hinweise der Werkzeuge abschalten (`CHECKPOINT_DISABLE`, `PRISMA_HIDE_UPDATE_MESSAGE`, `NUXT_TELEMETRY_DISABLED`).
+Quelle: Code app/Dockerfile | Herkunft: Abgeleitet | Inventar: D-032 | MUSS=SHALL
+
+#### Scenario: Image
+- GIVEN das gebaute Image
+- WHEN seine Umgebungsvariablen gelesen werden
+- THEN sind alle drei Variablen gesetzt
 
 ### Requirement: Upgrade ohne Logins
 Das System MUSS beim Upgrade einer Version ohne Logins nach Ergänzen von `SESSION_SECRET` und `USERS` die bisherigen „Spieler“ als Benutzer mit Initialpasswort übernehmen, die ihre Karten behalten.

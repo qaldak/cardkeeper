@@ -112,7 +112,7 @@ Quelle: Code app/server/services/prices.ts, app/server/tcg/*/adapter.ts; Test pr
 
 ### Requirement: „Geändert am“ bleibt unberührt
 Das System MUSS beim Preis-Reload `prices_checked_at` per Roh-SQL setzen, damit „geändert am“ der Karte nicht verändert wird.
-Quelle: Code app/server/services/prices.ts; Test price-refresh.test.ts | Herkunft: Abgeleitet | Inventar: R-094 | MUSS=SHALL
+Quelle: Code app/server/services/prices.ts; Test price-refresh.test.ts | Herkunft: Abgeleitet | Inventar: R-094, D-030 | MUSS=SHALL
 
 #### Scenario: Reload
 - GIVEN eine Karte mit „geändert am“ vom Vortag

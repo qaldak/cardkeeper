@@ -91,6 +91,15 @@ Quelle: Code app/app/error.vue | Herkunft: Abgeleitet | Inventar: R-105 | MUSS=S
 - WHEN die Seite erscheint
 - THEN gibt es einen Knopf zurück
 
+### Requirement: Schriften lokal
+Das System SOLL die Schrift IBM Plex Sans lokal über `@fontsource/ibm-plex-sans` ausliefern und keine Google-Fonts-Aufrufe machen.
+Quelle: Code app/package.json, app/app/assets/css/main.css; Chat 2026-10-04 (Zwischentext des Assistenten) | Herkunft: Abgeleitet | Inventar: D-031 | MUSS=SHALL
+
+#### Scenario: Offline
+- GIVEN die Seite wird geladen
+- WHEN die Schrift angefordert wird
+- THEN kommt sie vom eigenen Server
+
 ### Requirement: App-Symbole
 Das System MUSS ein Favicon (16/32/48), PNG-Symbole (16, 32) und ein Apple-Touch-Icon (180) ohne weissen Rahmen aus `public/` ausliefern, auch ohne Login.
 Quelle: Chat 2026-10-09 18:28, 18:32, 18:33 | Herkunft: User-Vorgabe | Inventar: R-214 | MUSS=SHALL

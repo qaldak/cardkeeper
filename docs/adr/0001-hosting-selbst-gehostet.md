@@ -3,7 +3,7 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (Datum des Konzepts)
 - **Herkunft:** Abgeleitet (Konzept des Benutzers, `docs/KONZEPT.md`); ob der Benutzer die Entscheide des Konzepts als eigene Vorgabe versteht, ist offen (Q-007). Die Containerisierung geht auf eine Vorgabe des Benutzers zurück (Chat 2026-10-04 09:59).
-- **Inventar:** D-001, R-036, R-062
+- **Inventar:** D-001, D-010, R-036, R-062
 - **Specs:** [`betrieb`](../../openspec/specs/betrieb/spec.md)
 
 ## Kontext

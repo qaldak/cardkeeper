@@ -3,7 +3,7 @@
 - **Status:** Akzeptiert (Nuxt 4 statt des im Konzept genannten Nuxt 3)
 - **Datum:** 2026-10-03 (Konzept); Abweichung Nuxt 4: 2026-10-04
 - **Herkunft:** Abgeleitet (Konzept des Benutzers; Q-007). Die Abweichungen Nuxt 4 und Node 24 stammen vom Assistenten, der Benutzer hat sie nicht beanstandet (Chat 2026-10-04 10:43).
-- **Inventar:** D-002, D-003, D-016, D-021, D-035, K-001, K-003
+- **Inventar:** D-002, D-003, D-016, D-021, D-035, R-108, K-001, K-003
 - **Specs:** [`oberflaeche`](../../openspec/specs/oberflaeche/spec.md), [`betrieb`](../../openspec/specs/betrieb/spec.md)
 
 ## Kontext
