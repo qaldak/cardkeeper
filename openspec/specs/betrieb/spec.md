@@ -52,7 +52,7 @@ Quelle: Code app/server/lib/config.ts, duration.ts; Test config.test.ts; README 
 
 ### Requirement: Datenbankrolle ohne Superuser
 Das System MUSS beim ersten Initialisieren des Datenverzeichnisses eine eigene Datenbankrolle der App (kein Superuser) anlegen; eine spätere Passwortänderung ändert eine bestehende Datenbank nicht.
-Quelle: README §Configuration; KONZEPT §Sicherheitskonzept; db/init/10-create-app-role.sh | Herkunft: Abgeleitet | Inventar: R-038 | MUSS=SHALL
+Quelle: README §Configuration; KONZEPT §Sicherheitskonzept (Antwort Q-007); db/init/10-create-app-role.sh | Herkunft: User-Vorgabe | Inventar: R-038 | MUSS=SHALL
 
 #### Scenario: Passwort geändert
 - GIVEN die Datenbank besteht

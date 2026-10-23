@@ -7,7 +7,7 @@ Kartenspiele als austauschbare Adapter: Registrierung, Vertrag, Daten und Sprach
 
 ### Requirement: Mehrere Spiele über Adapter
 Das System MUSS Yu-Gi-Oh! und Pokémon in einer Sammlung führen; ein weiteres Spiel MUSS über einen Adapter (`fetchCardById`, `fetchCardByName`, `searchCards`, `mapToCommonSchema`) und einen Eintrag in `server/tcg/registry.ts` ohne Änderung von Kernschema und Kerndiensten hinzufügbar sein.
-Quelle: README §Adding a game; KONZEPT §Multi-TCG; Code app/server/tcg/types.ts, registry.ts | Herkunft: Abgeleitet | Inventar: R-001 | MUSS=SHALL
+Quelle: README §Adding a game; KONZEPT §Multi-TCG (Antwort Q-007); Code app/server/tcg/types.ts, registry.ts | Herkunft: User-Vorgabe | Inventar: R-001 | MUSS=SHALL
 
 #### Scenario: Neues Spiel
 - GIVEN ein neuer Adapter ist registriert

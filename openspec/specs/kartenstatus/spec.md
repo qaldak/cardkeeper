@@ -1,7 +1,7 @@
 # Kartenstatus Specification
 
 ## Purpose
-Lebenszyklus einer Karte (aktiv, verkauft, getauscht, verschenkt, verloren) mit Datum, Gegenpartei und Verlauf. Entscheid: [ADR 0010](../../../docs/adr/0010-status-als-enum.md) (sprachneutrales Enum). Offene Frage zu „verloren“: Q-010.
+Lebenszyklus einer Karte (aktiv, verkauft, getauscht, verschenkt, verloren) mit Datum, Gegenpartei und Verlauf. Entscheid: [ADR 0010](../../../docs/adr/0010-status-als-enum.md) (sprachneutrales Enum).
 
 ## Requirements
 
@@ -20,8 +20,8 @@ Quelle: README §Features, §Data model; KONZEPT §Datenmodell; Chat 2026-10-04 
 - THEN zeigt sie „Sold“
 
 ### Requirement: Datum und Person
-Das System MUSS bei jedem Status ausser aktiv ein Datum führen (Standard: heute) und bei verkauft, getauscht und verschenkt eine Person; bei verloren und aktiv MUSS eine übergebene Person verworfen werden. [OFFEN Q-010] Annahme: Bei „verloren“ wird ein Datum erfasst, das Konzept nennt nur „Person leer“.
-Quelle: Code server/lib/status.ts; Test status.test.ts, cards.test.ts; KONZEPT §Datenmodell | Herkunft: Abgeleitet | Inventar: R-078 | MUSS=SHALL
+Das System MUSS bei jedem Status ausser aktiv ein Datum führen (Standard: heute) und bei verkauft, getauscht und verschenkt eine Person; bei verloren und aktiv MUSS eine übergebene Person verworfen werden.
+Quelle: Antwort Q-010 (2026-10-23: Datum auch bei verloren); Code server/lib/status.ts; Test status.test.ts, cards.test.ts; KONZEPT §Datenmodell | Herkunft: User-Vorgabe | Inventar: R-078 | MUSS=SHALL
 
 #### Scenario: Verkauft mit Person
 - GIVEN eine aktive Karte

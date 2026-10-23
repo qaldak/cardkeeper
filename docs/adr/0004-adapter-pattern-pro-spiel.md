@@ -2,7 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (Konzept); Erweiterung um Pokémon: 2026-10-05
-- **Herkunft:** Abgeleitet (Konzept des Benutzers; Q-007). Das zweite Spiel Pokémon wurde vom Benutzer verlangt (Chat 2026-10-05 18:57).
+- **Herkunft:** User-Vorgabe (Konzept des Benutzers; Antwort Q-007). Das zweite Spiel Pokémon wurde vom Benutzer verlangt (Chat 2026-10-05 18:57).
 - **Inventar:** D-006, D-017, R-001
 - **Specs:** [`spiele-adapter`](../../openspec/specs/spiele-adapter/spec.md)
 

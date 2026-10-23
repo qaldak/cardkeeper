@@ -32,13 +32,13 @@ Status: OFFEN | BEANTWORTET.
 - Antwort: Plugin im App-Prozess gilt; der Scheduler-Container des Konzepts ist verworfen.
 - Beantwortet am: 2026-10-23
 
-### Q-003 – Status: OFFEN
+### Q-003 – Status: BEANTWORTET
 - Betrifft: ADR 0018 (Schutz des `main`-Branches); D-037
 - Frage: Wie ist der Schutz von `main` auf GitHub tatsächlich eingerichtet (Ruleset-Name, geforderte Statusprüfungen, Admin-Ausnahme für den Release-Push)? Optionen: (a) wie in der Chat-Anleitung vom 2026-10-06, (b) abweichend, bitte Einstellungen nennen.
 - Evidenz: Chat 2026-10-06 14:49 (Frage des Benutzers) und 14:50 (Anleitung des Assistenten); 2026-10-07 10:51 Assistent: Release lief „auch mit dem neuen Branch-Schutz“. Die Einstellungen liegen nur auf GitHub, nicht im Repository.
 - Arbeitsannahme bis zur Antwort: Schutz wie in der Anleitung beschrieben (Ruleset „Protect main“, PR nötig mit 0 Freigaben, drei Statusprüfungen, Admin-Bypass).
-- Antwort:
-- Beantwortet am:
+- Antwort: Der Schutz ist wie in der Chat-Anleitung vom 2026-10-06 eingerichtet.
+- Beantwortet am: 2026-10-23
 
 ### Q-004 – Status: BEANTWORTET
 - Betrifft: Spec `waehrungsumrechnung` › Requirement „Anzeigewährung“; K-012; R-029
@@ -64,21 +64,21 @@ Status: OFFEN | BEANTWORTET.
 - Antwort: Nicht gewünscht; die Pokémon-Roadmap-Punkte sind aus der README gestrichen.
 - Beantwortet am: 2026-10-23
 
-### Q-007 – Status: OFFEN
+### Q-007 – Status: BEANTWORTET
 - Betrifft: ADRs 0001–0006 (Hosting, Stack, Datenmodell aus dem Konzept); K-019
 - Frage: Gelten die Entscheide des Konzepts (`docs/KONZEPT.md`: Hosting Variante 1, Nuxt/Prisma/PostgreSQL, Adapter-Pattern, Datenmodell) als vom Benutzer verantwortet, soweit sie nicht später geändert wurden? Optionen: (a) ja, (b) einzelne bitte nennen.
 - Evidenz: Chat 2026-10-04 09:59: Konzept als Anhang des Benutzers („Das konzept… findest du im anhang“); Kopfzeile des Dokuments „@Qaldak“; der Satz „Eine visuelle Architekturskizze… wurde im Chat gezeigt“ deutet auf eine frühere Beratung hin.
 - Arbeitsannahme bis zur Antwort: (a): Entscheide des Konzepts sind User-Vorgabe, Abweichungen sind in history/ADRs vermerkt.
-- Antwort:
-- Beantwortet am:
+- Antwort: Ja, alle Entscheide des Konzepts gelten als vom Benutzer verantwortet, soweit nicht später geändert.
+- Beantwortet am: 2026-10-23
 
-### Q-008 – Status: OFFEN
+### Q-008 – Status: BEANTWORTET
 - Betrifft: Spec `export` › Requirement „Geplante Funktionen“; R-060
 - Frage: Welche Inhalte soll „Für KI kopieren“ haben (Feldauswahl, Beschränkung auf Status „Aktiv“, Sprache, Kartentext, Einleitung, Banlist)? Optionen: Vorschlag des Assistenten vom 2026-10-21 19:10 übernehmen (gruppiert mit Anzahl, Englisch + deutscher Name, nur aktive Karten, Einleitung wählbar) oder ändern.
 - Evidenz: Chat 2026-10-21 19:10 (Anforderung „geeignet für einen AI-Prompt“) und Antwort des Assistenten mit zwei Profilen; der Benutzer hat nur das CSV-Profil beauftragt (2026-10-22 11:53).
 - Arbeitsannahme bis zur Antwort: Noch nicht festgelegt; die Spec beschreibt nur den Platzhalter im Menü.
-- Antwort:
-- Beantwortet am:
+- Antwort: Noch nicht festgelegt; bewusst zurückgestellt, Spec beschreibt nur den Menüplatzhalter.
+- Beantwortet am: 2026-10-23
 
 ### Q-009 – Status: BEANTWORTET
 - Betrifft: Spec `betrieb` › Requirement „Backup“; K-009
@@ -88,10 +88,10 @@ Status: OFFEN | BEANTWORTET.
 - Antwort: Nur manuelles Backup gilt.
 - Beantwortet am: 2026-10-23
 
-### Q-010 – Status: OFFEN
+### Q-010 – Status: BEANTWORTET
 - Betrifft: Spec `kartenstatus` › Requirement „Status mit Datum und Person“; R-078
 - Frage: Soll bei Status „verloren“ ein Datum erfasst werden? Das Konzept nennt nur „Person leer“, der Code speichert ein Datum. Optionen: (a) Datum wie bei allen Nicht-aktiv-Status (aktuell), (b) kein Datum bei „verloren“.
 - Evidenz: KONZEPT §Datenmodell: „Datum und Person… nur bei verkauft, getauscht, verschenkt – bei verloren bleibt person_text leer“; Code `server/lib/status.ts`/`shared/utils/status.ts`: Datum für alle ausser aktiv; README: „with date and counterpart“.
 - Arbeitsannahme bis zur Antwort: (a): Datum wird für „verloren“ erfasst, Person nicht.
-- Antwort:
-- Beantwortet am:
+- Antwort: Datum wird auch bei „verloren“ erfasst, ohne Person (Ist-Stand).
+- Beantwortet am: 2026-10-23

@@ -16,7 +16,7 @@ Quelle: README §Data model; Code app/prisma/schema.prisma | Herkunft: Abgeleite
 
 ### Requirement: Spielspezifische Werte als JSONB
 Das System MUSS spielspezifische Werte in `cards.game_specific_attributes` (JSONB) speichern.
-Quelle: KONZEPT §Datenmodell; README §Data model | Herkunft: Abgeleitet | Inventar: D-007 | MUSS=SHALL
+Quelle: KONZEPT §Datenmodell (Antwort Q-007); README §Data model | Herkunft: User-Vorgabe | Inventar: D-007 | MUSS=SHALL
 
 #### Scenario: Neues Spiel
 - GIVEN ein neues Spiel

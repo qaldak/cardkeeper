@@ -1,7 +1,7 @@
 # Export Specification
 
 ## Purpose
-Export der Karten als Tabelle zur Weiterverarbeitung (Excel). Der Export folgt der Auswahl der Übersicht. Die Kopie für KI-Prompts und die druckbare Liste sind als eigene Anforderungen geplant und im Menü als deaktivierte Platzhalter sichtbar. Entscheid: [ADR 0013](../../../docs/adr/0013-csv-export-serverseitig.md) (serverseitig). Verlauf: H-12, H-13. Offene Fragen: Q-008.
+Export der Karten als Tabelle zur Weiterverarbeitung (Excel). Der Export folgt der Auswahl der Übersicht. Die Kopie für KI-Prompts und die druckbare Liste sind als eigene Anforderungen geplant und im Menü als deaktivierte Platzhalter sichtbar. Entscheid: [ADR 0013](../../../docs/adr/0013-csv-export-serverseitig.md) (serverseitig). Verlauf: H-12, H-13.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ Quelle: Chat 2026-10-22 11:26, 11:46, 11:53 (Platzierung bestätigt); Code app/a
 - THEN erscheint „CSV-Export“ als aktiver Eintrag
 
 ### Requirement: Geplante Funktionen als Platzhalter
-Das System SOLL im Menü „Für KI kopieren (folgt)“ und „Liste drucken (folgt)“ als nicht wählbare Einträge zeigen; sie sind noch nicht umgesetzt. [OFFEN Q-008] Annahme: Inhalt der KI-Kopie und der Druckliste sind noch nicht festgelegt.
+Das System SOLL im Menü „Für KI kopieren (folgt)“ und „Liste drucken (folgt)“ als nicht wählbare Einträge zeigen; sie sind noch nicht umgesetzt, ihr Inhalt ist bewusst noch nicht festgelegt (Q-008).
 Quelle: Chat 2026-10-21 19:10, 2026-10-22 11:53; README §Roadmap; Code app/app/pages/index.vue | Herkunft: User-Vorgabe | Inventar: R-060, R-093 | MUSS=SHALL
 
 #### Scenario: Platzhalter

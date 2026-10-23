@@ -37,18 +37,18 @@ Branch: `docs/openspec-baseline` (lokal, nicht gepusht). Basis: `origin/main` @ 
 |---|---|
 | Specs (Domains) | 17, alle mit `openspec validate --specs --strict` gültig |
 | Requirements gesamt | 189 (262 Szenarien) |
-| davon Herkunft `User-Vorgabe` | 107 |
-| davon Herkunft `Abgeleitet` | 82 |
+| davon Herkunft `User-Vorgabe` | 111 |
+| davon Herkunft `Abgeleitet` | 78 |
 | davon Herkunft `Unklar` | 0 |
-| Requirements mit offener Frage (`[OFFEN Q-…]`) | 2 |
+| Requirements mit offener Frage (`[OFFEN Q-…]`) | 0 |
 | ADRs | 24 (`docs/adr/0001`–`0024`) |
 | Inventareinträge mit R-/D-Nummer | 171; abgedeckt 167, mit Begründung nicht oder teilweise abgedeckt 4 (siehe `COVERAGE.md`) |
 | Konflikte (Konzept/README/Code/Chat) | K-001…K-021 in `00-inventory.md`; alle am 2026-10-23 mit dem Benutzer geklärt (Status GELÖST) |
-| Offene Fragen | 4 offen (Q-003, Q-007, Q-008, Q-010), 6 beantwortet am 2026-10-23 (Q-001, Q-002, Q-004, Q-005, Q-006, Q-009) |
+| Offene Fragen | 0; alle 10 (Q-001…Q-010) am 2026-10-23 beantwortet |
 
 Requirements je Spec (Requirements/Szenarien): benutzer-zugriff 19/29, betrieb 14/15, bilder 10/15, datenhaltung 10/11, entwicklung-release 11/11, export 10/15, karte-detail 15/23, karten-blaettern 6/11, kartenerfassung 19/35, kartenstatus 6/8, oberflaeche 11/12, preise 11/14, set-import 11/13, sicherheit 4/7, spiele-adapter 11/12, uebersicht 14/23, waehrungsumrechnung 7/8.
 
-Hinweis zur Herkunft: Die Specs führen `Abgeleitet`, wenn der Chat die Forderung nicht ausdrücklich belegt (z. B. reine README- oder Code-Fakten, Entscheide des Assistenten ohne Beanstandung). Entscheide aus dem Konzept des Benutzers sind `Abgeleitet`, bis Q-007 beantwortet ist.
+Hinweis zur Herkunft: Die Specs führen `Abgeleitet`, wenn der Chat die Forderung nicht ausdrücklich belegt (z. B. reine README- oder Code-Fakten, Entscheide des Assistenten ohne Beanstandung). Entscheide aus dem Konzept des Benutzers gelten seit der Antwort auf Q-007 als `User-Vorgabe`.
 
 ## Konfliktklärung (2026-10-23)
 
@@ -57,3 +57,7 @@ Alle 21 Konflikte sind geklärt. Entscheide des Benutzers: Konzept als historisc
 Dabei geänderte Nicht-Doku-Dateien (ausdrücklich vom Benutzer freigegeben, eigener Commit): `README.md` (Tests-Abschnitt, Detailseite mit Japanisch, Hinweis auf Variablen ohne Wirkung in `.env`, Pokémon-Roadmap gestrichen) und ein Kommentar in `app/prisma/schema.prisma`. Zusätzlich `docs/KONZEPT.md` (Hinweisblock am Anfang).
 
 Korrektur gegenüber dem ersten Inventar (K-007): `IMAGE_DIR`, `YGOPRODECK_API_URL`, `TCGDEX_API_URL`, `EXCHANGE_RATE_API_URL` und `SKIP_MIGRATIONS` fehlen in der README-Tabelle zu Recht; `docker-compose.yml` reicht sie nicht aus `.env` weiter (die Entwicklungsdatei nur `YGOPRODECK_API_URL`). `.env.example` blieb unverändert.
+
+## Offene Fragen geklärt (2026-10-23)
+
+Q-003: Schutz von `main` wie in der Anleitung (ADR 0018). Q-007: Konzept-Entscheide gelten als eigene Vorgabe (ADR 0001–0005, 0019, 0023; Herkunft entsprechend angepasst). Q-008: Inhalt der KI-Kopie bewusst nicht festgelegt. Q-010: Datum auch bei „verloren“.

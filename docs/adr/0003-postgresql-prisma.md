@@ -2,7 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (Konzept)
-- **Herkunft:** Abgeleitet (Konzept des Benutzers; Q-007).
+- **Herkunft:** User-Vorgabe (Konzept des Benutzers; Antwort Q-007).
 - **Inventar:** D-004, D-005, R-036, R-038
 - **Specs:** [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md), [`betrieb`](../../openspec/specs/betrieb/spec.md)
 

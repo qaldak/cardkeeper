@@ -1,8 +1,8 @@
 # ADR 0018: Schutz des Branches `main` mit Ausnahme für den Release-Workflow
 
-- **Status:** Akzeptiert; Einzelheiten der Einstellung nur in der Chat-Anleitung belegt (Q-003)
+- **Status:** Akzeptiert (Einstellung wie in der Chat-Anleitung bestätigt, Q-003)
 - **Datum:** 2026-10-06
-- **Herkunft:** Abgeleitet (Empfehlung des Assistenten auf Frage des Benutzers; vom Benutzer in GitHub umgesetzt).
+- **Herkunft:** Abgeleitet (Empfehlung des Assistenten auf Frage des Benutzers); der Benutzer bestätigte am 2026-10-23, dass der Schutz wie in der Anleitung eingerichtet ist (Antwort Q-003).
 - **Inventar:** D-037
 - **Specs:** [`entwicklung-release`](../../openspec/specs/entwicklung-release/spec.md)
 
@@ -21,7 +21,7 @@ nicht dokumentiert.
 ## Konsequenzen
 
 - Änderungen laufen über Pull Requests mit der CI (Spec `entwicklung-release`).
-- Die tatsächlichen Einstellungen in GitHub sind aus dem Repository nicht prüfbar (Q-003).
+- Die Einstellungen liegen in GitHub und sind aus dem Repository nicht prüfbar; der Benutzer hat sie am 2026-10-23 bestätigt (Q-003).
 - Der erste Release mit Branch-Schutz lief erfolgreich (Chat 2026-10-07 10:51).
 
 ## Quellen

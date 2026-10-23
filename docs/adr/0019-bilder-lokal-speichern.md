@@ -2,7 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (Konzept); Vorschaubilder: 2026-10-09
-- **Herkunft:** Abgeleitet (Konzept des Benutzers, Q-007); das Bild schon bei Suche und Auswahl ist eine User-Vorgabe (Chat 2026-10-09 20:52), die Umsetzung über eine eigene Kopie ein Entscheid des Assistenten (20:58).
+- **Herkunft:** User-Vorgabe (Konzept des Benutzers, Antwort Q-007); das Bild schon bei Suche und Auswahl ist eine User-Vorgabe (Chat 2026-10-09 20:52), die Umsetzung über eine eigene Kopie ein Entscheid des Assistenten (20:58).
 - **Inventar:** D-046, R-027, R-058, R-083, R-100
 - **Specs:** [`bilder`](../../openspec/specs/bilder/spec.md), [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md)
 

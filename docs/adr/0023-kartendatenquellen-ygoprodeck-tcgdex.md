@@ -2,7 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (YGOPRODeck, Konzept); 2026-10-05 (TCGdex)
-- **Herkunft:** YGOPRODeck: Abgeleitet (Konzept des Benutzers, Q-007). TCGdex: User-Vorgabe (Chat 2026-10-05 18:57).
+- **Herkunft:** YGOPRODeck: User-Vorgabe (Konzept des Benutzers, Antwort Q-007). TCGdex: User-Vorgabe (Chat 2026-10-05 18:57).
 - **Inventar:** D-036, D-044, R-001, R-057
 - **Specs:** [`spiele-adapter`](../../openspec/specs/spiele-adapter/spec.md)
 
