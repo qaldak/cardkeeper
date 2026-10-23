@@ -14,7 +14,8 @@ Format je Eintrag: ID – Kurzbeschreibung | Quelle(n) | Herkunft (`User-Vorgabe
 | B | Code, Tests, Konfiguration (Quelle b) | fertig, siehe Abschnitt „Block B“ |
 | C1 | Chat 2026-10-04 bis 2026-10-05 19:57 (Turns 0–141) | fertig |
 | C2 | Chat 2026-10-05 20:00 bis 2026-10-07 17:11 (Turns 142–245) | fertig |
-| C3 | Chat ab Turn 246 (2026-10-07 17:18) | offen |
+| C3 | Chat 2026-10-07 17:18 bis 2026-10-08 19:13 (Turns 246–312) | fertig |
+| C4 | Chat ab Turn 313 (2026-10-09 18:28) | offen |
 
 Herkunft in Block A ist vorläufig `Abgeleitet` (README/Konzept); der Chat-Abgleich (Block C) hebt Einträge auf `User-Vorgabe`, wo der Chat die Forderung belegt.
 
@@ -296,6 +297,29 @@ Format der Bestätigungen: `ID | Chat-Beleg (Zeitpunkt, Zitat ≤ 15 Wörter) | 
 | R-005 | 2026-10-07 16:46: „Die App soll zusätzlich in einem Darkmode verfügbar sein… zeige zuerst ein Muster“; 17:06: „Design passt. Voreinstellungen: System folgt dem Gerät, wenn nicht erkannt: hell. Einstellungen merken.“ | → User-Vorgabe; Muster-Artefakt vor der Umsetzung |
 | D-040 (neu) | 2026-10-07 17:11 Assistent: Farben aus Nuxt UI, eigene Variablen in `main.css`; Text auf Blau mit `text-inverted` wegen Kontrast | Entscheid des Assistenten (Abgeleitet) |
 
-### C3 – (wird fortgesetzt ab Turn 246)
+### C3 – 2026-10-07 17:18 bis 2026-10-08 19:13 (Bildzoom, Kopfzeile, Titel, Editionen, tolerantes Parsen)
+
+| ID | Chat-Beleg | Wirkung |
+|---|---|---|
+| R-016 | 2026-10-07 17:18: „Bei Klick auf ein heruntergeladenes Bild soll das vergrössert (evtl. als Modal) angezeigt werden… Qualität gross genug“ | → User-Vorgabe; grösste Standardvariante der Karten-DB (Assistent 17:24) |
+| R-211 (neu) | 2026-10-07 17:18: Umschaltung „Karten“/„Benutzer“ soll immer an der gleichen Stelle sein, „Suche… nur in der Kartenübersicht“ | Kopfzeile bleibt beim Seitenwechsel stabil; Suchfeld nur in der Übersicht (User-Vorgabe, aktiv) |
+| R-212 (neu) | 2026-10-07 17:40: „immer wenn ich ein Dropdown öffne, verschiebt sich der Rand… Prüfe und korrigiere“ | Kein Layout-Sprung beim Öffnen von Dropdowns/Dialogen (User-Vorgabe, aktiv); Ursache doppelter Scrollbalken-Ausgleich (Assistent 17:45) |
+| R-016 | 2026-10-07 17:48: Klick auf das Bild schliesst den Dialog; grössere Blätter-Flächen; „Rechte Maustaste… Das Bild soll runtergeladen werden können“ | → User-Vorgabe; Kartenname als Dateiname, Download-Knopf (Assistent 17:58) |
+| R-081 | 2026-10-07 18:51: Frage, ob Bild-Upload/Hauptbild extra gespeichert werden muss; Antwort: sofort gespeichert | Information; Bild-Aktionen wirken sofort, mit Audit-Eintrag |
+| R-105 | 2026-10-07 19:16: „Der Titel soll ‚Cardkeeper - {Seite}‘ (z.B. Cardkeeper - Übersicht) heissen.“ | → User-Vorgabe |
+| R-025 | 2026-10-07 19:37: „Edition ‚1. Auflage‘… als Erfassungshilfe… Dropdown oder sonst relativ einfach“ | → User-Vorgabe (Ausgangspunkt) |
+| R-025, D-014 | 2026-10-07 21:15 (Benutzer, englischer Auftrag): Schlüssel statt Text für die Voreinstellungen von `card_sets.edition`, übersetzte Labels wie `status.<KEY>`, Migration mit Abgleich (ohne Gross-/Kleinschreibung), eigener Text bleibt unverändert; Tests für Migration und Label | → User-Vorgabe |
+| R-025 | 2026-10-07 21:37/21:39: Migration auch für „1. Auflage“ und „1.Auflage“; „Rest gibt es aktuell nicht.“ | → User-Vorgabe |
+| R-025, D-014 | 2026-10-08 17:42/17:52: nur zwei aufgedruckte Editionen („1st Edition“, „Limited Edition“); „Unlimited = leer“ (NULL); Buttons bei der Erfassung bleiben; Kartenseite Dropdown (übersetzt); „Freitext weg“; unbekannter bestehender Text bleibt sichtbar | → User-Vorgabe; ersetzt den Zwischenstand mit dem Schlüssel `UNLIMITED` (siehe history) |
+| R-025 | 2026-10-08 18:13: Kein Listeneintrag „Ohne Aufdruck (unlimitiert)“ im Dropdown der Detailansicht | → User-Vorgabe; Assistent: ✕-Knopf zum Leeren, Platzhalter „Keine Edition“ (18:18) |
+| R-104 | 2026-10-08 18:18: Migration: alles mit „1st“ oder „1.“ → `FIRST_EDITION`; „Andere Werte bleiben… und schreiben einen Logeintrag im Docker Container“ | → User-Vorgabe; Startprüfung im App-Container (Assistent 18:22) |
+| R-015 | 2026-10-08 18:18: „bei SET_CODE soll immer UPPERCASE eingegeben werden… auf dem UI so veranlassen“ | → User-Vorgabe |
+| R-046/R-104 (Info) | 2026-10-08 18:24: Benutzer fragt SQL-Vorkontrolle und wie der DB-Container zu öffnen ist (`docker compose exec db psql …`) | Information, nur im Chat (nichts ins Repository) |
+| R-213 (neu) | 2026-10-08 17:52: „bei der Erfassung… immer ein Pokemon Bild geholt statt das korrekte Yu-Gi-Oh“ (Testumgebung); „Sicherstellen, dass die SST-Aufrufe weiterhin korrekt funktionieren“ | Anforderung: ein YGO-Treffer lädt nur YGO-Bilder, ein Pokémon-Treffer nur TCGdex-Bilder (User-Vorgabe); Ursache war ein Browser-Cache (Benutzer 18:08), Test `api-calls.test.ts` ergänzt |
+| R-027 | 2026-10-08 18:08: Bild erschien nach Strg+Umschalt+R korrekt („Es war der Cache“) | Anlass für ETag-Auslieferung (R-082) |
+| R-059 | 2026-10-08 19:03/19:13: YGO-Link-Karte („Hieratic Seal…“, `def: null`) → 502 `upstream_invalid_response`; Benutzer liefert die API-Antwort | → User-Vorgabe (Fehlerbehebung); Entscheid: unerwartete Feldwerte weglassen und loggen, nur Karte ohne ID/Name ablehnen (Assistent 19:07) |
+| R-025 (Pokémon) | 2026-10-08 19:10: Frage zu vorhandenen Werten `holo`, `normal`, `reverse` in `card_sets.edition` bei der Migration; Antwort: bleiben unverändert, Migration betrifft nur Yu-Gi-Oh! | Information; Migration spielbezogen (Test `edition-migration.test.ts`) |
+
+### C4 – (wird fortgesetzt ab Turn 313)
 
 _noch nicht ausgewertet_
