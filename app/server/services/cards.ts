@@ -214,6 +214,11 @@ export function createCardService(deps: CardServiceDeps) {
     }
   }
 
+  async function orderedIds(filters: CardFilters, order: { sort: CardSort, dir?: SortDirection }): Promise<number[]> {
+    const rows = await db.card.findMany({ where: buildCardWhere(filters), select: sortSelect() })
+    return sortRows(rows.map(toSortRow), order.sort, order.dir).map(row => row.id)
+  }
+
   return {
     get,
 
@@ -283,8 +288,7 @@ export function createCardService(deps: CardServiceDeps) {
       order: { sort: CardSort, dir?: SortDirection },
       pageSize: number,
     ): Promise<CardNeighborsDto> {
-      const rows = await db.card.findMany({ where: buildCardWhere(filters), select: sortSelect() })
-      const ids = sortRows(rows.map(toSortRow), order.sort, order.dir).map(row => row.id)
+      const ids = await orderedIds(filters, order)
       const index = ids.indexOf(id)
       const total = ids.length
       if (index === -1) {
@@ -298,6 +302,9 @@ export function createCardService(deps: CardServiceDeps) {
         page: Math.floor(index / pageSize) + 1,
       }
     },
+
+    /** The ids of all cards that match the filters, in the order of the overview (every page, for the export and the paging). */
+    orderedIds,
 
     /** Distinct values of the collection for the filter dropdowns. */
     async facets(gameSlug?: string): Promise<FacetsDto> {

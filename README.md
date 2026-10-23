@@ -21,6 +21,11 @@ Everything runs in containers: there is nothing to install on the host except Do
   order and page are kept when going to a card and back, until the next login or logout; a card opened from the overview can be paged through (previous/next, wrapping around) in the order of the overview (also with the arrow keys), and "back to overview" returns to the page of the card; the search box matches names in every language, set code and set name;
   sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come
   last); total value of the active cards
+- CSV export (overview → "Export" → "CSV export"): the selection of the overview (filters and sort order, every page, any
+  owner and status) as a CSV file for Excel: all data of the cards without images, in the order of the card page, texts in
+  the language of the interface (English where a card has none), the latest price of the price source and, with
+  `DISPLAY_CURRENCY`, in that currency as well. Semicolon separated, UTF-8 with a byte order mark; the same file is at
+  `GET /api/export/cards`
 - Card detail page: texts in German and English with a language switch (German first, a language the card does not
   have is disabled), the set code (always capitals) and edition can be corrected (e.g. German or Japanese prints, applies to all
   languages), manual image upload, click on the image to see it enlarged (a click on the enlarged image closes it, wide areas beside it and the arrow keys go through several images, a button downloads it; "Save image as" in the right-click menu works as well and suggests the card name), status handling (active, sold, traded, gifted, lost) with date and counterpart,
@@ -67,7 +72,7 @@ Everything runs in containers: there is nothing to install on the host except Do
 - User interface in German and English
 - Semantic releases, multi-arch (amd64 + arm64) Docker images, automated dependency updates
 
-Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): PDF/CSV/Markdown export. See [Roadmap](#roadmap).
+Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): the copy for an AI and the printable list. See [Roadmap](#roadmap).
 
 ## Quick start
 
@@ -414,7 +419,7 @@ No schema change and no change in the core services is required.
 
 ## Roadmap
 
-- Export as PDF, CSV and Markdown
+- Export: copy the cards for an AI prompt (deck building), printable list as PDF or Word
 - Pokémon: a list price that depends on the variant (holo and reverse holo have their own prices), paging through the search
   results, more filters (set, illustrator, regulation mark)
 
