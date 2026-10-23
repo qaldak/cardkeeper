@@ -16,7 +16,7 @@ Format je Eintrag: ID – Kurzbeschreibung | Quelle(n) | Herkunft (`User-Vorgabe
 | C2 | Chat 2026-10-05 20:00 bis 2026-10-07 17:11 (Turns 142–245) | fertig |
 | C3 | Chat 2026-10-07 17:18 bis 2026-10-08 19:13 (Turns 246–312) | fertig |
 | C4 | Chat 2026-10-09 18:28 bis 2026-10-10 20:33 (Turns 313–343) | fertig |
-| C5 | Chat ab Turn 344 (2026-10-10 20:39) | offen |
+| C5 | Chat 2026-10-10 20:39 bis 2026-10-23 16:06 (Turns 344–415) | fertig |
 
 Herkunft in Block A ist vorläufig `Abgeleitet` (README/Konzept); der Chat-Abgleich (Block C) hebt Einträge auf `User-Vorgabe`, wo der Chat die Forderung belegt.
 
@@ -336,6 +336,37 @@ Format der Bestätigungen: `ID | Chat-Beleg (Zeitpunkt, Zitat ≤ 15 Wörter) | 
 | R-021 | 2026-10-10 19:56: „Set-Wizard soll auch für Pokemon Sets möglich werden… analog YGO“; falls nicht möglich: Info | → User-Vorgabe; Variante ist das „Unklare“, Ladezeit durch Varianten-Einzelanfragen (Assistent 20:09) |
 | R-053 | 2026-10-10 20:26: Bug-Verdacht: Pokémon-Edition in der Detailansicht änderbar, obwohl keine andere Variante zur Wahl; 20:33: „Nein, in diesem fall keine Änderung. lass das feld wie's ist“ | verworfen: Variantenfeld bleibt wie es ist (aktiv, mit nur den vorhandenen Varianten); `sv08-249` zeigt nur Holo, wenn die API nur Holo meldet |
 
-### C5 – (wird fortgesetzt ab Turn 344)
+### C5 – 2026-10-10 20:39 bis 2026-10-23 16:06 (Preis-Reload, Banner, CHF, Filter, Paging, Review, Export)
 
-_noch nicht ausgewertet_
+| ID | Chat-Beleg | Wirkung |
+|---|---|---|
+| R-030, R-031 | 2026-10-10 20:40: Preise „regelmässig, z.B. wöchentlich… via API neu geladen“; „gestaffelt… mit einem Set starten und… 1 Tag später die nächste Tranche“; Dauer frei konfigurierbar (täglich, x Tage/Wochen/Monate, „ähnlich einem Cron“) | → User-Vorgabe |
+| R-030 | 2026-10-10 20:40: „manuell eingegebene Daten… nicht überschrieben, nur die Preise aktualisiert“; „aktuelle Preis dokumentiert werden, wenn dieser nicht ändert… Reporting“ | → User-Vorgabe |
+| R-037 | 2026-10-10 20:40: „Die Konfiguration muss nicht im UI passieren. Das kann im .env gemacht werden.“; „Passe auch… das Readme an“ (Roadmap-Eintrag entfernen) | → User-Vorgabe |
+| R-216 (neu) | 2026-10-10 20:58: „ist das ein feature oder ein breaking change?… ich will das nicht zwingend konfigurieren müssen… auch wieder deaktivieren“ | Anforderung: neue Einstellungen sind optional mit Standardwerten, abschaltbar (`off`); die Änderung ist ein Minor-Release (User-Vorgabe) |
+| R-031 | 2026-10-10 21:10/21:15: Standard höher als 100 („670 Karten erfasst… 300 pro Tag“); Rechnung vor der Anpassung; „nicht zu viel dokumentieren, einfach knapp“; zu hohe Werte werden nicht verhindert, aber im README beim Parameter erwähnt | → User-Vorgabe; Standard 300 pro Tranche (Assistent 21:19), Tabelle der Dauer (Assistent 21:11) |
+| R-032 | 2026-10-10 21:15: „falls Fehler auftreten, weil… zuviele Requests gemacht wurden, muss diese bis an den User gehen“ (z. B. „Anzahl der Schnittstellenabfragen erreicht. Versuche es später wieder.“) | → User-Vorgabe; eigene Meldung für Suche, Auswahl, Hinzufügen, Aktualisieren, Set-Wizard; Lücke bei Varianten/Namen geschlossen (Assistent 21:19) |
+| R-101 | 2026-10-10 21:38: „beim starten von docker compose up soll im Log angezeigt werden, welche Version gestartet wird… kleiner welcome screen“; 21:42: „Auf Englisch… Im Readme nicht ergänzen“ | → User-Vorgabe; Vorschlag mit Release-/Lokal-Kennzeichnung vom Benutzer bestätigt |
+| R-029 | 2026-10-10 22:14: Preise zusätzlich in CHF: Übersicht (Karten, Total) in CHF; Detail „CHF 0.08 (EUR 0.09)“; Währung in `.env`, Parameter nicht zwingend; Kurs täglich einmal, bei erstem Bedarf, nutzerübergreifend im Cache; je Paar erst beim ersten Gebrauch; Kurs nicht im UI; bei Fehler Originalwert; Quelle Frankfurter (EZB) | → User-Vorgabe |
+| R-029 (Auslegung) | 2026-10-10 22:14: „Wenn nicht definiert, wird weiterhin EUR verwendet wie jetzt.“ | Auslegung des Assistenten (22:25): ohne Parameter bleiben Preise in der Quellwährung (EUR/USD), keine Umrechnung nach EUR; vom Benutzer nicht beanstandet (Herkunft: Abgeleitet) |
+| R-029 | 2026-10-10 22:36/22:38: „Dann dasselbe… bei den Preisen bei Pokemon Karten“; „Pokemon bereits umgesetzt. Richtig.“ | → User-Vorgabe (gilt für beide Spiele; Umrechnung im gemeinsamen Service) |
+| R-096 (Auslegung) | 2026-10-10 22:25 Assistent: bei Dienstausfall wird der Kurs eines früheren Tages verwendet (wie im Beispielcode des Benutzers „lieber alter Kurs als keiner“) | Abweichung von „nur Originalwert“, vom Benutzer nicht beanstandet (Abgeleitet) |
+| R-097 (Auslegung) | 2026-10-10 22:25 Assistent: Preisverlauf wird mit dem heutigen Kurs umgerechnet (nicht mit dem damaligen) | Entscheid des Assistenten, nicht beanstandet (Abgeleitet) |
+| R-217 (neu) | 2026-10-10 22:40: Test-Typfehler (`TS7053`) im CI nach dem Pokémon-Test | Anforderung an die Arbeitsweise: Lint und Typecheck müssen auch für Tests laufen (CI, siehe R-050); Fehler lag im Test, nicht in der App |
+| R-091 | 2026-10-20 09:09: „Beschreibungsfeld bei Yu-Gi-Oh auf 6 Zeilen erhöhen… optional: dynamisch… bis max. 6 Zeilen und dann scrollen“ | → User-Vorgabe; Umsetzung für beide Spiele, 3 bis 6 Zeilen (Assistent) |
+| R-007 | 2026-10-20 09:09: „Standardmässig sollen die Filter auf die eigene, angemeldete Person gesetzt sein.“ | → User-Vorgabe (Besitzerfilter) |
+| R-008 | 2026-10-20 09:09: Filter bleiben bei „zur übersicht“ erhalten; „Bei Neuanmeldung resp. neustart können wieder die Standardfilter… gesetzt sein“ | → User-Vorgabe; Session-Cookie, bei Login/Logout gelöscht (Assistent) |
+| R-010 | 2026-10-21 04:40: Bug: Suche oben rechts berücksichtige „nur die Sprache DE“; „Anforderung: die Texteingabe… soll über alle Sprachen prüfen… Filter mitberücksichtigt“ | → User-Vorgabe (Anforderung bestätigt); Befund: im Code schon erfüllt, Fehler nicht reproduzierbar; Regressionstest ergänzt (Assistent); Rückfrage nach konkretem Fall, keine Antwort im Chat → Q offen |
+| R-009 | 2026-10-21 11:00: „in der Übersicht eine Detailansicht öffne, will ich auch ‚weiter‘ und ‚zurück‘ blättern können… entsprechend dem Filter und der Sortierung“ | → User-Vorgabe |
+| R-009 (Entscheide) | 2026-10-21 11:02: „1. URL ist okay. 2. wieder beginnen mit der ersten, respektive… der letzten. 3. a. Rückfragen, ob gespeichert werden soll. 4. Buttons reichen… 5. ok“ | → User-Vorgabe (Kontext in der URL; Umlauf; Rückfrage bei ungespeicherten Änderungen; Buttons; Rückkehr auf die Seite der Karte) |
+| R-090 | 2026-10-21 11:46/11:48: Pfeiltasten (Bildzoom bereits belegt) zum Blättern zwischen Detailseiten; „Ja, so einbauen, aber ohne Einblendtipp.“ | → User-Vorgabe; Bedingungen (kein Feld/Liste/Dialog/Zusatztaste, nur bei `nav=1`) aus dem Vorschlag des Assistenten vom Benutzer bestätigt |
+| R-106, R-218 (neu) | 2026-10-21 14:27: externes Review (Sicherheit, Architektur) „prüfen, validieren, notwendige Anpassungen umsetzen“ | → User-Vorgabe (Auftrag); Ergebnis: Schutz vor Cross-Site-Schreibzugriffen, Sicherheits-Header, Coverage-Skript; viele Behauptungen widerlegt (Assistent 14:37 ff.) |
+| R-218 (neu) | 2026-10-21: Coverage-Messung `npm run test:coverage` (v8, ohne Schwelle), Dependabot-Gruppe vitest | Anforderung aus Review (Abgeleitet), vom Benutzer nicht beanstandet; ca. 86 % Zeilenabdeckung |
+| R-219 (neu) | 2026-10-21 14:37: Offene Review-Punkte Soft-Delete, Aufteilen von `cards.ts`, Trivy/Scans: „ok. keine weiteren aktivitäten nötig.“ | verworfen/zurückgestellt (User-Vorgabe): nicht umgesetzt |
+| R-013, R-060 | 2026-10-21 19:10: Export der Karten „geeignet für einen AI-Prompt“, Excel/CSV; Phase 1 nur eigene Karten; druckbare Liste als eigene Anforderung | → User-Vorgabe; Phase-1-Einschränkung „nur eigene Karten“ am 2026-10-22 11:53 aufgehoben (siehe history) |
+| R-093 | 2026-10-22 11:26: Mockup für „Export / Deck-Copy und Listendruck“ nebeneinander (Dropdown oder Modal); 11:46: „Warum nicht neben dem Button ‚+ Karte hinzufügen‘?“, „kann der Export… als Wizard“; 11:53: „Passt für mich“ (Dropdown in der Übersichtsleiste + eigenes Modal je Funktion) | → User-Vorgabe (Platzierung und Bedienmuster, nach Begründung des Assistenten) |
+| R-013 | 2026-10-22 11:53: „alle Attribute (ohne Bilder) als .csv-Datei… Sprache gem. Auswahl… Fallback Englisch… Auswahl gem. Filter… Keine Einschränkung auf Status, Benutzer… Reihenfolge der Felder analog Detail… Preis nur der letzte… runtergeladen, nicht geöffnet… Semikolon“ | → User-Vorgabe |
+| R-093 | 2026-10-23 14:59: Menü/Titel „CSV-Export“ statt „Tabelle exportieren“; Untertitel entfernen; Buttons rechts, primär zuerst; „Sicherstellen der Übersetzungen“; Erklärungen sparsamer; 15:05: „Als Klick-Popover umsetzen.“ | → User-Vorgabe |
+| R-093 | 2026-10-23 15:23: „Nach Klick auf ‚Herunterladen‘ kommt ein 404… Das CSV wurde aber erfolgreich erstellt“ | → User-Vorgabe (Fehlerbehebung); Ursache Router-Link statt normalem Link |
+| (kein Eintrag) | 2026-10-22 13:46: Frage nach einer PHP-Schwachstelle | Antwort: nicht betroffen (kein PHP im Repository); keine Anforderung |
+| R-060 | 2026-10-23: Roadmap offen: „Für KI kopieren“ (Deck-Daten), „Liste drucken“ | Anforderung bestätigt, nicht umgesetzt (Dropdown-Platzhalter) |
