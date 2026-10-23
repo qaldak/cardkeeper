@@ -435,14 +435,13 @@
   "export": {
     "menu": {
       "label": "Export",
-      "table": "Export table",
+      "table": "CSV export",
       "ai": "Copy for AI (coming)",
       "print": "Print list (coming)"
     },
-    "title": "Export table",
-    "subtitle": "For Excel and your own analyses",
+    "title": "CSV export",
     "selection": "Selection",
-    "cards": "{n} cards",
+    "cards": "no cards | {n} card | {n} cards",
     "sortedBy": "Sort: {sort} {direction}",
     "allOwners": "All owners",
     "allStatus": "All statuses",

@@ -15,7 +15,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <UModal v-model:open="open" :title="t('export.title')" :description="t('export.subtitle')">
+  <UModal v-model:open="open" :title="t('export.title')">
     <template #body>
       <div class="flex flex-col gap-4 text-sm">
         <div class="rounded-lg bg-elevated px-3 py-2.5" data-test="export-selection">
@@ -33,16 +33,19 @@ const { t } = useI18n()
       </div>
     </template>
     <template #footer>
-      <UButton color="neutral" variant="outline" @click="open = false">
-        {{ t('common.cancel') }}
-      </UButton>
-      <!-- A link that downloads; without cards a button that cannot be pressed (a link cannot be disabled). -->
-      <UButton v-if="count === 0" icon="i-lucide-download" disabled data-test="export-download">
-        {{ t('export.download') }}
-      </UButton>
-      <UButton v-else as="a" :href="href" download icon="i-lucide-download" data-test="export-download" @click="open = false">
-        {{ t('export.download') }}
-      </UButton>
+      <!-- On the right, the main action first. -->
+      <div class="flex w-full justify-end gap-2">
+        <!-- A link that downloads; without cards a button that cannot be pressed (a link cannot be disabled). -->
+        <UButton v-if="count === 0" icon="i-lucide-download" disabled data-test="export-download">
+          {{ t('export.download') }}
+        </UButton>
+        <UButton v-else as="a" :href="href" download icon="i-lucide-download" data-test="export-download" @click="open = false">
+          {{ t('export.download') }}
+        </UButton>
+        <UButton color="neutral" variant="outline" data-test="export-cancel" @click="open = false">
+          {{ t('common.cancel') }}
+        </UButton>
+      </div>
     </template>
   </UModal>
 </template>

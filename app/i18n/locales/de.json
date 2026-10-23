@@ -435,14 +435,13 @@
   "export": {
     "menu": {
       "label": "Exportieren",
-      "table": "Tabelle exportieren",
+      "table": "CSV-Export",
       "ai": "Für KI kopieren (folgt)",
       "print": "Liste drucken (folgt)"
     },
-    "title": "Tabelle exportieren",
-    "subtitle": "Für Excel und eigene Auswertungen",
+    "title": "CSV-Export",
     "selection": "Auswahl",
-    "cards": "{n} Karten",
+    "cards": "keine Karten | {n} Karte | {n} Karten",
     "sortedBy": "Sortierung: {sort} {direction}",
     "allOwners": "Alle Besitzer",
     "allStatus": "Alle Status",

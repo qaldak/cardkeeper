@@ -21,7 +21,7 @@ Everything runs in containers: there is nothing to install on the host except Do
   order and page are kept when going to a card and back, until the next login or logout; a card opened from the overview can be paged through (previous/next, wrapping around) in the order of the overview (also with the arrow keys), and "back to overview" returns to the page of the card; the search box matches names in every language, set code and set name;
   sortable by recently added, name, level, purchase date and price (ascending/descending; cards without a value come
   last); total value of the active cards
-- Table export (overview → "Export" → "Export table"): the selection of the overview (filters and sort order, every page, any
+- CSV export (overview → "Export" → "CSV export"): the selection of the overview (filters and sort order, every page, any
   owner and status) as a CSV file for Excel: all data of the cards without images, in the order of the card page, texts in
   the language of the interface (English where a card has none), the latest price of the price source and, with
   `DISPLAY_CURRENCY`, in that currency as well. Semicolon separated, UTF-8 with a byte order mark; the same file is at

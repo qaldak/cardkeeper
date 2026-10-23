@@ -47,7 +47,7 @@ const str = (value: unknown): CsvValue => (typeof value === 'string' || typeof v
  * The column keys of the table export in the order of the card page, top to bottom: basic data, the attributes of the
  * game, the description, status and owner, the dates and the latest price. The header of each is `export.columns.<key>`.
  */
-const COLUMN_KEYS = [
+export const COLUMN_KEYS = [
   'game', 'name', 'setCode', 'edition', 'setName', 'rarity', 'externalId', 'origin',
   // Yu-Gi-Oh!
   'atk', 'def', 'level', 'cardType', 'race', 'attribute', 'archetype', 'scale', 'linkval', 'linkmarkers', 'frameType', 'typeline',
