@@ -15,7 +15,8 @@ Format je Eintrag: ID – Kurzbeschreibung | Quelle(n) | Herkunft (`User-Vorgabe
 | C1 | Chat 2026-10-04 bis 2026-10-05 19:57 (Turns 0–141) | fertig |
 | C2 | Chat 2026-10-05 20:00 bis 2026-10-07 17:11 (Turns 142–245) | fertig |
 | C3 | Chat 2026-10-07 17:18 bis 2026-10-08 19:13 (Turns 246–312) | fertig |
-| C4 | Chat ab Turn 313 (2026-10-09 18:28) | offen |
+| C4 | Chat 2026-10-09 18:28 bis 2026-10-10 20:33 (Turns 313–343) | fertig |
+| C5 | Chat ab Turn 344 (2026-10-10 20:39) | offen |
 
 Herkunft in Block A ist vorläufig `Abgeleitet` (README/Konzept); der Chat-Abgleich (Block C) hebt Einträge auf `User-Vorgabe`, wo der Chat die Forderung belegt.
 
@@ -320,6 +321,21 @@ Format der Bestätigungen: `ID | Chat-Beleg (Zeitpunkt, Zitat ≤ 15 Wörter) | 
 | R-059 | 2026-10-08 19:03/19:13: YGO-Link-Karte („Hieratic Seal…“, `def: null`) → 502 `upstream_invalid_response`; Benutzer liefert die API-Antwort | → User-Vorgabe (Fehlerbehebung); Entscheid: unerwartete Feldwerte weglassen und loggen, nur Karte ohne ID/Name ablehnen (Assistent 19:07) |
 | R-025 (Pokémon) | 2026-10-08 19:10: Frage zu vorhandenen Werten `holo`, `normal`, `reverse` in `card_sets.edition` bei der Migration; Antwort: bleiben unverändert, Migration betrifft nur Yu-Gi-Oh! | Information; Migration spielbezogen (Test `edition-migration.test.ts`) |
 
-### C4 – (wird fortgesetzt ab Turn 313)
+### C4 – 2026-10-09 18:28 bis 2026-10-10 20:33 (Favicon, ß/ss, Vorschaubilder, Set-Code-Suche, Set-Wizards)
+
+| ID | Chat-Beleg | Wirkung |
+|---|---|---|
+| R-214 (neu) | 2026-10-09 18:28: „bislang gab es kein Favicon für die app… Installiere das Favicon gemäss Anhang“; 18:32 „verkleinern auf benötigte ideale Grösse“; 18:33 „der weisse Rahmen soll entfernt werden“ | App-Symbole (`favicon.ico` 16/32/48, 16er/32er PNG, Apple-Touch-Icon 180) im Verzeichnis `public/`, ohne weissen Rahmen, ohne Login erreichbar (User-Vorgabe); Quelle: hochgeladenes Asset-Paket |
+| R-026 | 2026-10-09 19:19: „ß Eszett… auch gefunden wird, wenn ss eingegeben wird“ (in der CH wird ss geschrieben); 20:41: „funktioniert das in allen schnittstellen? … Pokemon und … YGO?“ | → User-Vorgabe; gilt für beide Adapter, den Abruf nach Namen und die Suche in der eigenen Sammlung (Assistent 20:44) |
+| R-058 | 2026-10-09 20:52: Bild der Karte schon bei Suche und Auswahl, auch bei YGO („nicht erst im Detail“) | → User-Vorgabe; Umsetzung über eigene Kopie wegen „nicht hotlinken“ von YGOPRODeck (Assistent 20:58) |
+| R-024 | 2026-10-10 12:04: Einzelkarten auch über Set-Code („L5DD-ENA15“) einlesen; bei Code „L5DD-DEA15“ ohne Treffer erneut mit „L5DD-ENA15“ | → User-Vorgabe |
+| R-024 | 2026-10-10 12:29: bei Fund über die englische Version soll der eingegebene Code übernommen werden; Set englisch vorbelegen, „bei mehreren keine Auswahl. bei eindeutigem Treffer aber auswählen. und den DE Code speichern“ | → User-Vorgabe; Code wird nur ersetzt, wenn er zum gewählten Druck gehört (Assistent 12:33) |
+| R-020 | 2026-10-10 12:56: „alle Karten eines Sets hinzufügen“; Set wählen, Sprache wählen (DE, EN, JA; Set-Codes in dieser Sprache); bei unklarem Druck „wie in einem Wizard“; 1. Auflage/Limited Edition „pro Karte gespeichert“; „nur bei Unklarheiten soll der User eingreifen“ | → User-Vorgabe |
+| R-020 | 2026-10-10 13:24: nach der Setwahl standardmässig nur Karten mit Konflikt zeigen; zum Abwählen einzelner Karten die Liste aufklappen | → User-Vorgabe |
+| R-215 (neu) | 2026-10-10 18:42: Prozessschritte als Fortschrittsanzeige, nicht als Buttons („verleitet zum draufklicken“); 19:56: „Status der Prozessanzeige ist so okay“ | UI: Schrittanzeige des Wizards als nicht klickbare Liste mit nummerierten Kreisen, Haken und Hervorhebung (User-Vorgabe, aktiv) |
+| R-021 | 2026-10-10 19:56: „Set-Wizard soll auch für Pokemon Sets möglich werden… analog YGO“; falls nicht möglich: Info | → User-Vorgabe; Variante ist das „Unklare“, Ladezeit durch Varianten-Einzelanfragen (Assistent 20:09) |
+| R-053 | 2026-10-10 20:26: Bug-Verdacht: Pokémon-Edition in der Detailansicht änderbar, obwohl keine andere Variante zur Wahl; 20:33: „Nein, in diesem fall keine Änderung. lass das feld wie's ist“ | verworfen: Variantenfeld bleibt wie es ist (aktiv, mit nur den vorhandenen Varianten); `sv08-249` zeigt nur Holo, wenn die API nur Holo meldet |
+
+### C5 – (wird fortgesetzt ab Turn 344)
 
 _noch nicht ausgewertet_
