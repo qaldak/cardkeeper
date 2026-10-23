@@ -1,3 +1,9 @@
+## [0.23.1](https://github.com/qaldak/cardkeeper/compare/v0.23.0...v0.23.1) (2026-10-23)
+
+### Maintenance
+
+* npm: Bump @nuxt/ui from 4.11.3 to 4.12.0 in /app ([ad8e792](https://github.com/qaldak/cardkeeper/commit/ad8e792404b799921055e41f73f8fca0bc253ad1))
+
 ## [0.23.0](https://github.com/qaldak/cardkeeper/compare/v0.22.0...v0.23.0) (2026-10-21)
 
 ### Features
