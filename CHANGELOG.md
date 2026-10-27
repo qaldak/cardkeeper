@@ -1,3 +1,9 @@
+## [0.25.0](https://github.com/qaldak/cardkeeper/compare/v0.24.1...v0.25.0) (2026-10-27)
+
+### Features
+
+* copy the selection for an AI prompt ([#57](https://github.com/qaldak/cardkeeper/issues/57)) ([4d36527](https://github.com/qaldak/cardkeeper/commit/4d3652775e4949da30c29635ec71898f0dc9ebb8))
+
 ## [0.24.1](https://github.com/qaldak/cardkeeper/compare/v0.24.0...v0.24.1) (2026-10-26)
 
 ### Maintenance
