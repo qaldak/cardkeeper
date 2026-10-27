@@ -72,7 +72,7 @@ Everything runs in containers: there is nothing to install on the host except Do
 - User interface in German and English
 - Semantic releases, multi-arch (amd64 + arm64) Docker images, automated dependency updates
 
-Not part of this first version (see [`docs/KONZEPT.md`](docs/KONZEPT.md) for the full concept): the copy for an AI and the printable list. See [Roadmap](#roadmap).
+Not part of this first version (see the historical [`docs/KONZEPT.md`](docs/KONZEPT.md) for the original concept): the copy for an AI and the printable list. See [Roadmap](#roadmap).
 
 ## Quick start
 
@@ -305,7 +305,8 @@ app/                      Nuxt web app (UI + API routes), one Docker image
   prisma/                 Schema and migrations
   tests/                  Unit and integration tests
 db/init/                  PostgreSQL first-start script (application role)
-docs/                     Original concept and UI mockups
+docs/                     Architecture overview, decision records (adr/), UI mockups, original concept (historical)
+openspec/specs/           Requirements per topic (German), the valid state of what the app does
 docker-compose.yml        Production stack
 docker-compose.dev.yml    Development and test overlay
 ```

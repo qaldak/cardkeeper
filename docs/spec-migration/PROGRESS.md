@@ -61,3 +61,7 @@ Korrektur gegenüber dem ersten Inventar (K-007): `IMAGE_DIR`, `YGOPRODECK_API_U
 ## Offene Fragen geklärt (2026-10-23)
 
 Q-003: Schutz von `main` wie in der Anleitung (ADR 0018). Q-007: Konzept-Entscheide gelten als eigene Vorgabe (ADR 0001–0005, 0019, 0023; Herkunft entsprechend angepasst). Q-008: Inhalt der KI-Kopie bewusst nicht festgelegt. Q-010: Datum auch bei „verloren“.
+
+## Nachträge nach der Beurteilung (2026-10-27)
+
+Auf Empfehlung des Beraters umgesetzt: `docs/ARCHITECTURE.md` (C4-Überblick mit Mermaid, aus README, Compose und Code), `CLAUDE.md` (Regel „Spec und Code deckungsgleich halten“, OpenSpec-Change nur für grössere Anforderungen), dieses Verzeichnis als Archiv gekennzeichnet (`README.md`), Verweise in `README.md` und `openspec/config.yaml` ergänzt. Specs und ADRs blieben unverändert.

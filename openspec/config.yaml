@@ -25,9 +25,11 @@ context: |
   - Tests: Unit-Tests für reine Logik, Integrationstests gegen eine echte PostgreSQL über `TEST_DATABASE_URL` (README §Tests).
 
   Dokumentation der Entscheide und ihrer Herkunft:
+  - Überblick (C4: Kontext, Container, Bausteine, Abläufe): docs/ARCHITECTURE.md
+  - Arbeitsregeln für Claude Code (Spec und Code deckungsgleich halten): CLAUDE.md
   - Architekturentscheide: docs/adr/ (ADR 0001–0024)
   - Anforderungen: openspec/specs/<domain>/spec.md; jede Anforderung nennt Quelle, Herkunft und Inventar-ID
-  - Inventar, Verlauf geänderter Anforderungen und offene Fragen: docs/spec-migration/ (00-inventory.md, history.md, OPEN-QUESTIONS.md)
+  - Inventar, Verlauf geänderter Anforderungen und Konflikte der Baseline (Archiv, nicht mehr gepflegt): docs/spec-migration/
 
 rules:
   specs:
