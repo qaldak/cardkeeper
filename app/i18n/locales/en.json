@@ -436,7 +436,7 @@
     "menu": {
       "label": "Export",
       "table": "CSV export",
-      "ai": "Copy for AI (coming)",
+      "ai": "Copy for AI",
       "print": "Print list (coming)"
     },
     "title": "CSV export",
@@ -513,6 +513,20 @@
       "priceDate": "Price date"
     },
     "info": "About the export",
-    "textLanguage": "Texts: {language}"
+    "textLanguage": "Texts: {language}",
+    "ai": {
+      "title": "Copy for AI",
+      "onlyActive": "Only active cards",
+      "withText": "Include card text",
+      "intro": "Add an introduction for the AI",
+      "wish": "Your wish for the deck (optional)",
+      "wishPlaceholder": "e.g. a competitive deck for the Standard format",
+      "preview": "Preview",
+      "size": "{characters} characters, about {tokens} tokens",
+      "copy": "Copy",
+      "copied": "Copied to the clipboard",
+      "copyFailed": "Copying failed, use the download instead",
+      "loadFailed": "The text could not be created, please try again."
+    }
   }
 }

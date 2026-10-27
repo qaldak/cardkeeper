@@ -1,26 +1,26 @@
 # Export Specification
 
 ## Purpose
-Export of the cards as a table for further processing (Excel). The export follows the selection of the overview. The copy for AI prompts and the printable list are planned as separate requirements and are visible in the menu as disabled placeholders. Decision: [ADR 0013](../../../docs/adr/0013-csv-export-server-side.md) (server side).
+Export of the cards as a table for further processing (Excel). The export follows the selection of the overview. The text for AI prompts is a capability of its own (`export-ai-prompt`); the printable list is planned as a separate requirement and is visible in the menu as a disabled placeholder. Decision: [ADR 0013](../../../docs/adr/0013-csv-export-server-side.md) (server side).
 
 ## Requirements
 
 ### Requirement: Menu "Export" in the overview
-The system SHALL offer a menu "Export" (German: "Exportieren") in the toolbar of the overview next to the sort order; the entry "CSV export" opens a dialog.
-Source: User instruction 2026-10-22 11:26, 11:46, 11:53 (placement confirmed); code app/app/pages/index.vue | Origin: user requirement
+The system SHALL offer a menu "Export" (German: "Exportieren") in the toolbar of the overview next to the sort order; the entries "CSV export" and "Copy for AI" each open a dialog.
+Source: User instruction 2026-10-22 11:26, 11:46, 11:53 (placement confirmed); 2026-10-27 (entry "Copy for AI"); code app/app/pages/index.vue | Origin: user requirement
 
 #### Scenario: Menu
 - GIVEN the overview
 - WHEN "Export" is opened
-- THEN "CSV export" appears as an active entry
+- THEN "CSV export" and "Copy for AI" appear as active entries
 
 ### Requirement: Planned functions as placeholders
-The system SHALL show "Copy for AI (coming)" and "Print list (coming)" in the menu as entries that cannot be chosen; they are not implemented yet and their content is deliberately not defined yet.
-Source: User instruction 2026-10-21 19:10, 2026-10-22 11:53; README §Roadmap; code app/app/pages/index.vue | Origin: user requirement
+The system SHALL show "Print list (coming)" in the menu as an entry that cannot be chosen; it is not implemented yet and its content is deliberately not defined yet.
+Source: User instruction 2026-10-21 19:10, 2026-10-22 11:53, 2026-10-27; README §Roadmap; code app/app/pages/index.vue | Origin: user requirement
 
 #### Scenario: Placeholder
 - GIVEN the menu is open
-- WHEN "Copy for AI (coming)" is clicked
+- WHEN "Print list (coming)" is clicked
 - THEN nothing happens, the entry is disabled
 
 ### Requirement: The export follows the selection of the overview
