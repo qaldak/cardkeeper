@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-04
 - **Herkunft:** Abgeleitet (README §Releases; der Benutzer verwies auf eigene Repositories als Vorlage für Workflows, Chat 2026-10-04 09:59). Die Regel „Major nur bei Breaking Change“ stützt sich auf die Rückfrage vom 2026-10-10 20:58.
-- **Inventar:** D-018, D-019, R-051, R-052, R-203, R-205, H-21
 - **Specs:** [`entwicklung-release`](../../openspec/specs/entwicklung-release/spec.md)
 
 ## Kontext

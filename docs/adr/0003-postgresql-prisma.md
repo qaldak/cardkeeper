@@ -2,8 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (Konzept)
-- **Herkunft:** User-Vorgabe (Konzept des Benutzers; Antwort Q-007).
-- **Inventar:** D-004, D-005, R-036, R-038
+- **Herkunft:** User-Vorgabe (Konzept des Benutzers; vom Benutzer am 2026-10-23 bestätigt).
 - **Specs:** [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md), [`betrieb`](../../openspec/specs/betrieb/spec.md)
 
 ## Kontext
@@ -22,7 +21,7 @@ nicht dokumentiert.
 
 - Datenmodell und Invarianten: Spec `datenhaltung`.
 - Datenbank ohne veröffentlichten Port, zwei Volumes (`db-data`, `card-images`): Spec `betrieb`.
-- Prisma-Client wird im Image erzeugt; im Laufzeit-Image liegt nur die Prisma-CLI für Migrationen (D-033).
+- Prisma-Client wird im Image erzeugt; im Laufzeit-Image liegt nur die Prisma-CLI für Migrationen.
 
 ## Quellen
 

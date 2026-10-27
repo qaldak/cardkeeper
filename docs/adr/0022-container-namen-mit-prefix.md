@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-06
 - **Herkunft:** User-Vorgabe (feste Namen, Chat 2026-10-06 13:08); die Präfix-Variable ist ein Entscheid des Assistenten (13:12), vom Benutzer nicht beanstandet.
-- **Inventar:** D-041, R-037, R-048
 - **Specs:** [`betrieb`](../../openspec/specs/betrieb/spec.md), [`entwicklung-release`](../../openspec/specs/entwicklung-release/spec.md)
 
 ## Kontext
@@ -28,4 +27,3 @@ Die Namen lauten `${CONTAINER_PREFIX:-cardkeeper}_app` und `…_db`; das Präfix
 
 - Chat 2026-10-06 13:08, 13:12
 - `README.md` §Configuration, §Trying out a branch
-- `docs/spec-migration/history.md` H-07

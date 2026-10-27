@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** nicht dokumentiert (Abweichung vom Konzept, beschrieben im README)
 - **Herkunft:** Abgeleitet (README §Data model; im Chat nicht als eigener Entscheid belegt).
-- **Inventar:** D-012, D-013, R-208, R-109
 - **Specs:** [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md), [`spiele-adapter`](../../openspec/specs/spiele-adapter/spec.md), [`uebersicht`](../../openspec/specs/uebersicht/spec.md)
 
 ## Kontext
@@ -27,5 +26,5 @@ nicht dokumentiert.
 ## Quellen
 
 - `README.md` §Data model
-- Chat 2026-10-05 17:18 (R-208)
+- Chat 2026-10-05 17:18
 - `app/prisma/schema.prisma`, `app/shared/utils/languages.ts`

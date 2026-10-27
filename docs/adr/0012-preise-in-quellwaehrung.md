@@ -2,8 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-04 und 2026-10-10
-- **Herkunft:** User-Vorgabe (Fragerunde „Währung“ 2026-10-04 10:00 und Anforderung CHF 2026-10-10 22:14); Die Auslegungen „ohne `DISPLAY_CURRENCY` bleibt die Quellwährung“ und „bei Ausfall früherer Kurs, sonst Originalpreis“ bestätigte der Benutzer am 2026-10-23 (Q-004, Q-005); die Umrechnung des Preisverlaufs mit dem heutigen Kurs ist ein Entscheid des Assistenten, nicht beanstandet.
-- **Inventar:** D-015, D-025, D-034, R-028, R-029, R-096, R-097
+- **Herkunft:** User-Vorgabe (Fragerunde „Währung“ 2026-10-04 10:00 und Anforderung CHF 2026-10-10 22:14); Die Auslegungen „ohne `DISPLAY_CURRENCY` bleibt die Quellwährung“ und „bei Ausfall früherer Kurs, sonst Originalpreis“ bestätigte der Benutzer am 2026-10-23; die Umrechnung des Preisverlaufs mit dem heutigen Kurs ist ein Entscheid des Assistenten, nicht beanstandet.
 - **Specs:** [`waehrungsumrechnung`](../../openspec/specs/waehrungsumrechnung/spec.md), [`preise`](../../openspec/specs/preise/spec.md)
 
 ## Kontext
@@ -28,6 +27,5 @@ Preise bleiben in der Währung ihres Marktplatzes in der Datenbank. Eine optiona
 ## Quellen
 
 - Chat 2026-10-04 10:00 (Fragerunde „Währung“), 2026-10-10 22:14, 22:25, 22:36/22:38
-- `docs/spec-migration/history.md` H-01
 - `README.md` §Features, §Data model
 - `app/server/services/rates.ts`

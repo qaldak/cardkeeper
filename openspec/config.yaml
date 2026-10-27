@@ -28,11 +28,10 @@ context: |
   - Überblick (C4: Kontext, Container, Bausteine, Abläufe): docs/ARCHITECTURE.md
   - Arbeitsregeln für Claude Code (Spec und Code deckungsgleich halten): CLAUDE.md
   - Architekturentscheide: docs/adr/ (ADR 0001–0024)
-  - Anforderungen: openspec/specs/<domain>/spec.md; jede Anforderung nennt Quelle, Herkunft und Inventar-ID
-  - Inventar, Verlauf geänderter Anforderungen und Konflikte der Baseline (Archiv, nicht mehr gepflegt): docs/spec-migration/
+  - Anforderungen: openspec/specs/<domain>/spec.md; jede Anforderung nennt Quelle und Herkunft
 
 rules:
   specs:
     - "Anforderungen mit MUSS/SOLL formulieren und Szenarien als GIVEN/WHEN/THEN."
-    - "Jede Anforderung enthält eine Zeile `Quelle: … | Herkunft: User-Vorgabe|Abgeleitet|Unklar | Inventar: … | MUSS=SHALL`; nichts ohne Quelle erfinden."
+    - "Jede Anforderung enthält eine Zeile `Quelle: … | Herkunft: User-Vorgabe|Abgeleitet|Unklar | MUSS=SHALL`; nichts ohne Quelle erfinden."
     - "Anforderungstext inklusive Quelle-Zeile höchstens 500 Zeichen (Grenze des OpenSpec-Validators)."

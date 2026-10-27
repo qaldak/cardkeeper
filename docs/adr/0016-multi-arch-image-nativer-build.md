@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-04
 - **Herkunft:** User-Vorgabe (GHCR multi-arch); Build-Aufbau: Abgeleitet (Fehlerbehebung des Assistenten, vom Benutzer akzeptiert).
-- **Inventar:** D-033, R-035
 - **Specs:** [`entwicklung-release`](../../openspec/specs/entwicklung-release/spec.md), [`betrieb`](../../openspec/specs/betrieb/spec.md)
 
 ## Kontext

@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** nicht dokumentiert (entstand vermutlich mit dem Login am 2026-10-07; Vermutung)
 - **Herkunft:** Abgeleitet (Code-Kommentar und README; im Chat nicht als eigener Entscheid belegt).
-- **Inventar:** D-024, R-070
 - **Specs:** [`benutzer-zugriff`](../../openspec/specs/benutzer-zugriff/spec.md)
 
 ## Kontext

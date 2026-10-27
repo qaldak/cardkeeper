@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-04
 - **Herkunft:** Abgeleitet (Entscheid des Assistenten, im Chat als Abweichung vom Konzept genannt und nicht beanstandet; Chat 2026-10-04 10:43).
-- **Inventar:** D-011, D-035
 - **Specs:** [`kartenstatus`](../../openspec/specs/kartenstatus/spec.md), [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md)
 
 ## Kontext
@@ -27,5 +26,5 @@ Der Status wird als Enum `ACTIVE`, `SOLD`, `TRADED`, `GIFTED`, `LOST` gespeicher
 
 - `docs/KONZEPT.md` §Datenmodell
 - `README.md` §Data model
-- Chat 2026-10-04 10:43 (D-035)
+- Chat 2026-10-04 10:43
 - `app/prisma/schema.prisma`

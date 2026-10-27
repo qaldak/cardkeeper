@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-04
 - **Herkunft:** User-Vorgabe (Chat 2026-10-04 09:59).
-- **Inventar:** D-045, R-201
 - **Specs:** [`entwicklung-release`](../../openspec/specs/entwicklung-release/spec.md), [`oberflaeche`](../../openspec/specs/oberflaeche/spec.md)
 
 ## Kontext

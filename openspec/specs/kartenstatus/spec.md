@@ -7,7 +7,7 @@ Lebenszyklus einer Karte (aktiv, verkauft, getauscht, verschenkt, verloren) mit 
 
 ### Requirement: Fünf Statuswerte
 Das System MUSS für jede Karte genau einen der Status aktiv, verkauft, getauscht, verschenkt oder verloren führen (neue Karten: aktiv) und diese in der Oberfläche in der gewählten Sprache anzeigen.
-Quelle: README §Features, §Data model; KONZEPT §Datenmodell; Chat 2026-10-04 09:59 (Konzept); Code shared/utils/status.ts | Herkunft: User-Vorgabe | Inventar: R-017, R-064 | MUSS=SHALL
+Quelle: README §Features, §Data model; KONZEPT §Datenmodell; Chat 2026-10-04 09:59 (Konzept); Code shared/utils/status.ts | Herkunft: User-Vorgabe | MUSS=SHALL
 
 #### Scenario: Neue Karte
 - GIVEN eine Karte wird angelegt
@@ -21,7 +21,7 @@ Quelle: README §Features, §Data model; KONZEPT §Datenmodell; Chat 2026-10-04 
 
 ### Requirement: Datum und Person
 Das System MUSS bei jedem Status ausser aktiv ein Datum führen (Standard: heute) und bei verkauft, getauscht und verschenkt eine Person; bei verloren und aktiv MUSS eine übergebene Person verworfen werden.
-Quelle: Antwort Q-010 (2026-10-23: Datum auch bei verloren); Code server/lib/status.ts; Test status.test.ts, cards.test.ts; KONZEPT §Datenmodell | Herkunft: User-Vorgabe | Inventar: R-078 | MUSS=SHALL
+Quelle: Entscheid des Benutzers (2026-10-23: Datum auch bei verloren); Code server/lib/status.ts; Test status.test.ts, cards.test.ts; KONZEPT §Datenmodell | Herkunft: User-Vorgabe | MUSS=SHALL
 
 #### Scenario: Verkauft mit Person
 - GIVEN eine aktive Karte
@@ -35,7 +35,7 @@ Quelle: Antwort Q-010 (2026-10-23: Datum auch bei verloren); Code server/lib/sta
 
 ### Requirement: Statuswechsel erzeugt Verlaufszeile
 Das System MUSS bei einem Statuswechsel eine neue Zeile im Statusverlauf anhängen (Status, Datum, Person, ändernder Benutzer) und den Wechsel im Änderungsprotokoll festhalten.
-Quelle: Code server/services/cards.ts (update); Test cards.test.ts (tracks status changes) | Herkunft: Abgeleitet | Inventar: R-078, R-033 | MUSS=SHALL
+Quelle: Code server/services/cards.ts (update); Test cards.test.ts (tracks status changes) | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Wechsel
 - GIVEN eine aktive Karte
@@ -44,7 +44,7 @@ Quelle: Code server/services/cards.ts (update); Test cards.test.ts (tracks statu
 
 ### Requirement: Korrektur des aktuellen Status
 Das System MUSS Datum oder Person des aktuellen (nicht aktiven) Status in der letzten Verlaufszeile korrigieren statt eine neue anzulegen.
-Quelle: Code server/services/cards.ts (update); Test cards.test.ts (corrects date and person in place) | Herkunft: Abgeleitet | Inventar: R-078 | MUSS=SHALL
+Quelle: Code server/services/cards.ts (update); Test cards.test.ts (corrects date and person in place) | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Datum korrigieren
 - GIVEN eine Karte ist verkauft
@@ -53,7 +53,7 @@ Quelle: Code server/services/cards.ts (update); Test cards.test.ts (corrects dat
 
 ### Requirement: Ungültiges Datum wird abgelehnt
 Das System MUSS ein Statusdatum ablehnen, das kein echtes Kalenderdatum im Format `YYYY-MM-DD` ist.
-Quelle: Code server/lib/dates.ts, server/lib/schemas.ts; Test cards.test.ts (rejects an invalid status date) | Herkunft: Abgeleitet | Inventar: R-078 | MUSS=SHALL
+Quelle: Code server/lib/dates.ts, server/lib/schemas.ts; Test cards.test.ts (rejects an invalid status date) | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Kein Datum
 - GIVEN eine Karte wird auf verkauft gesetzt
@@ -62,7 +62,7 @@ Quelle: Code server/lib/dates.ts, server/lib/schemas.ts; Test cards.test.ts (rej
 
 ### Requirement: Statusanzeige
 Das System SOLL den Status farbig kennzeichnen: aktiv grün, verloren rot, alle anderen neutral.
-Quelle: Code app/app/components/StatusBadge.vue (Kommentar: nach den UI-Mockups) | Herkunft: Abgeleitet | Inventar: R-017 | MUSS=SHALL
+Quelle: Code app/app/components/StatusBadge.vue (Kommentar: nach den UI-Mockups) | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Abzeichen
 - GIVEN Karten mit den Status aktiv, verloren und verkauft

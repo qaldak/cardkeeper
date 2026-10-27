@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-21
 - **Herkunft:** User-Vorgabe (Auftrag, ein externes Review zu prüfen und die notwendigen Anpassungen umzusetzen, Chat 2026-10-21 14:27); konkrete Massnahmen: Abgeleitet.
-- **Inventar:** D-043, R-106, R-218, R-219
 - **Specs:** [`sicherheit`](../../openspec/specs/sicherheit/spec.md)
 
 ## Kontext

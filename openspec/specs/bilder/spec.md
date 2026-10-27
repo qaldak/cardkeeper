@@ -1,13 +1,13 @@
 # Bilder Specification
 
 ## Purpose
-Kartenbilder: lokale Speicherung, Hochladen, Hauptbild, Vergrösserung und Auslieferung. Bilder werden nie von den Karten-Datenbanken eingebunden, ausser den kleinen Bildern der Trefferliste bei Pokémon. Entscheid: [ADR 0019](../../../docs/adr/0019-bilder-lokal-speichern.md). Verlauf: H-09.
+Kartenbilder: lokale Speicherung, Hochladen, Hauptbild, Vergrösserung und Auslieferung. Bilder werden nie von den Karten-Datenbanken eingebunden, ausser den kleinen Bildern der Trefferliste bei Pokémon. Entscheid: [ADR 0019](../../../docs/adr/0019-bilder-lokal-speichern.md).
 
 ## Requirements
 
 ### Requirement: Bilder werden einmal geladen und lokal gespeichert
 Das System MUSS das Bild einer Karte beim Anlegen einmal von der Karten-Datenbank laden, auf dem Volume `card-images` speichern und die Karte nie mit einem fremden Bild verlinken.
-Quelle: README §Features, §Notes on the card API; Test cards.test.ts, api-calls.test.ts | Herkunft: Abgeleitet | Inventar: R-027, R-213 | MUSS=SHALL
+Quelle: README §Features, §Notes on the card API; Test cards.test.ts, api-calls.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Eigene Kopie
 - GIVEN eine Karte wurde mit API-Bild angelegt
@@ -16,7 +16,7 @@ Quelle: README §Features, §Notes on the card API; Test cards.test.ts, api-call
 
 ### Requirement: Ein fehlendes API-Bild verhindert das Anlegen nicht
 Das System MUSS eine Karte auch dann anlegen, wenn der Bild-Download scheitert.
-Quelle: Test cards.test.ts (does not block creation when the image download fails) | Herkunft: Abgeleitet | Inventar: R-076 | MUSS=SHALL
+Quelle: Test cards.test.ts (does not block creation when the image download fails) | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Download scheitert
 - GIVEN die Bildquelle antwortet mit einem Fehler
@@ -25,7 +25,7 @@ Quelle: Test cards.test.ts (does not block creation when the image download fail
 
 ### Requirement: Bilder des richtigen Spiels
 Das System MUSS für eine Yu-Gi-Oh!-Karte nur YGOPRODeck und für eine Pokémon-Karte nur TCGdex nach Bildern fragen, und eine Karte MUSS ihr eigenes Bild behalten.
-Quelle: Chat 2026-10-08 17:52 (falsches Bild im Test); Test api-calls.test.ts | Herkunft: User-Vorgabe | Inventar: R-213 | MUSS=SHALL
+Quelle: Chat 2026-10-08 17:52 (falsches Bild im Test); Test api-calls.test.ts | Herkunft: User-Vorgabe | MUSS=SHALL
 
 #### Scenario: Gemischte Sammlung
 - GIVEN je eine Karte beider Spiele
@@ -34,7 +34,7 @@ Quelle: Chat 2026-10-08 17:52 (falsches Bild im Test); Test api-calls.test.ts | 
 
 ### Requirement: Mehrere Bilder, ein Hauptbild
 Das System MUSS pro Karte mehrere Bilder erlauben, das erste Bild zum Hauptbild machen, ein API-Bild beim späteren Upload als Hauptbild belassen und den Wechsel des Hauptbilds erlauben.
-Quelle: KONZEPT §Datenmodell; Code server/services/images.ts; Test images.test.ts | Herkunft: Abgeleitet | Inventar: R-065, R-081 | MUSS=SHALL
+Quelle: KONZEPT §Datenmodell; Code server/services/images.ts; Test images.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Erster Upload
 - GIVEN eine Karte ohne Bild
@@ -53,7 +53,7 @@ Quelle: KONZEPT §Datenmodell; Code server/services/images.ts; Test images.test.
 
 ### Requirement: Upload wird geprüft
 Das System MUSS einen Upload ablehnen, wenn er leer ist (400 `empty_file`), grösser als `MAX_UPLOAD_MB` (413 `file_too_large`, Standard 5) oder kein PNG, JPEG oder WebP ist (400 `unsupported_image`); der Typ wird an der Dateisignatur erkannt, nicht am gemeldeten Typ.
-Quelle: Code server/services/images.ts, server/lib/image-files.ts, server/api/cards/[id]/images.post.ts; Tests images.test.ts, image-files.test.ts | Herkunft: Abgeleitet | Inventar: R-081 | MUSS=SHALL
+Quelle: Code server/services/images.ts, server/lib/image-files.ts, server/api/cards/[id]/images.post.ts; Tests images.test.ts, image-files.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Falscher Typ
 - GIVEN eine Textdatei mit Endung `.png`
@@ -67,7 +67,7 @@ Quelle: Code server/services/images.ts, server/lib/image-files.ts, server/api/ca
 
 ### Requirement: Bildaktionen wirken sofort
 Das System MUSS Hochladen, Hauptbild-Wechsel und Löschen eines Bildes sofort speichern (ohne weiteres „Speichern“), im Änderungsprotokoll festhalten und als Änderung des Benutzers zählen; nur der Besitzer darf sie ausführen.
-Quelle: Chat 2026-10-07 18:51; Code server/services/images.ts; Tests images.test.ts, ownership.test.ts | Herkunft: Abgeleitet | Inventar: R-081, R-075 | MUSS=SHALL
+Quelle: Chat 2026-10-07 18:51; Code server/services/images.ts; Tests images.test.ts, ownership.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Upload
 - GIVEN ein Besitzer lädt ein Bild hoch
@@ -76,7 +76,7 @@ Quelle: Chat 2026-10-07 18:51; Code server/services/images.ts; Tests images.test
 
 ### Requirement: Löschen befördert das nächste Bild
 Das System MUSS beim Löschen des Hauptbildes das älteste verbleibende Bild zum Hauptbild machen und die Bilddatei entfernen.
-Quelle: Code server/services/images.ts; Test images.test.ts | Herkunft: Abgeleitet | Inventar: R-081 | MUSS=SHALL
+Quelle: Code server/services/images.ts; Test images.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Hauptbild gelöscht
 - GIVEN eine Karte mit zwei Bildern
@@ -85,7 +85,7 @@ Quelle: Code server/services/images.ts; Test images.test.ts | Herkunft: Abgeleit
 
 ### Requirement: Auslieferung mit Wiederholungsprüfung
 Das System MUSS Bilder mit ETag, `Cache-Control: private, no-cache`, `X-Content-Type-Options: nosniff` und einem Dateinamen nach dem Kartennamen (`inline`) ausliefern, damit der Browser bei jedem Abruf prüft, ob es noch dasselbe Bild ist.
-Quelle: Chat 2026-10-07 17:48, 2026-10-08 18:08 (Cache); Code server/api/images/[id]/index.get.ts | Herkunft: User-Vorgabe | Inventar: R-016, R-082 | MUSS=SHALL
+Quelle: Chat 2026-10-07 17:48, 2026-10-08 18:08 (Cache); Code server/api/images/[id]/index.get.ts | Herkunft: User-Vorgabe | MUSS=SHALL
 
 #### Scenario: Erneuter Abruf
 - GIVEN ein Browser hat das Bild bereits
@@ -99,7 +99,7 @@ Quelle: Chat 2026-10-07 17:48, 2026-10-08 18:08 (Cache); Code server/api/images/
 
 ### Requirement: Vergrösserung im Dialog
 Das System MUSS ein Bild in einem Dialog vergrössern, der sich mit Klick auf das Bild, Esc oder dem Kreuz schliesst, bei mehreren Bildern per grossen Pfeilflächen und Pfeiltasten wechselt, die Bildnummer zeigt und einen Download-Knopf hat; das Kontextmenü des Bildes MUSS erhalten bleiben.
-Quelle: Chat 2026-10-07 17:18, 17:48; README §Features; Code app/app/pages/cards/[id].vue | Herkunft: User-Vorgabe | Inventar: R-016 | MUSS=SHALL
+Quelle: Chat 2026-10-07 17:18, 17:48; README §Features; Code app/app/pages/cards/[id].vue | Herkunft: User-Vorgabe | MUSS=SHALL
 
 #### Scenario: Klick aufs Bild
 - GIVEN der Dialog ist offen
@@ -113,7 +113,7 @@ Quelle: Chat 2026-10-07 17:18, 17:48; README §Features; Code app/app/pages/card
 
 ### Requirement: Bildplatzhalter
 Das System SOLL für eine Karte ohne Bild einen Platzhalter „Bild“ zeigen und bei Karten-Datenbank-Bildern, die fehlen, auf das nächste Format zurückfallen und sonst einen leeren Kasten gleicher Grösse zeigen.
-Quelle: Code app/app/components/RemoteImage.vue, app/app/components/CardTile.vue; Test image-fallback.test.ts | Herkunft: Abgeleitet | Inventar: R-016 | MUSS=SHALL
+Quelle: Code app/app/components/RemoteImage.vue, app/app/components/CardTile.vue; Test image-fallback.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
 
 #### Scenario: Karte ohne Bild
 - GIVEN eine Karte ohne Bild

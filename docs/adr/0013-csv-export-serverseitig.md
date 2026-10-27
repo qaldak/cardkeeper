@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-21/22 (Anforderung), 2026-10-23 (Korrekturen)
 - **Herkunft:** User-Vorgabe (Anforderung, Format, Platzierung); serverseitige Umsetzung: Abgeleitet.
-- **Inventar:** D-009, D-027, D-028, R-013, R-092, R-093
 - **Specs:** [`export`](../../openspec/specs/export/spec.md)
 
 ## Kontext
@@ -25,11 +24,10 @@ Der Export läuft serverseitig (`GET /api/export/cards`) über alle Seiten mit d
 
 - Der Export erfasst auch Karten anderer Benutzer und alle Status.
 - Die Oberfläche öffnet den Download über einen normalen externen Link, weil ein Router-Link zu einem 404 führte (Fehlerbehebung nach der Meldung des Benutzers, 2026-10-23).
-- Offen: Inhalt der KI-Kopie (Q-008).
+- Offen: Inhalt der KI-Kopie.
 
 ## Quellen
 
 - Chat 2026-10-21/22 (Anforderung), 2026-10-22 11:26, 11:46, 11:53; 2026-10-23 14:59, 15:05, 15:23
-- `docs/spec-migration/history.md` H-12, H-13
 - `docs/KONZEPT.md` §Architektur
 - `app/server/api/export/cards.get.ts`, `app/server/services/export.ts`

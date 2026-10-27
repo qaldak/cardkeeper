@@ -2,8 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (Konzept)
-- **Herkunft:** User-Vorgabe (Konzept des Benutzers; Antwort Q-007).
-- **Inventar:** D-007
+- **Herkunft:** User-Vorgabe (Konzept des Benutzers; vom Benutzer am 2026-10-23 bestätigt).
 - **Specs:** [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md), [`spiele-adapter`](../../openspec/specs/spiele-adapter/spec.md)
 
 ## Kontext

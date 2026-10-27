@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-06 und 2026-10-20
 - **Herkunft:** User-Vorgabe für das Verhalten (Chat 2026-10-06 07:31, 13:08; 2026-10-20 09:09); die Wahl von Cookies als Speicherort stammt vom Assistenten bzw. vom Benutzer im Wortlaut „(cookie)“ (13:08).
-- **Inventar:** D-042, R-002, R-003, R-089
 - **Specs:** [`uebersicht`](../../openspec/specs/uebersicht/spec.md), [`kartenerfassung`](../../openspec/specs/kartenerfassung/spec.md), [`oberflaeche`](../../openspec/specs/oberflaeche/spec.md)
 
 ## Kontext
@@ -16,7 +15,7 @@ Der Zustand liegt in Cookies: `cardkeeper-last-game` (Erfassen, 1 Jahr), `cardke
 
 ## Betrachtete Alternativen
 
-nicht dokumentiert (frühere Standards: Yu-Gi-Oh! als Standardspiel, Besitzer „alle“; siehe `history.md` H-04, H-05, H-16).
+nicht dokumentiert (frühere Standards: Yu-Gi-Oh! als Standardspiel, Besitzer „alle“, Chat 2026-10-06 und 2026-10-20).
 
 ## Konsequenzen
 
@@ -26,5 +25,4 @@ nicht dokumentiert (frühere Standards: Yu-Gi-Oh! als Standardspiel, Besitzer �
 ## Quellen
 
 - Chat 2026-10-06 07:31, 13:08; 2026-10-20 09:09
-- `docs/spec-migration/history.md` H-04, H-05, H-16
 - `app/shared/utils/overview-query.ts`, `app/app/middleware/overview-query.global.ts`

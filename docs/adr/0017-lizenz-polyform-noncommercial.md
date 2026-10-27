@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-07
 - **Herkunft:** User-Vorgabe (Chat 2026-10-07 15:31, 15:53).
-- **Inventar:** D-020, R-061, R-210, K-021
 - **Specs:** [`entwicklung-release`](../../openspec/specs/entwicklung-release/spec.md)
 
 ## Kontext
@@ -28,4 +27,3 @@ Die Anwendung steht unter der PolyForm Noncommercial License 1.0.0 (private Nutz
 
 - Chat 2026-10-07 15:31, 15:32, 15:51–15:53
 - `README.md` §License, `LICENSE`, `NOTICE`
-- `docs/spec-migration/history.md` H-15

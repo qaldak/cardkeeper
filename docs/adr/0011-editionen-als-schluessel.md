@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-07 bis 2026-10-08
 - **Herkunft:** User-Vorgabe (schrittweise im Chat entschieden).
-- **Inventar:** D-014, R-025, R-104
 - **Specs:** [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md), [`kartenerfassung`](../../openspec/specs/kartenerfassung/spec.md)
 
 ## Kontext
@@ -29,6 +28,5 @@ Aufgedruckte Editionen werden als Schlüssel `FIRST_EDITION` und `LIMITED_EDITIO
 ## Quellen
 
 - Chat 2026-10-07 19:37, 19:44, 21:15, 21:37; 2026-10-08 17:42, 17:52, 18:13, 18:18
-- `docs/spec-migration/history.md` H-08
 - `README.md` §Data model
 - `app/server/plugins/editions.ts`, `app/shared/utils/editions.ts`

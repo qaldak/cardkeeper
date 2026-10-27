@@ -2,8 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (YGOPRODeck, Konzept); 2026-10-05 (TCGdex)
-- **Herkunft:** YGOPRODeck: User-Vorgabe (Konzept des Benutzers, Antwort Q-007). TCGdex: User-Vorgabe (Chat 2026-10-05 18:57).
-- **Inventar:** D-036, D-044, R-001, R-057
+- **Herkunft:** YGOPRODeck: User-Vorgabe (Konzept des Benutzers, vom Benutzer am 2026-10-23 bestätigt). TCGdex: User-Vorgabe (Chat 2026-10-05 18:57).
 - **Specs:** [`spiele-adapter`](../../openspec/specs/spiele-adapter/spec.md)
 
 ## Kontext
@@ -22,7 +21,7 @@ Yu-Gi-Oh!-Daten kommen von YGOPRODeck, Pokémon-Daten von TCGdex (Deutsch, Engli
 
 - Beide Dienste haben Begrenzungen; die App meldet sie dem Benutzer (Spec `spiele-adapter`, `preise`).
 - Magic ist nicht umgesetzt.
-- Die Basis-URLs werden nur aus dem Container-Umfeld gelesen; `docker-compose.yml` reicht sie nicht aus `.env` weiter, die Entwicklungsdatei nur `YGOPRODECK_API_URL` (K-007, README §Configuration).
+- Die Basis-URLs werden nur aus dem Container-Umfeld gelesen; `docker-compose.yml` reicht sie nicht aus `.env` weiter, die Entwicklungsdatei nur `YGOPRODECK_API_URL` (README §Configuration).
 
 ## Quellen
 

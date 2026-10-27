@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-07
 - **Herkunft:** User-Vorgabe (Anforderungen und Fragerunden vom 2026-10-07 14:46–14:51); technische Umsetzung (h3-Sitzung, scrypt): Abgeleitet, vom Benutzer nicht beanstandet.
-- **Inventar:** D-008, D-022, D-023, D-038, D-039, R-039–R-045
 - **Specs:** [`benutzer-zugriff`](../../openspec/specs/benutzer-zugriff/spec.md), [`sicherheit`](../../openspec/specs/sicherheit/spec.md)
 
 ## Kontext

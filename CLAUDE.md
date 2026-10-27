@@ -4,9 +4,8 @@ Cardkeeper: selbst gehostete Sammlung für Yu-Gi-Oh!- und Pokémon-Karten. Über
 
 ## Wo steht was
 
-- `openspec/specs/<domain>/spec.md`: Anforderungen, letzter gültiger Stand (MUSS/SOLL, GIVEN/WHEN/THEN). Jede Anforderung nennt Quelle, Herkunft und Inventar-ID.
+- `openspec/specs/<domain>/spec.md`: Anforderungen, letzter gültiger Stand (MUSS/SOLL, GIVEN/WHEN/THEN). Jede Anforderung nennt Quelle und Herkunft (`User-Vorgabe` oder `Abgeleitet`).
 - `docs/adr/`: Architekturentscheide (Status, Datum, Herkunft, Kontext, Entscheid, Alternativen, Konsequenzen, Quellen).
-- `docs/spec-migration/`: Archiv der Baseline vom 2026-10-23 (Inventar, Verlauf, Konflikte). Wird nicht mehr gepflegt.
 - `docs/KONZEPT.md`: historisches Ausgangskonzept, nicht mehr gültig.
 
 ## Spec und Code bleiben deckungsgleich

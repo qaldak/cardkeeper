@@ -3,7 +3,6 @@
 - **Status:** Akzeptiert
 - **Datum:** nicht dokumentiert
 - **Herkunft:** Abgeleitet (Code-Kommentar; im Chat nicht besprochen).
-- **Inventar:** D-029, R-084, R-085, R-086
 - **Specs:** [`uebersicht`](../../openspec/specs/uebersicht/spec.md), [`karten-blaettern`](../../openspec/specs/karten-blaettern/spec.md), [`export`](../../openspec/specs/export/spec.md)
 
 ## Kontext

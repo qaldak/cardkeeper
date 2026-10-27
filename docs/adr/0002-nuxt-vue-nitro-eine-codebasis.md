@@ -2,8 +2,7 @@
 
 - **Status:** Akzeptiert (Nuxt 4 statt des im Konzept genannten Nuxt 3)
 - **Datum:** 2026-10-03 (Konzept); Abweichung Nuxt 4: 2026-10-04
-- **Herkunft:** User-Vorgabe (Konzept des Benutzers; Antwort Q-007). Die Abweichungen Nuxt 4 und Node 24 stammen vom Assistenten, der Benutzer hat sie nicht beanstandet (Chat 2026-10-04 10:43).
-- **Inventar:** D-002, D-003, D-016, D-021, D-035, R-108, K-001, K-003
+- **Herkunft:** User-Vorgabe (Konzept des Benutzers; vom Benutzer am 2026-10-23 bestätigt). Die Abweichungen Nuxt 4 und Node 24 stammen vom Assistenten, der Benutzer hat sie nicht beanstandet (Chat 2026-10-04 10:43).
 - **Specs:** [`oberflaeche`](../../openspec/specs/oberflaeche/spec.md), [`betrieb`](../../openspec/specs/betrieb/spec.md)
 
 ## Kontext
@@ -21,8 +20,8 @@ nicht dokumentiert (das Konzept nennt nur die Wahl und ihre Begründung).
 ## Konsequenzen
 
 - Eine Codebasis, ein Container-Image für UI und API.
-- Die Dienste sind framework-unabhängige Fabriken (`createXService(deps)`), die Nitro-Schicht bleibt dünn (D-021).
-- Konzept und Umsetzung weichen bei Nuxt-Version und Node-Version ab (K-001, K-003).
+- Die Dienste sind framework-unabhängige Fabriken (`createXService(deps)`), die Nitro-Schicht bleibt dünn.
+- Konzept und Umsetzung weichen bei Nuxt-Version und Node-Version ab.
 
 ## Quellen
 

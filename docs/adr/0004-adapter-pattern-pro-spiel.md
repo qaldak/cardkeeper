@@ -2,8 +2,7 @@
 
 - **Status:** Akzeptiert
 - **Datum:** 2026-10-03 (Konzept); Erweiterung um Pokémon: 2026-10-05
-- **Herkunft:** User-Vorgabe (Konzept des Benutzers; Antwort Q-007). Das zweite Spiel Pokémon wurde vom Benutzer verlangt (Chat 2026-10-05 18:57).
-- **Inventar:** D-006, D-017, R-001
+- **Herkunft:** User-Vorgabe (Konzept des Benutzers; vom Benutzer am 2026-10-23 bestätigt). Das zweite Spiel Pokémon wurde vom Benutzer verlangt (Chat 2026-10-05 18:57).
 - **Specs:** [`spiele-adapter`](../../openspec/specs/spiele-adapter/spec.md)
 
 ## Kontext
@@ -12,7 +11,7 @@ Das Konzept will weitere Spiele „ohne Eingriff ins Kernschema oder die UI“ a
 
 ## Entscheid
 
-Jedes Spiel erhält einen Adapter mit einheitlicher Schnittstelle (`fetchCardById`, `fetchCardByName`, `searchCards`, `mapToCommonSchema`), ein Registry wählt ihn anhand des Spiels. Das Verhalten des Drucks pro Spiel steht in `shared/utils/game-config.ts` (D-017).
+Jedes Spiel erhält einen Adapter mit einheitlicher Schnittstelle (`fetchCardById`, `fetchCardByName`, `searchCards`, `mapToCommonSchema`), ein Registry wählt ihn anhand des Spiels. Das Verhalten des Drucks pro Spiel steht in `shared/utils/game-config.ts`.
 
 ## Betrachtete Alternativen
 
