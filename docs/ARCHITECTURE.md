@@ -107,6 +107,8 @@ sequenceDiagram
     A-->>B: file cardkeeper-export-YYYY-MM-DD.csv
 ```
 
+The text for an AI prompt (`GET /api/export/ai`) uses the same selection and order and merges identical cards to one line with the quantity; spec [`export-ai-prompt`](../openspec/specs/export-ai-prompt/spec.md).
+
 Specs: [`export`](../openspec/specs/export/spec.md), [ADR 0013](adr/0013-csv-export-server-side.md), [ADR 0014](adr/0014-overview-filtering-in-memory.md).
 
 ## 5. Cross-cutting topics
