@@ -27,5 +27,5 @@ Yu-Gi-Oh! data comes from YGOPRODeck, Pokémon data from TCGdex (German, English
 
 - `docs/KONZEPT.md` §Multi-TCG-Konzept
 - User instruction 2026-10-05 18:57
-- `README.md` §Pokémon, §Notes on the card API
+- `README.md` (7f3d955) §Pokémon, §Notes on the card API
 - `app/server/tcg/ygo/adapter.ts`, `app/server/tcg/tcgdex/adapter.ts`

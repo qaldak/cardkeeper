@@ -7,7 +7,7 @@ The detail page of a card: texts in several languages, the few editable fields, 
 
 ### Requirement: Texts in several languages with a switch
 The system SHALL show the texts of a card in German and English (Pokémon also Japanese) with a language switch, choose German first when present, and make a language that the card does not have not selectable.
-Source: User instruction 2026-10-04 19:40 (3), 2026-10-05 18:57; README §Features; code app/app/pages/cards/[id].vue | Origin: user requirement
+Source: User instruction 2026-10-04 19:40 (3), 2026-10-05 18:57; README (7f3d955) §Features; code app/app/pages/cards/[id].vue | Origin: user requirement
 
 #### Scenario: German first
 - GIVEN a card with German and English text
@@ -21,7 +21,7 @@ Source: User instruction 2026-10-04 19:40 (3), 2026-10-05 18:57; README §Featur
 
 ### Requirement: Data from the card database is read-only
 The system SHALL show names, texts and attributes of a card read-only and allow only set code and edition (for Pokémon the variant) as editable card data, without a label "editable".
-Source: User instruction 2026-10-04 19:40 (5), 2026-10-05 17:18; README §Data model; code server/lib/schemas.ts | Origin: user requirement
+Source: User instruction 2026-10-04 19:40 (5), 2026-10-05 17:18; README (7f3d955) §Data model; code server/lib/schemas.ts | Origin: user requirement
 
 #### Scenario: Changing the name
 - GIVEN a change call contains a name
@@ -30,7 +30,7 @@ Source: User instruction 2026-10-04 19:40 (5), 2026-10-05 17:18; README §Data m
 
 ### Requirement: Set code and edition apply to all languages
 The system SHALL apply changes to set code and edition to all languages of the card, because they describe the physical card (e.g. German or Japanese prints).
-Source: User instruction 2026-10-04 19:40 (5); README §Data model | Origin: user requirement
+Source: User instruction 2026-10-04 19:40 (5); README (7f3d955) §Data model | Origin: user requirement
 
 #### Scenario: German print
 - GIVEN a card with an English set code
@@ -48,7 +48,7 @@ Source: User instruction 2026-10-08 18:18 ("always UPPERCASE"); code app/app/pag
 
 ### Requirement: Edition for Yu-Gi-Oh!
 The system SHALL offer the edition on the card page as a dropdown with "1st Edition" and "Limited Edition", allow clearing the value with a ✕ (Unlimited = empty), contain no free text field and no entry "no imprint", and keep an already stored foreign text visible as an additional entry.
-Source: User instruction 2026-10-08 17:42, 17:52, 18:13; README §Data model; code app/app/pages/cards/[id].vue | Origin: user requirement
+Source: User instruction 2026-10-08 17:42, 17:52, 18:13; README (7f3d955) §Data model; code app/app/pages/cards/[id].vue | Origin: user requirement
 
 #### Scenario: Clearing
 - GIVEN a card with "1st Edition"
@@ -62,7 +62,7 @@ Source: User instruction 2026-10-08 17:42, 17:52, 18:13; README §Data model; co
 
 ### Requirement: Variant for Pokémon
 The system SHALL offer the variant for Pokémon cards only among the variants that the card has according to the database (and the stored one) and reject another with 400 `invalid_variant`; the card ID is not changeable (400 `field_not_editable`).
-Source: User instruction 2026-10-05 18:58 (question round), 2026-10-10 20:33; README §Pokémon; code server/services/cards.ts | Origin: user requirement
+Source: User instruction 2026-10-05 18:58 (question round), 2026-10-10 20:33; README (7f3d955) §Pokémon; code server/services/cards.ts | Origin: user requirement
 
 #### Scenario: Only one variant
 - GIVEN a card that exists only as holo
@@ -90,7 +90,7 @@ Source: Code server/services/cards.ts (update); tests cards.test.ts (does nothin
 
 ### Requirement: Note "modified on"
 The system SHALL show "modified on" with the date in the header of the card after the origin ("taken from API" or "entered manually") as soon as a user has changed something; updating from the API does not count.
-Source: User instruction 2026-10-04 19:40 (4); README §Features; code app/app/pages/cards/[id].vue | Origin: user requirement
+Source: User instruction 2026-10-04 19:40 (4); README (7f3d955) §Features; code app/app/pages/cards/[id].vue | Origin: user requirement
 
 #### Scenario: After a change
 - GIVEN a user changes the edition
@@ -104,7 +104,7 @@ Source: User instruction 2026-10-04 19:40 (4); README §Features; code app/app/p
 
 ### Requirement: Updating from the card database
 The system SHALL reload texts, attributes and prices in all stored languages on "Update from API" and leave set code, edition, status, owner, purchase date and images unchanged.
-Source: User instruction 2026-10-04 19:40 (6); README §Features; test cards.test.ts (refresh) | Origin: user requirement
+Source: User instruction 2026-10-04 19:40 (6); README (7f3d955) §Features; test cards.test.ts (refresh) | Origin: user requirement
 
 #### Scenario: Data changed
 - GIVEN the database has a new text
@@ -164,7 +164,7 @@ Source: User instruction 2026-10-20 09:09 (Yu-Gi-Oh!); extension to both games c
 
 ### Requirement: Pokémon details
 The system SHALL show the language-dependent values of Pokémon cards (category, types, stage, attacks, abilities, weakness, resistance, effect) read-only in the chosen language and fall back to the English spellings for the attribute values.
-Source: README §Pokémon; code app/app/components/PokemonInfo.vue | Origin: derived
+Source: README (7f3d955) §Pokémon; code app/app/components/PokemonInfo.vue | Origin: derived
 
 #### Scenario: Attacks
 - GIVEN a Pokémon card with attacks

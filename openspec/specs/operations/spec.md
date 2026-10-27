@@ -106,7 +106,7 @@ Source: Code app/Dockerfile | Origin: derived
 
 ### Requirement: Upgrade without logins
 The system SHALL take over on the upgrade of a version without logins, after `SESSION_SECRET` and `USERS` are added, the existing "players" as users with the initial password, who keep their cards.
-Source: README §Users and passwords | Origin: derived
+Source: README (7f3d955) §Users and passwords | Origin: derived
 
 #### Scenario: Upgrade
 - GIVEN player Anna with 5 cards

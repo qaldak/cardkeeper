@@ -27,5 +27,5 @@ Prices stay in the currency of their marketplace in the database. An optional `D
 ## Sources
 
 - User instruction 2026-10-04 10:00 (question round "currency"), 2026-10-10 22:14, 22:25, 22:36/22:38
-- `README.md` §Features, §Data model
+- `README.md` (7f3d955) §Features, §Data model
 - `app/server/services/rates.ts`

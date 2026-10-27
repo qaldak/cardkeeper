@@ -16,7 +16,7 @@ Source: README §Adding a game; KONZEPT §Multi-TCG (confirmed by the user 2026-
 
 ### Requirement: Game behaviour per print
 The system SHALL describe the behaviour of a game for the print (set code and edition or variant) in `shared/utils/game-config.ts`.
-Source: README §Pokémon, §Adding a game; code app/shared/utils/game-config.ts | Origin: derived
+Source: README (7f3d955) §Pokémon, §Adding a game; code app/shared/utils/game-config.ts | Origin: derived
 
 #### Scenario: Print
 - GIVEN a game with variants
@@ -34,7 +34,7 @@ Source: User instruction 2026-10-05 19:48/19:55 (Japanese as the third language)
 
 ### Requirement: Pokémon data model
 The system SHALL separate for Pokémon language-independent values (`PokemonAttributes`, from the English answer) and language-dependent ones (`PokemonDetails`); the print is the card ID, the variant (`normal`, `reverse`, `holo`, `firstEdition`, `wPromo`) is selectable among the existing ones.
-Source: User instruction 2026-10-05 18:57/18:58 ("explicit data model", "variant"); README §Pokémon | Origin: user requirement
+Source: User instruction 2026-10-05 18:57/18:58 ("explicit data model", "variant"); README (7f3d955) §Pokémon | Origin: user requirement
 
 #### Scenario: Variant
 - GIVEN a card that exists only as holo
@@ -43,7 +43,7 @@ Source: User instruction 2026-10-05 18:57/18:58 ("explicit data model", "variant
 
 ### Requirement: Japanese cards
 The system SHALL keep Japanese cards from the own TCGdex database, findable only through set and number or ID; categories, types and stages SHALL be mapped to the English spelling.
-Source: User instruction 2026-10-05 19:48, 19:55; README §Pokémon | Origin: user requirement
+Source: User instruction 2026-10-05 19:48, 19:55; README (7f3d955) §Pokémon | Origin: user requirement
 
 #### Scenario: Japanese
 - GIVEN the set of a Japanese card is chosen
@@ -52,7 +52,7 @@ Source: User instruction 2026-10-05 19:48, 19:55; README §Pokémon | Origin: us
 
 ### Requirement: Images only from declared hosts
 The system SHALL load images only from the hosts declared by the adapter; a YGO hit loads only YGO images, a Pokémon hit only TCGdex images.
-Source: User instruction 2026-10-08 17:52 ("always fetched a Pokémon image"); README §Notes on the card API; test api-calls.test.ts | Origin: user requirement
+Source: User instruction 2026-10-08 17:52 ("always fetched a Pokémon image"); README (7f3d955) §Notes on the card API; test api-calls.test.ts | Origin: user requirement
 
 #### Scenario: YGO hit
 - GIVEN a Yu-Gi-Oh! hit is entered
@@ -61,7 +61,7 @@ Source: User instruction 2026-10-08 17:52 ("always fetched a Pokémon image"); R
 
 ### Requirement: Size of the result list
 The system SHALL limit the search to at most 25 hits for Yu-Gi-Oh! and at most 50 for Pokémon.
-Source: Code app/server/tcg/ygo/adapter.ts, tcgdex/adapter.ts (`MAX_SEARCH_RESULTS`); README §Notes on the card API | Origin: derived
+Source: Code app/server/tcg/ygo/adapter.ts, tcgdex/adapter.ts (`MAX_SEARCH_RESULTS`); README (7f3d955) §Notes on the card API | Origin: derived
 
 #### Scenario: Broad name
 - GIVEN a name with very many cards
@@ -70,7 +70,7 @@ Source: Code app/server/tcg/ygo/adapter.ts, tcgdex/adapter.ts (`MAX_SEARCH_RESUL
 
 ### Requirement: Errors of the card database
 The system SHALL treat on an HTTP 400 answer of YGOPRODeck only "No card matching" as an empty result and all others as error 502 `upstream_error` with the text.
-Source: User instruction 2026-10-04 20:47 (check error handling according to the API); README §Notes on the card API; code app/server/tcg/ygo/adapter.ts | Origin: user requirement
+Source: User instruction 2026-10-04 20:47 (check error handling according to the API); README (7f3d955) §Notes on the card API; code app/server/tcg/ygo/adapter.ts | Origin: user requirement
 
 #### Scenario: No hits
 - GIVEN "No card matching"
@@ -102,7 +102,7 @@ Source: User instruction 2026-10-08 19:03/19:07/19:13 (link card with `def: null
 
 ### Requirement: Untranslated card
 The system SHALL recognise an English copy on a German request and not store it as a German translation.
-Source: README §Notes on the card API; code app/server/tcg/ygo/adapter.ts | Origin: derived
+Source: README (7f3d955) §Notes on the card API; code app/server/tcg/ygo/adapter.ts | Origin: derived
 
 #### Scenario: English only
 - GIVEN the API delivers the English text on a German request

@@ -7,7 +7,7 @@ Card images: local storage, upload, main image, enlargement and delivery. Images
 
 ### Requirement: Images are loaded once and stored locally
 The system SHALL load the image of a card once from the card database when the card is created, store it on the volume `card-images` and never link the card to a foreign image.
-Source: README §Features, §Notes on the card API; tests cards.test.ts, api-calls.test.ts | Origin: derived
+Source: README (7f3d955) §Features, §Notes on the card API; tests cards.test.ts, api-calls.test.ts | Origin: derived
 
 #### Scenario: Own copy
 - GIVEN a card was created with an API image
@@ -99,7 +99,7 @@ Source: User instruction 2026-10-07 17:48, 2026-10-08 18:08 (cache); code server
 
 ### Requirement: Enlargement in a dialog
 The system SHALL enlarge an image in a dialog that closes with a click on the image, Esc or the cross, switches between several images with large arrow areas and the arrow keys, shows the image number and has a download button; the context menu of the image SHALL be preserved.
-Source: User instruction 2026-10-07 17:18, 17:48; README §Features; code app/app/pages/cards/[id].vue | Origin: user requirement
+Source: User instruction 2026-10-07 17:18, 17:48; README (7f3d955) §Features; code app/app/pages/cards/[id].vue | Origin: user requirement
 
 #### Scenario: Click on the image
 - GIVEN the dialog is open

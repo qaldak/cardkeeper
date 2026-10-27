@@ -7,7 +7,7 @@ Prices of the cards: storage per marketplace in its currency, price history and 
 
 ### Requirement: Prices per marketplace in its currency
 The system SHALL store prices per marketplace in the currency of that marketplace (Cardmarket EUR; TCGplayer, eBay, Amazon, CoolStuffInc USD); list and total SHALL use the marketplace of the `PRICE_SOURCE` (default `cardmarket`).
-Source: User instruction 2026-10-04 10:00 (question round "source + original currency"); README §Features, §Configuration; code app/server/lib/config.ts | Origin: user requirement
+Source: User instruction 2026-10-04 10:00 (question round "source + original currency"); README (7f3d955) §Features, §Configuration; code app/server/lib/config.ts | Origin: user requirement
 
 #### Scenario: Source currency
 - GIVEN a card with a Cardmarket price of 0.09 EUR and a TCGplayer price of 0.12 USD
@@ -21,7 +21,7 @@ Source: User instruction 2026-10-04 10:00 (question round "source + original cur
 
 ### Requirement: Pokémon prices
 The system SHALL keep for Pokémon cards the prices `cardmarket` (EUR), `cardmarket-holo` and `tcgplayer-<variant>` (USD); list and total SHALL use `PRICE_SOURCE` for both games.
-Source: User instruction 2026-10-10 22:36/22:38 ("Pokémon already implemented"); README §Pokémon | Origin: derived
+Source: User instruction 2026-10-10 22:36/22:38 ("Pokémon already implemented"); README (7f3d955) §Pokémon | Origin: derived
 
 #### Scenario: Pokémon price
 - GIVEN a Pokémon card with a Cardmarket price
@@ -30,7 +30,7 @@ Source: User instruction 2026-10-10 22:36/22:38 ("Pokémon already implemented")
 
 ### Requirement: Price history on the detail page
 The system SHALL keep every loaded price row with a timestamp and show the history on the detail page.
-Source: README §Features; User instruction 2026-10-10 20:40 ("document the current price even if it does not change") | Origin: user requirement
+Source: README (7f3d955) §Features; User instruction 2026-10-10 20:40 ("document the current price even if it does not change") | Origin: user requirement
 
 #### Scenario: History
 - GIVEN a card with two price rows

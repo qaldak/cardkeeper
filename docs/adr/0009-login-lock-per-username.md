@@ -24,5 +24,5 @@ After 10 failed attempts within 15 minutes the user name is locked for the rest 
 ## Sources
 
 - `app/server/lib/login-throttle.ts` (comment)
-- `README.md` §Users and passwords (safeguards)
+- `README.md` (7f3d955) §Users and passwords (safeguards)
 - Tests `login-throttle.test.ts`, `users.test.ts`

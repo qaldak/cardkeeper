@@ -27,5 +27,5 @@ Images are downloaded once and stored in the volume `card-images`; the table `ca
 
 - `docs/KONZEPT.md` §Datenmodell
 - User instruction 2026-10-09 20:52, 20:58
-- `README.md` §Features, §Notes on the card API
+- `README.md` (7f3d955) §Features, §Notes on the card API
 - `app/server/services/thumbnails.ts`, `images.ts`

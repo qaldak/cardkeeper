@@ -7,7 +7,7 @@ Adding single new cards: game choice, search in the card database (name, ID, set
 
 ### Requirement: Choose and remember the game when adding
 The system SHALL require the choice of the game when adding a card and remember the last choice per browser in a cookie `cardkeeper-last-game` (1 year); an unknown game in the cookie falls back to the first game.
-Source: User instruction 2026-10-05 18:57, 2026-10-06 07:31; README §Features; test last-game.test.ts | Origin: user requirement
+Source: User instruction 2026-10-05 18:57, 2026-10-06 07:31; README (7f3d955) §Features; test last-game.test.ts | Origin: user requirement
 
 #### Scenario: Last choice
 - GIVEN a user chooses Pokémon and creates a card
@@ -21,7 +21,7 @@ Source: User instruction 2026-10-05 18:57, 2026-10-06 07:31; README §Features; 
 
 ### Requirement: Search by name or ID, German first
 The system SHALL search by name or card number (Yu-Gi-Oh!: passcode, Pokémon: card ID such as `swsh3-136`) when adding a card without a language choice, first in German and only without a hit in English, and store both languages where available.
-Source: User instruction 2026-10-04 19:40 (1)/(2); README §Features; test cards.test.ts (lookup) | Origin: user requirement
+Source: User instruction 2026-10-04 19:40 (1)/(2); README (7f3d955) §Features; test cards.test.ts (lookup) | Origin: user requirement
 
 #### Scenario: German hit
 - GIVEN a card "Dunkler Magier"
@@ -40,7 +40,7 @@ Source: User instruction 2026-10-04 19:40 (1)/(2); README §Features; test cards
 
 ### Requirement: Result list with preview images
 The system SHALL show the small image of a card in the result list and in the selection of the card, for Yu-Gi-Oh! from an own copy under `/api/thumbnails/ygo/<passcode>` (loaded once, at most 4 at the same time, browser cache one week), for Pokémon directly from `assets.tcgdex.net`.
-Source: User instruction 2026-10-05 18:58 (question round), 2026-10-09 20:52; README §Notes on the card API; test thumbnails.test.ts | Origin: user requirement
+Source: User instruction 2026-10-05 18:58 (question round), 2026-10-09 20:52; README (7f3d955) §Notes on the card API; test thumbnails.test.ts | Origin: user requirement
 
 #### Scenario: YGO image
 - GIVEN a hit in the Yu-Gi-Oh! search
@@ -63,7 +63,7 @@ Source: Code server/services/thumbnails.ts, server/api/thumbnails/**; test thumb
 
 ### Requirement: Choice of the print
 The system SHALL offer all known prints (set, rarity, for Yu-Gi-Oh! with codes of all languages) for choice on a hit and allow creating the card without a specific print too; a print that does not belong to the card is rejected (400 `invalid_set`).
-Source: README §Features; tests cards.test.ts (offers printings…, creates a card without a specific printing, rejects an unknown… printing) | Origin: derived
+Source: README (7f3d955) §Features; tests cards.test.ts (offers printings…, creates a card without a specific printing, rejects an unknown… printing) | Origin: derived
 
 #### Scenario: German print
 - GIVEN a print exists only in the German answer
@@ -77,7 +77,7 @@ Source: README §Features; tests cards.test.ts (offers printings…, creates a c
 
 ### Requirement: Yu-Gi-Oh!: search by set code
 The system SHALL recognise a text like `L5DD-ENA15` or `lob-en005` in the same search field as a set code (capital letters, codes without a language part such as `SDY-006` included), look up the print at YGOPRODeck (`cardsetsinfo.php`) and search like a name on failure.
-Source: User instruction 2026-10-10 12:04; README §Features; tests set-code.test.ts, ygo-adapter.test.ts | Origin: user requirement
+Source: User instruction 2026-10-10 12:04; README (7f3d955) §Features; tests set-code.test.ts, ygo-adapter.test.ts | Origin: user requirement
 
 #### Scenario: Set code
 - GIVEN the card is in the set `L5DD`
@@ -100,7 +100,7 @@ Source: User instruction 2026-10-10 12:04 (only DE named); assistant 12:12 (exte
 
 ### Requirement: Yu-Gi-Oh!: the printed set code is stored
 The system SHALL store the entered code if it belongs to the chosen (English) print; the print is preselected if it is the only one with this code, with several rarities the choice stays open; set and rarity come from the chosen print.
-Source: User instruction 2026-10-10 12:29; README §Features; test cards.test.ts (stores the code printed on the card…) | Origin: user requirement
+Source: User instruction 2026-10-10 12:29; README (7f3d955) §Features; test cards.test.ts (stores the code printed on the card…) | Origin: user requirement
 
 #### Scenario: Unambiguous print
 - GIVEN `L5DD-DEA15` leads to a single English print
@@ -119,7 +119,7 @@ Source: User instruction 2026-10-10 12:29; README §Features; test cards.test.ts
 
 ### Requirement: Yu-Gi-Oh!: edition as a one-click choice
 The system SHALL offer the editions "1st Edition" and "Limited Edition" next to the print as buttons when adding (a second click takes it back), activate them only after a print is chosen, and leave the edition empty without a choice (Unlimited).
-Source: User instruction 2026-10-07 19:37, 2026-10-08 17:52 (buttons stay); README §Features; test cards.test.ts | Origin: user requirement
+Source: User instruction 2026-10-07 19:37, 2026-10-08 17:52 (buttons stay); README (7f3d955) §Features; test cards.test.ts | Origin: user requirement
 
 #### Scenario: Choice
 - GIVEN a print is chosen
@@ -133,7 +133,7 @@ Source: User instruction 2026-10-07 19:37, 2026-10-08 17:52 (buttons stay); READ
 
 ### Requirement: Pokémon: choose a variant
 The system SHALL require the choice of a variant among those that the card has according to the database (normal, reverse, holo, firstEdition, wPromo) when adding a Pokémon card, otherwise 400 `printing_required`.
-Source: User instruction 2026-10-05 18:58 (question round "variant"); README §Pokémon; test pokemon.test.ts | Origin: user requirement
+Source: User instruction 2026-10-05 18:58 (question round "variant"); README (7f3d955) §Pokémon; test pokemon.test.ts | Origin: user requirement
 
 #### Scenario: Without a variant
 - GIVEN a Pokémon card without a variant
@@ -142,7 +142,7 @@ Source: User instruction 2026-10-05 18:58 (question round "variant"); README §P
 
 ### Requirement: Pokémon: search by set and number
 The system SHALL offer for Pokémon the search by set and printed number: choose the language of the database, type the number (`040/088`), choose the set by name or logo and find the card through the number in the set; the part after the slash narrows the set list by the printed set size.
-Source: User instruction 2026-10-05 19:48, 19:54; README §Pokémon; tests pokemon.test.ts, pokemon-number.test.ts | Origin: user requirement
+Source: User instruction 2026-10-05 19:48, 19:54; README (7f3d955) §Pokémon; tests pokemon.test.ts, pokemon-number.test.ts | Origin: user requirement
 
 #### Scenario: Example Hippoterus
 - GIVEN set `me03`, number `040/088`
@@ -156,7 +156,7 @@ Source: User instruction 2026-10-05 19:48, 19:54; README §Pokémon; tests pokem
 
 ### Requirement: Pokémon: default language of the set choice
 The system SHALL preset the language of the set choice to German (selectable: English, Japanese) and not remember the choice.
-Source: User instruction 2026-10-07 10:47; README §Pokémon; code app/app/components/PokemonSetPicker.vue | Origin: user requirement
+Source: User instruction 2026-10-07 10:47; README (7f3d955) §Pokémon; code app/app/components/PokemonSetPicker.vue | Origin: user requirement
 
 #### Scenario: Opened again
 - GIVEN the user chose English before
@@ -165,7 +165,7 @@ Source: User instruction 2026-10-07 10:47; README §Pokémon; code app/app/compo
 
 ### Requirement: Pokémon: number with or without a slash
 The system SHALL accept the card number with or without a slash and, for an evenly divisible digit sequence (3+3 or 4+4), add the slash at the latest when the field is left, remove spaces and ignore leading zeros when matching (`040` = `40`, `TG01` = `tg01`).
-Source: User instruction 2026-10-07 11:02; README §Pokémon; tests pokemon-number.test.ts | Origin: user requirement
+Source: User instruction 2026-10-07 11:02; README (7f3d955) §Pokémon; tests pokemon-number.test.ts | Origin: user requirement
 
 #### Scenario: Without a slash
 - GIVEN input `040088`
@@ -184,7 +184,7 @@ Source: User instruction 2026-10-07 11:02; README §Pokémon; tests pokemon-numb
 
 ### Requirement: Pokémon: the set choice shows only the logo
 The system SHALL show only the logo of the set in the set choice (loaded lazily, falling back to PNG if the format is missing, otherwise an empty box), no set symbol.
-Source: User instruction 2026-10-06 12:20, 13:08; 2026-10-07 10:47; README §Pokémon; test image-fallback.test.ts | Origin: user requirement
+Source: User instruction 2026-10-06 12:20, 13:08; 2026-10-07 10:47; README (7f3d955) §Pokémon; test image-fallback.test.ts | Origin: user requirement
 
 #### Scenario: Logo
 - GIVEN a set with a logo
@@ -198,7 +198,7 @@ Source: User instruction 2026-10-06 12:20, 13:08; 2026-10-07 10:47; README §Pok
 
 ### Requirement: Set browser and set cache
 The system SHALL deliver the set list and the cards of a set through `GET /api/sets` and `GET /api/sets/<id>`, cache them for six hours, allow logo addresses only from allowed hosts, and report 400 `sets_not_supported` for games without a set browser and 404 `set_not_found` for an unknown set.
-Source: README §Pokémon; code server/services/catalog.ts; test catalog.test.ts | Origin: derived
+Source: README (7f3d955) §Pokémon; code server/services/catalog.ts; test catalog.test.ts | Origin: derived
 
 #### Scenario: Second request
 - GIVEN the set list was just loaded
@@ -212,7 +212,7 @@ Source: README §Pokémon; code server/services/catalog.ts; test catalog.test.ts
 
 ### Requirement: Japanese Pokémon cards
 The system SHALL keep Japanese cards through their own database and ID (`SV9-040`) as the third stored language, make them findable only through set and number or ID (no name search with Latin script), and store a Japanese-only card with Japanese text only.
-Source: User instruction 2026-10-05 19:48, 19:55; README §Pokémon; tests tcgdex-adapter.test.ts, pokemon.test.ts | Origin: user requirement
+Source: User instruction 2026-10-05 19:48, 19:55; README (7f3d955) §Pokémon; tests tcgdex-adapter.test.ts, pokemon.test.ts | Origin: user requirement
 
 #### Scenario: Japanese only
 - GIVEN a card only in the Japanese database
@@ -221,7 +221,7 @@ Source: User instruction 2026-10-05 19:48, 19:55; README §Pokémon; tests tcgde
 
 ### Requirement: ß and ss in the search
 The system SHALL treat "ss" and "ß" as equivalent in the search when adding (both games, name search and lookup by name) and query all spellings (at most 8; from four positions on only as typed, all "ß", all "ss"); hits appear once, those of the typed spelling first.
-Source: User instruction 2026-10-09 19:19, 20:41; README §Features; tests eszett.test.ts, cards.test.ts | Origin: user requirement
+Source: User instruction 2026-10-09 19:19, 20:41; README (7f3d955) §Features; tests eszett.test.ts, cards.test.ts | Origin: user requirement
 
 #### Scenario: weisser
 - GIVEN the card is called "weißer Drache"
@@ -235,7 +235,7 @@ Source: User instruction 2026-10-09 19:19, 20:41; README §Features; tests eszet
 
 ### Requirement: Create a card
 The system SHALL store card, translations, print, prices, raw answers (snapshots), status history (active) and log entry `created` in one transaction when creating, make the creator the owner and take over an optional purchase date.
-Source: README §Features, §Data model; code server/services/cards.ts (create); test cards.test.ts | Origin: derived
+Source: README (7f3d955) §Features, §Data model; code server/services/cards.ts (create); test cards.test.ts | Origin: derived
 
 #### Scenario: Create
 - GIVEN a card is found

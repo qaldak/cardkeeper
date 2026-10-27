@@ -7,7 +7,7 @@ Life cycle of a card (active, sold, traded, gifted, lost) with date, counterpart
 
 ### Requirement: Five status values
 The system SHALL keep exactly one of the statuses active, sold, traded, gifted or lost for every card (new cards: active) and show them in the interface in the chosen language.
-Source: README §Features, §Data model; KONZEPT §Datenmodell; User instruction 2026-10-04 09:59 (concept); code shared/utils/status.ts | Origin: user requirement
+Source: README (7f3d955) §Features, §Data model; KONZEPT §Datenmodell; User instruction 2026-10-04 09:59 (concept); code shared/utils/status.ts | Origin: user requirement
 
 #### Scenario: New card
 - GIVEN a card is created

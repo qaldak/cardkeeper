@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** Not documented (deviation from the concept, described in the README)
-- **Origin:** Derived (README §Data model; not documented as a separate decision in the user instructions).
+- **Origin:** Derived (README (7f3d955) §Data model; not documented as a separate decision in the user instructions).
 - **Specs:** [`data-storage`](../../openspec/specs/data-storage/spec.md), [`game-adapters`](../../openspec/specs/game-adapters/spec.md), [`overview`](../../openspec/specs/overview/spec.md)
 
 ## Context
@@ -25,6 +25,6 @@ Not documented.
 
 ## Sources
 
-- `README.md` §Data model
+- `README.md` (7f3d955) §Data model
 - User instruction 2026-10-05 17:18
 - `app/prisma/schema.prisma`, `app/shared/utils/languages.ts`

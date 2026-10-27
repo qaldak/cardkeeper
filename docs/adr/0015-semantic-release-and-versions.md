@@ -25,5 +25,5 @@ Not documented.
 ## Sources
 
 - User instruction 2026-10-04 09:59, 10:00, 10:57–14:41; 2026-10-05 17:18; 2026-10-10 20:58
-- `README.md` §Releases, §Dependency updates
+- `README.md` §Releases
 - `.github/workflows/release.yml`, `.github/dependabot.yml`

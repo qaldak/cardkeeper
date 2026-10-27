@@ -7,7 +7,7 @@ Cross-cutting characteristics of the interface: light/dark, language, page title
 
 ### Requirement: Light and dark
 The system SHALL offer the interface in a light and a dark appearance; the default is "System" (follows the device, light if the device reports nothing), a switch in the header (light, dark, system) SHALL remember the choice in the browser.
-Source: User instruction 2026-10-07 16:46, 17:06 ("system follows the device, if not recognised: light. Remember settings."); README §Features | Origin: user requirement
+Source: User instruction 2026-10-07 16:46, 17:06 ("system follows the device, if not recognised: light. Remember settings."); README (7f3d955) §Features | Origin: user requirement
 
 #### Scenario: Device dark
 - GIVEN the device reports dark and nothing was chosen

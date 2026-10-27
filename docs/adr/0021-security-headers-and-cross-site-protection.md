@@ -25,5 +25,5 @@ Not documented. The review points soft delete, splitting `cards.ts` and scans we
 ## Sources
 
 - User instruction 2026-10-21 14:27, 14:37 ff.
-- `README.md` §Users and passwords (safeguards)
+- `README.md` (7f3d955) §Users and passwords (safeguards)
 - `app/nuxt.config.ts`, `app/server/lib/cross-site.ts`, `app/server/middleware/cross-site.ts`

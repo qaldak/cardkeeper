@@ -33,5 +33,5 @@ The app has its own login. Users are listed in `USERS` of the `.env` and created
 
 - User instruction 2026-10-07 14:46, question rounds 14:47 and 14:51, 15:18, 15:31
 - `docs/KONZEPT.md` §Sicherheitskonzept, §Offene Punkte
-- `README.md` §Users and passwords
+- `README.md` (7f3d955) §Users and passwords
 - `app/server/lib/session.ts`, `app/server/lib/password.ts`

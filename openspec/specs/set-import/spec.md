@@ -7,7 +7,7 @@ Adding all cards of a set in one pass (wizard), for Yu-Gi-Oh! and Pokémon. Only
 
 ### Requirement: Wizard "Whole set"
 The system SHALL offer the tab "Whole set" when adding cards (Yu-Gi-Oh!: next to "Single card"; Pokémon: next to "By set and number" and "By name or ID") with the steps choose the set, check the cards, add.
-Source: User instruction 2026-10-10 12:56, 19:56; README §Features; code app/app/components/SetImportWizard.vue | Origin: user requirement
+Source: User instruction 2026-10-10 12:56, 19:56; README (7f3d955) §Features; code app/app/components/SetImportWizard.vue | Origin: user requirement
 
 #### Scenario: Searching a set
 - GIVEN the set list (newest first)
@@ -16,7 +16,7 @@ Source: User instruction 2026-10-10 12:56, 19:56; README §Features; code app/ap
 
 ### Requirement: Yu-Gi-Oh!: the language determines the set code
 The system SHALL let the user choose in the Yu-Gi-Oh! wizard the language of the cards (German, English, Japanese) in which the set codes are stored (e.g. `SDAZ-DE001`), and show the codes in this language in the table.
-Source: User instruction 2026-10-10 12:56; README §Features; code shared/utils/set-import.ts (importBody) | Origin: user requirement
+Source: User instruction 2026-10-10 12:56; README (7f3d955) §Features; code shared/utils/set-import.ts (importBody) | Origin: user requirement
 
 #### Scenario: German codes
 - GIVEN set SDAZ, language German
@@ -25,7 +25,7 @@ Source: User instruction 2026-10-10 12:56; README §Features; code shared/utils/
 
 ### Requirement: Edition once for the set, changeable per card
 The system SHALL let the user choose in the Yu-Gi-Oh! wizard the edition (1st Edition, Limited Edition, none = Unlimited) once for the whole set and store it changeable per card.
-Source: User instruction 2026-10-10 12:56 ("stored per card"); README §Features | Origin: user requirement
+Source: User instruction 2026-10-10 12:56 ("stored per card"); README (7f3d955) §Features | Origin: user requirement
 
 #### Scenario: Set edition
 - GIVEN "1st Edition" for the set
@@ -34,7 +34,7 @@ Source: User instruction 2026-10-10 12:56 ("stored per card"); README §Features
 
 ### Requirement: Clear or unclear
 The system SHALL treat a row as clear when the card has exactly one print in the set or the Pokémon variant chosen for the whole set occurs exactly once, and as a conflict when several prints remain (Yu-Gi-Oh!: a code in several rarities or several codes).
-Source: README §Features; code shared/utils/set-import.ts; test set-import.test.ts | Origin: derived
+Source: README (7f3d955) §Features; code shared/utils/set-import.ts; test set-import.test.ts | Origin: derived
 
 #### Scenario: Only print
 - GIVEN a card with one print
@@ -48,7 +48,7 @@ Source: README §Features; code shared/utils/set-import.ts; test set-import.test
 
 ### Requirement: Only conflicts are visible by default
 The system SHALL show only the conflict cards (marked yellow) by default after the set is chosen, summarise the number of unambiguous cards and make the complete list expandable for deselecting single cards; a decided card SHALL NOT disappear from the list.
-Source: User instruction 2026-10-10 13:24; README §Features; test set-import.test.ts (visibleRows) | Origin: user requirement
+Source: User instruction 2026-10-10 13:24; README (7f3d955) §Features; test set-import.test.ts (visibleRows) | Origin: user requirement
 
 #### Scenario: Without conflicts
 - GIVEN a set without conflicts
@@ -62,7 +62,7 @@ Source: User instruction 2026-10-10 13:24; README §Features; test set-import.te
 
 ### Requirement: Adding only without an open choice
 The system SHALL allow adding only when a print is fixed for all cards to be added.
-Source: README §Features; code shared/utils/set-import.ts (needsChoice); test set-import.test.ts | Origin: derived
+Source: README (7f3d955) §Features; code shared/utils/set-import.ts (needsChoice); test set-import.test.ts | Origin: derived
 
 #### Scenario: Open choice
 - GIVEN a conflict card is undecided
@@ -71,7 +71,7 @@ Source: README §Features; code shared/utils/set-import.ts (needsChoice); test s
 
 ### Requirement: Adding with the same checks, three at a time
 The system SHALL add the cards one by one with the same checks as a single card, at most three at a time (limit of the card database), show the progress, list failed cards and allow a new attempt; every card is added once, there is no quantity.
-Source: User instruction 2026-10-10 12:56, 19:56; README §Features | Origin: user requirement
+Source: User instruction 2026-10-10 12:56, 19:56; README (7f3d955) §Features | Origin: user requirement
 
 #### Scenario: Failure
 - GIVEN a card fails
@@ -89,7 +89,7 @@ Source: Code shared/utils/set-import.ts (importBody); test set-import.test.ts | 
 
 ### Requirement: Pokémon: the variant is the unclear part
 The system SHALL let the user choose the language of the set list in the Pokémon wizard, treat the variant as the unclear point (one variant can be chosen for the whole set and applies to every card that has it exactly once) and store all languages of a card as for a single card.
-Source: User instruction 2026-10-10 19:56; README §Features | Origin: user requirement
+Source: User instruction 2026-10-10 19:56; README (7f3d955) §Features | Origin: user requirement
 
 #### Scenario: One variant for all
 - GIVEN variant "reverse" for the set
@@ -98,7 +98,7 @@ Source: User instruction 2026-10-10 19:56; README §Features | Origin: user requ
 
 ### Requirement: Pokémon: variants are loaded per card
 The system SHALL load the variants per card individually (at most four at a time) when a Pokémon set is opened and cache them for a few hours; a card that cannot be loaded is left out, a limit of the card database is reported.
-Source: README §Features; code server/tcg/tcgdex/adapter.ts (listCardPrints), server/services/catalog.ts | Origin: derived
+Source: README (7f3d955) §Features; code server/tcg/tcgdex/adapter.ts (listCardPrints), server/services/catalog.ts | Origin: derived
 
 #### Scenario: Large set
 - GIVEN a set with many cards
