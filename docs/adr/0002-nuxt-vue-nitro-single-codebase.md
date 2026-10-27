@@ -26,6 +26,6 @@ Not documented (the concept names only the choice and its reasons).
 ## Sources
 
 - `docs/KONZEPT.md` §Tech-Stack
-- `README.md` §Architecture, §Data model (Nuxt 4 default layout)
+- `README.md` (7f3d955) §Architecture, §Data model (Nuxt 4 default layout)
 - User instruction 2026-10-04 10:43 (deviations from the concept)
 - `app/package.json`

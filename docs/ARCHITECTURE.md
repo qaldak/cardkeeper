@@ -1,6 +1,6 @@
 # Architecture
 
-Short overview in the style of C4 (context, containers, building blocks) with three runtime flows. The decisions are in `docs/adr/`, the requirements in `openspec/specs/`; this file does not repeat them but links to them. Every statement comes from `README.md` §Architecture, `docker-compose.yml` or the code under `app/`.
+Short overview in the style of C4 (context, containers, building blocks) with three runtime flows. The decisions are in `docs/adr/`, the requirements in `openspec/specs/`; this file does not repeat them but links to them. Every statement comes from `README.md` (7f3d955) §Architecture, `docker-compose.yml` or the code under `app/`.
 
 ## 1. System context
 

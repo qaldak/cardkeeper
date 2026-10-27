@@ -7,7 +7,7 @@ Sign-in, user management through the configuration, password rules, sessions and
 
 ### Requirement: Everything is behind the login
 The system SHALL reject every request under `/api/` without a valid login with 401 `unauthenticated`, except `/api/health`, `/api/auth/login` and `/api/_nuxt_icon/`.
-Source: User instruction 2026-10-07 14:46; README §Users; code server/middleware/auth.ts | Origin: user requirement
+Source: User instruction 2026-10-07 14:46; README (7f3d955) §Users; code server/middleware/auth.ts | Origin: user requirement
 
 #### Scenario: API without login
 - GIVEN no login cookie
@@ -39,7 +39,7 @@ Source: User instruction 2026-10-07 14:46; test ownership.test.ts | Origin: user
 
 ### Requirement: Only the owner changes a card
 The system SHALL allow changing, deleting, updating from the card API and changing the images of a card only to its owner and reject everybody else with 403 `not_card_owner`; whoever creates a card SHALL be its owner.
-Source: User instruction 2026-10-07 14:46; README §Users; test ownership.test.ts | Origin: user requirement
+Source: User instruction 2026-10-07 14:46; README (7f3d955) §Users; test ownership.test.ts | Origin: user requirement
 
 #### Scenario: Changing another person's card
 - GIVEN a card belongs to Anna
@@ -67,7 +67,7 @@ Source: User instruction 2026-10-07 14:51 (question round: yes); code server/lib
 
 ### Requirement: Cards without an owner are unchangeable
 The system SHALL keep cards without an owner visible for everybody, but reject their change by any user with 403 `card_has_no_owner` until an owner is set in the database.
-Source: User instruction 2026-10-07 14:47/14:51; README §Users; test ownership.test.ts | Origin: user requirement
+Source: User instruction 2026-10-07 14:47/14:51; README (7f3d955) §Users; test ownership.test.ts | Origin: user requirement
 
 #### Scenario: Changing an ownerless card
 - GIVEN a card without an owner
@@ -81,7 +81,7 @@ Source: User instruction 2026-10-07 14:47/14:51; README §Users; test ownership.
 
 ### Requirement: A deleted user leaves the cards in place
 The system SHALL keep the cards of a user who was removed in the database, without an owner.
-Source: README §Users; test ownership.test.ts; schema onDelete SetNull | Origin: derived
+Source: README (7f3d955) §Users; test ownership.test.ts; schema onDelete SetNull | Origin: derived
 
 #### Scenario: User removed
 - GIVEN Max owns cards
@@ -90,7 +90,7 @@ Source: README §Users; test ownership.test.ts; schema onDelete SetNull | Origin
 
 ### Requirement: Users come from the configuration
 The system SHALL create at startup the users named in `USERS` that do not exist yet (case-insensitive), with the initial password `cardkeeper`.
-Source: User instruction 2026-10-07 14:46/14:47; README §Users; test users.test.ts | Origin: user requirement
+Source: User instruction 2026-10-07 14:46/14:47; README (7f3d955) §Users; test users.test.ts | Origin: user requirement
 
 #### Scenario: New user
 - GIVEN `USERS=anna,max`, only `anna` exists
@@ -104,7 +104,7 @@ Source: User instruction 2026-10-07 14:46/14:47; README §Users; test users.test
 
 ### Requirement: Removed names delete nothing
 The system SHALL leave users who disappear from `USERS` unchanged, with their password and cards; an admin role and an admin interface SHALL NOT exist.
-Source: README §Users; User instruction 2026-10-07 14:46, 15:31; test users.test.ts | Origin: user requirement
+Source: README (7f3d955) §Users; User instruction 2026-10-07 14:46, 15:31; test users.test.ts | Origin: user requirement
 
 #### Scenario: Name removed
 - GIVEN `max` owns cards and is missing in `USERS`
@@ -122,7 +122,7 @@ Source: User instruction 2026-10-07 14:46, 14:51 (question round: forced); code 
 
 ### Requirement: Password rules
 The system SHALL require a new password of 8 to 200 characters that is neither `cardkeeper` (case-insensitive) nor the current one, and allow the change only with the correct current password (otherwise 400 `current_password_wrong`).
-Source: README §Users; code shared/utils/users.ts; tests users.test.ts, password.test.ts | Origin: derived
+Source: README (7f3d955) §Users; code shared/utils/users.ts; tests users.test.ts, password.test.ts | Origin: derived
 
 #### Scenario: Too short
 - GIVEN a user changes their password
@@ -136,7 +136,7 @@ Source: README §Users; code shared/utils/users.ts; tests users.test.ts, passwor
 
 ### Requirement: Password reset by the operator
 The system SHALL reset a password when the operator sets `password_hash` of the user to NULL in the database; afterwards `cardkeeper` applies again with a forced password choice, and all earlier sessions of the user SHALL end.
-Source: User instruction 2026-10-07 14:46, 14:47 (SQL: hash to NULL); README §Users; test users.test.ts | Origin: user requirement
+Source: User instruction 2026-10-07 14:46, 14:47 (SQL: hash to NULL); README (7f3d955) §Users; test users.test.ts | Origin: user requirement
 
 #### Scenario: Reset
 - GIVEN Anna's hash is set to NULL
@@ -159,7 +159,7 @@ Source: Code server/services/users.ts; test users.test.ts | Origin: derived
 
 ### Requirement: Lock after failed attempts
 The system SHALL lock a user name after 10 failed sign-in or password checks within 15 minutes until the end of this window (429 `too_many_attempts`), also for the correct password, per user name and not per address.
-Source: README §Users (safeguards); code server/lib/login-throttle.ts; tests login-throttle.test.ts | Origin: derived
+Source: README (7f3d955) §Users (safeguards); code server/lib/login-throttle.ts; tests login-throttle.test.ts | Origin: derived
 
 #### Scenario: Locked
 - GIVEN 10 failed attempts for `anna` within 15 minutes
@@ -173,7 +173,7 @@ Source: README §Users (safeguards); code server/lib/login-throttle.ts; tests lo
 
 ### Requirement: Session as a sealed cookie
 The system SHALL keep the session as an encrypted and signed cookie `cardkeeper-session` (httpOnly, SameSite=Lax, 30 days, `secure` according to the protocol reported by the reverse proxy), without a session store on the server.
-Source: README §Users; code server/lib/session.ts | Origin: derived
+Source: README (7f3d955) §Users; code server/lib/session.ts | Origin: derived
 
 #### Scenario: Cookie after login
 - GIVEN a login over https behind a proxy with `X-Forwarded-Proto`
@@ -182,7 +182,7 @@ Source: README §Users; code server/lib/session.ts | Origin: derived
 
 ### Requirement: A password change ends other sessions
 The system SHALL let a session apply only to the password state in which it was created; after a change or reset the changing browser SHALL stay signed in and other browsers SHALL be signed out.
-Source: README §Users; code server/lib/password.ts, server/api/auth/password.put.ts; test users.test.ts | Origin: derived
+Source: README (7f3d955) §Users; code server/lib/password.ts, server/api/auth/password.put.ts; test users.test.ts | Origin: derived
 
 #### Scenario: Change
 - GIVEN Anna is signed in in two browsers
@@ -214,7 +214,7 @@ Source: Code app/app/pages/login.vue, app/app/middleware/auth.global.ts | Origin
 
 ### Requirement: Switch from a version without logins
 The system SHALL refuse to start without `SESSION_SECRET` or `USERS`, take over existing "players" as users with the initial password and their cards, and ignore a header `X-Remote-User`.
-Source: README §Users (upgrading); docker-compose.yml; User instruction 2026-10-07 14:47/14:51 | Origin: user requirement
+Source: README (7f3d955) §Users (upgrading); docker-compose.yml; User instruction 2026-10-07 14:47/14:51 | Origin: user requirement
 
 #### Scenario: Configuration missing
 - GIVEN `.env` without `SESSION_SECRET` or `USERS`

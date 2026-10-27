@@ -7,7 +7,7 @@ Display of prices in a configurable currency (e.g. CHF) in addition to the sourc
 
 ### Requirement: Display currency
 The system SHALL show prices and the total of the overview in the currency set in the environment variable `DISPLAY_CURRENCY` (e.g. `CHF`) and both values on the detail page (`CHF 0.08 (EUR 0.09)`); the parameter SHALL be optional.
-Source: User instruction 2026-10-10 22:14; README §Features, §Configuration; code app/server/lib/config.ts | Origin: user requirement
+Source: User instruction 2026-10-10 22:14; README (7f3d955) §Features, §Configuration; code app/server/lib/config.ts | Origin: user requirement
 
 #### Scenario: Detail page
 - GIVEN `DISPLAY_CURRENCY=CHF` and a price of 0.09 EUR
@@ -21,7 +21,7 @@ Source: User instruction 2026-10-10 22:14; README §Features, §Configuration; c
 
 ### Requirement: Without a display currency
 The system SHALL show prices unchanged in the source currency (EUR or USD) without `DISPLAY_CURRENCY` and not convert them.
-Source: User instruction 2026-10-10 22:14 ("If not defined, EUR continues to be used as now"); decision by the user (2026-10-23: source currency stays); README §Features | Origin: user requirement
+Source: User instruction 2026-10-10 22:14 ("If not defined, EUR continues to be used as now"); decision by the user (2026-10-23: source currency stays); README (7f3d955) §Features | Origin: user requirement
 
 #### Scenario: Not set
 - GIVEN `DISPLAY_CURRENCY` is not set

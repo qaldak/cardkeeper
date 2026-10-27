@@ -25,6 +25,6 @@ The status is stored as the enum `ACTIVE`, `SOLD`, `TRADED`, `GIFTED`, `LOST` an
 ## Sources
 
 - `docs/KONZEPT.md` §Datenmodell
-- `README.md` §Data model
+- `README.md` (7f3d955) §Data model
 - User instruction 2026-10-04 10:43
 - `app/prisma/schema.prisma`

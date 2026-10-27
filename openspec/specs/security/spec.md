@@ -7,7 +7,7 @@ Hardening of responses and downloads: security headers, protection against cross
 
 ### Requirement: Security headers on every response
 The system SHALL deliver every response (pages, API, images) with `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` and `Referrer-Policy: same-origin`.
-Source: README §Users (safeguards); code app/nuxt.config.ts (routeRules); User instruction 2026-10-21 14:27 (review assignment) | Origin: derived
+Source: README (7f3d955) §Users (safeguards); code app/nuxt.config.ts (routeRules); User instruction 2026-10-21 14:27 (review assignment) | Origin: derived
 
 #### Scenario: Headers on page and API
 - GIVEN the app is running
@@ -16,7 +16,7 @@ Source: README §Users (safeguards); code app/nuxt.config.ts (routeRules); User 
 
 ### Requirement: Cross-site write requests are rejected
 The system SHALL reject requests with POST, PUT, PATCH or DELETE to `/api/` that the browser marks with `Sec-Fetch-Site: cross-site` or `same-site` with 403 `cross_site_request`; `same-origin`, `none`, a missing header and read access stay allowed.
-Source: README §Users (safeguards); code server/lib/cross-site.ts; test cross-site.test.ts; User instruction 2026-10-21 14:27 | Origin: derived
+Source: README (7f3d955) §Users (safeguards); code server/lib/cross-site.ts; test cross-site.test.ts; User instruction 2026-10-21 14:27 | Origin: derived
 
 #### Scenario: Foreign page
 - GIVEN a request carries `Sec-Fetch-Site: cross-site`
@@ -35,7 +35,7 @@ Source: README §Users (safeguards); code server/lib/cross-site.ts; test cross-s
 
 ### Requirement: Images only from allowed hosts
 The system SHALL load images from card databases only over HTTPS and only from the hosts that the adapter of the game declares, with a limited file size, so that manipulated answers cannot make it fetch arbitrary addresses.
-Source: Code server/lib/image-download.ts, server/lib/image-url.ts; README §Notes on the card API; test image-download.test.ts | Origin: derived
+Source: Code server/lib/image-download.ts, server/lib/image-url.ts; README (7f3d955) §Notes on the card API; test image-download.test.ts | Origin: derived
 
 #### Scenario: Foreign host
 - GIVEN an answer names an image URL on a host that is not declared

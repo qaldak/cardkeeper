@@ -26,5 +26,5 @@ Not documented.
 ## Sources
 
 - `docs/KONZEPT.md` §Tech-Stack, §Datenmodell
-- `README.md` §Data model, §Quick start
+- `README.md` (7f3d955) §Data model, §Quick start
 - `app/prisma/schema.prisma`

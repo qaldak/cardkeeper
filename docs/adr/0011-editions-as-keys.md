@@ -28,5 +28,5 @@ Printed editions are stored as the keys `FIRST_EDITION` and `LIMITED_EDITION` an
 ## Sources
 
 - User instruction 2026-10-07 19:37, 19:44, 21:15, 21:37; 2026-10-08 17:42, 17:52, 18:13, 18:18
-- `README.md` §Data model
+- `README.md` (7f3d955) §Data model
 - `app/server/plugins/editions.ts`, `app/shared/utils/editions.ts`

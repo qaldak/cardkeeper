@@ -21,10 +21,10 @@ Not documented.
 
 - No schema change per new game (concept).
 - Filtering and sorting by these values happens in memory (see ADR 0014).
-- Language-dependent additional data (Pokémon) is in `card_translations.details` (README §Data model).
+- Language-dependent additional data (Pokémon) is in `card_translations.details` (README (7f3d955) §Data model).
 
 ## Sources
 
 - `docs/KONZEPT.md` §Datenmodell
-- `README.md` §Data model
+- `README.md` (7f3d955) §Data model
 - `app/prisma/schema.prisma`

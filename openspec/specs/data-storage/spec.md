@@ -7,7 +7,7 @@ Data model invariants of the collection: read-only card data, translations, raw-
 
 ### Requirement: Tables
 The system SHALL keep the collection in the tables `games`, `cards` (one row per physical card), `card_sets`, `card_translations`, `price_history`, `status_history`, `users`, `api_snapshots`, `card_images`, `audit_log` and `price_refresh_runs`.
-Source: README §Data model; code app/prisma/schema.prisma | Origin: derived
+Source: README (7f3d955) §Data model; code app/prisma/schema.prisma | Origin: derived
 
 #### Scenario: Card
 - GIVEN a card that was entered
@@ -16,7 +16,7 @@ Source: README §Data model; code app/prisma/schema.prisma | Origin: derived
 
 ### Requirement: Game-specific values as JSONB
 The system SHALL store game-specific values in `cards.game_specific_attributes` (JSONB).
-Source: KONZEPT §Datenmodell (confirmed by the user 2026-10-23); README §Data model | Origin: user requirement
+Source: KONZEPT §Datenmodell (confirmed by the user 2026-10-23); README (7f3d955) §Data model | Origin: user requirement
 
 #### Scenario: New game
 - GIVEN a new game
@@ -25,7 +25,7 @@ Source: KONZEPT §Datenmodell (confirmed by the user 2026-10-23); README §Data 
 
 ### Requirement: Texts per language
 The system SHALL store language-dependent texts in `card_translations` (one row per card and language); `cards.name` SHALL be the display name in the preferred language.
-Source: README §Data model | Origin: derived
+Source: README (7f3d955) §Data model | Origin: derived
 
 #### Scenario: Display name
 - GIVEN a card with a German and an English name
@@ -34,7 +34,7 @@ Source: README §Data model | Origin: derived
 
 ### Requirement: Card data is read-only
 The system SHALL keep names, texts and attributes read-only; only set code and edition or variant of the print (`card_sets`) SHALL be editable, `manual_overrides` is dropped.
-Source: README §Data model; code app/prisma/schema.prisma | Origin: derived
+Source: README (7f3d955) §Data model; code app/prisma/schema.prisma | Origin: derived
 
 #### Scenario: Name
 - GIVEN the detail page of a card is open
@@ -43,7 +43,7 @@ Source: README §Data model; code app/prisma/schema.prisma | Origin: derived
 
 ### Requirement: Status as a key
 The system SHALL store the status as a language-neutral enum (`ACTIVE`, `SOLD`, `TRADED`, `GIFTED`, `LOST`) and translate it in the interface.
-Source: README §Data model; code app/prisma/schema.prisma | Origin: derived
+Source: README (7f3d955) §Data model; code app/prisma/schema.prisma | Origin: derived
 
 #### Scenario: Display
 - GIVEN status `SOLD` and the interface in German
@@ -52,7 +52,7 @@ Source: README §Data model; code app/prisma/schema.prisma | Origin: derived
 
 ### Requirement: Editions as keys
 The system SHALL store the printed Yu-Gi-Oh! editions as the keys `FIRST_EDITION` and `LIMITED_EDITION`; "Unlimited" SHALL be NULL.
-Source: User instruction 2026-10-08 17:42–18:18; README §Data model | Origin: user requirement
+Source: User instruction 2026-10-08 17:42–18:18; README (7f3d955) §Data model | Origin: user requirement
 
 #### Scenario: Unlimited
 - GIVEN a card without an edition imprint
@@ -70,7 +70,7 @@ Source: User instruction 2026-10-08 18:18 ("other values stay… log entry in th
 
 ### Requirement: Immutable raw data
 The system SHALL store the unchanged answer of the card database per fetch and language in `api_snapshots` without changing it later.
-Source: README §Data model ("immutable raw API responses") | Origin: derived
+Source: README (7f3d955) §Data model ("immutable raw API responses") | Origin: derived
 
 #### Scenario: Update
 - GIVEN a card is updated
@@ -79,7 +79,7 @@ Source: README §Data model ("immutable raw API responses") | Origin: derived
 
 ### Requirement: Audit log and "modified on"
 The system SHALL record changes by users in the audit log (old and new value) and show "modified on" only after a user has changed something; a refresh from the API does not count.
-Source: User instruction 2026-10-04 19:40 ("'modified on' + date"); README §Features; code app/server/services/cards.ts | Origin: user requirement
+Source: User instruction 2026-10-04 19:40 ("'modified on' + date"); README (7f3d955) §Features; code app/server/services/cards.ts | Origin: user requirement
 
 #### Scenario: Refresh
 - GIVEN a card is only updated from the API
@@ -93,7 +93,7 @@ Source: User instruction 2026-10-04 19:40 ("'modified on' + date"); README §Fea
 
 ### Requirement: Image files in the volume
 The system SHALL store image files in the volume `card-images` and store only relative paths in `card_images`.
-Source: README §Data model; code app/server/lib/image-files.ts | Origin: derived
+Source: README (7f3d955) §Data model; code app/server/lib/image-files.ts | Origin: derived
 
 #### Scenario: Image
 - GIVEN a stored image

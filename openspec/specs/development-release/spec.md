@@ -16,7 +16,7 @@ Source: User instruction 2026-10-04 09:59 ("no local installation on the host");
 
 ### Requirement: Testing a branch next to the installation
 The system SHALL allow testing a branch next to the real installation under another project name (own containers and volumes, `CONTAINER_PREFIX`).
-Source: User instruction 2026-10-05 18:57; 2026-10-06 13:12 (prefix); README §Trying out a branch | Origin: user requirement
+Source: User instruction 2026-10-05 18:57; 2026-10-06 13:12 (prefix); docs/development.md | Origin: user requirement
 
 #### Scenario: Second stack
 - GIVEN a running installation
@@ -25,7 +25,7 @@ Source: User instruction 2026-10-05 18:57; 2026-10-06 13:12 (prefix); README §T
 
 ### Requirement: Tests
 The system SHALL run unit tests for pure logic and integration tests against a real PostgreSQL with a fake card API; integration tests SHALL use `TEST_DATABASE_URL` and never `DATABASE_URL`; a coverage script (`npm run test:coverage`, v8, without a threshold) SHALL be present.
-Source: README §Tests; User instruction 2026-10-21 (review, coverage) | Origin: derived
+Source: README (7f3d955) §Tests; User instruction 2026-10-21 (review, coverage) | Origin: derived
 
 #### Scenario: Test database
 - GIVEN `TEST_DATABASE_URL` points to `cardkeeper_test`
@@ -34,7 +34,7 @@ Source: README §Tests; User instruction 2026-10-21 (review, coverage) | Origin:
 
 ### Requirement: Continuous integration
 The system SHALL run in the CI (`tests.yml`) lint, type check (also for tests), all tests with PostgreSQL, the Docker build and the Compose validation on every pull request and as the first stage of every release.
-Source: README §Tests; User instruction 2026-10-10 22:40 (TS7053 in the CI) | Origin: derived
+Source: README (7f3d955) §Tests; User instruction 2026-10-10 22:40 (TS7053 in the CI) | Origin: derived
 
 #### Scenario: Type error
 - GIVEN a type error in a test
@@ -70,7 +70,7 @@ Source: User instruction 2026-10-04 10:57–14:41; README §Releases | Origin: d
 
 ### Requirement: Dependency updates
 The system SHALL run Dependabot weekly for npm, Dockerfile, Compose and Actions; production updates SHALL carry `chore:` (patch release), the others `build:` (no release), Prisma is grouped, major updates of Node, PostgreSQL and TypeScript are ignored.
-Source: README §Dependency updates; code .github/dependabot.yml | Origin: derived
+Source: README §Releases; code .github/dependabot.yml | Origin: derived
 
 #### Scenario: Dev update
 - GIVEN a dev dependency update

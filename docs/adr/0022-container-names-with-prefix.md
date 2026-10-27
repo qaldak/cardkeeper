@@ -26,4 +26,4 @@ The names are `${CONTAINER_PREFIX:-cardkeeper}_app` and `…_db`; the prefix can
 ## Sources
 
 - User instruction 2026-10-06 13:08, 13:12
-- `README.md` §Configuration, §Trying out a branch
+- `README.md` §Configuration, `docs/development.md`
