@@ -1,0 +1,37 @@
+schema: spec-driven
+
+# Project context. Every statement is backed by a source; sources are named in brackets.
+context: |
+  Project: Cardkeeper, a self-hosted collection for Yu-Gi-Oh! and Pokémon cards (README §Intro).
+
+  Stack (README §Architecture, docs/adr/):
+  - Nuxt 4 (TypeScript, Vue 3, Nitro) as one codebase for interface and API, Nuxt UI + Tailwind CSS
+  - Prisma 7 with PostgreSQL 16, Vitest, Node 24 (Alpine), Docker Compose (services `db` and `app`)
+  - Card data: YGOPRODeck (Yu-Gi-Oh!), TCGdex (Pokémon), one adapter each behind a registry
+
+  Principles (README, docs/adr/):
+  - A new game needs no schema change: game-specific values are stored as JSONB (ADR 0004, 0005).
+  - Names, texts and attributes of the cards are read-only; only set code and edition or variant are editable (README §Data model).
+  - Only the owner changes a card; all signed-in users see all cards (ADR 0008).
+  - Prices stay in the currency of their marketplace; conversion happens only on display (ADR 0012).
+  - Configuration through environment variables in `.env`, not through the interface (user instruction 2026-10-10, see spec `operations`).
+  - New settings are optional with a default value and can be switched off (spec `development-release`).
+  - Every interface string is in `app/i18n/locales/de.json` and `en.json` (spec `user-interface`).
+
+  Conventions:
+  - Code comments, README, specs and ADRs in English (ADR 0024); the historical initial concept `docs/KONZEPT.md` stays German.
+  - Conventional Commits; on a squash merge the pull request title determines the version; major version only for an explicit breaking change (ADR 0015).
+  - Meaningful branch names; ask before executing (spec `development-release`).
+  - Tests: unit tests for pure logic, integration tests against a real PostgreSQL through `TEST_DATABASE_URL` (README §Tests).
+
+  Documentation of the decisions and their origin:
+  - Overview (C4: context, containers, building blocks, flows): docs/ARCHITECTURE.md
+  - Working rules for Claude Code (keep spec and code in step): CLAUDE.md
+  - Architecture decisions: docs/adr/ (ADR 0001–0024)
+  - Requirements: openspec/specs/<domain>/spec.md; every requirement names source and origin
+
+rules:
+  specs:
+    - "Write requirements with SHALL/MUST and scenarios as GIVEN/WHEN/THEN."
+    - "Every requirement contains a line `Source: … | Origin: user requirement|derived|unclear`; do not invent anything without a source."
+    - "Requirement text including the source line at most 500 characters (limit of the OpenSpec validator)."
