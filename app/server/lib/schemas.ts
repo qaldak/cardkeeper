@@ -31,6 +31,16 @@ export const listQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(200).default(48),
 })
 
+// The text of the selection of the overview for an AI prompt: the filters and the sort order of the list plus the options.
+const flag = (fallback: boolean) => z.enum(['true', 'false']).optional().transform(value => (value === undefined ? fallback : value === 'true'))
+
+export const aiExportQuerySchema = listQuerySchema.extend({
+  onlyActive: flag(true),
+  withText: flag(true),
+  intro: flag(true),
+  wish: z.string().trim().max(500).optional(),
+})
+
 export const setsQuerySchema = z.object({
   game: z.string().trim().min(1).max(40),
   language: z.string().trim().min(2).max(5).optional(),

@@ -115,15 +115,15 @@ Source: User instruction 2026-10-27 (recommendations 3 and 4 accepted); the banl
 - THEN the text starts with the first heading and the wish is not used
 
 ### Requirement: Preview and copy or download
-The system SHALL show a preview of the beginning of the text with the number of cards and an estimate of its size, and offer "Copy to clipboard" and "Download" (`cardkeeper-ai-YYYY-MM-DD.txt`) as plain text; both SHALL be disabled when the selection contains no cards.
+The system SHALL show a preview of the beginning of the text with the number of cards and an estimate of its size, and offer "Copy" (to the clipboard, also where the browser has no clipboard interface) and "Download" (`cardkeeper-ai-YYYY-MM-DD.txt`) as plain text; both SHALL be disabled when the selection contains no cards.
 Source: User instruction 2026-10-27 (proposal accepted); the CSV dialog for the empty selection | Origin: user requirement
 
 #### Scenario: Copy
 - GIVEN the dialog shows a preview
-- WHEN "Copy to clipboard" is clicked
+- WHEN "Copy" is clicked
 - THEN the whole text is in the clipboard
 
 #### Scenario: Empty selection
 - GIVEN the selection contains no cards, or no active card with the option checked
 - WHEN the dialog appears
-- THEN "Copy to clipboard" and "Download" are not possible
+- THEN "Copy" and "Download" are not possible

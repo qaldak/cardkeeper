@@ -5,6 +5,7 @@ import { sortByLanguagePreference } from '../../shared/utils/languages'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import type { CardFilters } from '../lib/card-filters'
 import type { AppConfig } from '../lib/config'
+import { buildAiText, type AiCard } from '../lib/ai-text'
 import { buildCsv, type CsvValue } from '../lib/csv'
 import { formatDateOnly } from '../lib/dates'
 import { translator, type ExportLocale, type Translator } from '../lib/messages'
@@ -27,6 +28,9 @@ const exportInclude = (priceSource: string) => ({
   priceHistory: { where: { source: priceSource }, orderBy: [{ fetchedAt: 'desc' }, { id: 'desc' }], take: 1 },
   statusHistory: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 1 },
 }) satisfies Prisma.CardInclude
+
+/** What the text for an AI needs: no prices, owners or histories. */
+const aiInclude = { game: { select: { slug: true, displayName: true } }, translations: true } satisfies Prisma.CardInclude
 
 type ExportCard = Prisma.CardGetPayload<{ include: ReturnType<typeof exportInclude> }>
 type Attributes = Record<string, unknown>
@@ -201,6 +205,50 @@ export function createExportService({ db, config, rates, orderedIds, now = () =>
 
       const day = now().toISOString().slice(0, 10)
       return { fileName: `cardkeeper-export-${day}.csv`, csv: buildCsv(header, rows), count: rows.length }
+    },
+
+    /**
+     * The text of a selection for an AI prompt: the cards of the selection in the order of the overview (the active ones
+     * only, if asked), merged to one line per distinct card with the quantity; see `buildAiText`.
+     */
+    async cardsAiText(
+      filters: CardFilters,
+      order: { sort: CardSort, dir?: SortDirection },
+      options: { onlyActive: boolean, withText: boolean, intro: boolean, wish?: string },
+    ): Promise<{ text: string, fileName: string, total: number, distinct: number }> {
+      const ids = await orderedIds(filters, order)
+      const loaded = new Map<number, Prisma.CardGetPayload<{ include: typeof aiInclude }>>()
+      for (let start = 0; start < ids.length; start += CHUNK) {
+        const found = await db.card.findMany({ where: { id: { in: ids.slice(start, start + CHUNK) } }, include: aiInclude })
+        for (const card of found) {
+          loaded.set(card.id, card)
+        }
+      }
+
+      const cards = ids.flatMap((id): AiCard[] => {
+        const card = loaded.get(id)
+        if (!card || (options.onlyActive && card.status !== 'ACTIVE')) {
+          return []
+        }
+        // English, else whatever the card has; the German name is added next to it where it differs.
+        const sorted = sortByLanguagePreference(card.translations)
+        const translation = sorted.find(entry => entry.language === 'en') ?? sorted[0]
+        const german = card.translations.find(entry => entry.language === 'de')
+        return [{
+          gameSlug: card.game.slug,
+          gameName: card.game.displayName,
+          externalId: card.externalId,
+          name: translation?.name ?? card.name,
+          nameDe: german?.name ?? null,
+          description: translation?.description ?? '',
+          attributes: (card.gameSpecificAttributes ?? {}) as Record<string, unknown>,
+          details: ((translation?.details ?? {}) as PokemonDetails),
+        }]
+      })
+
+      const { text, total, distinct } = buildAiText(cards, options)
+      const day = now().toISOString().slice(0, 10)
+      return { text, fileName: `cardkeeper-ai-${day}.txt`, total, distinct }
     },
   }
 }

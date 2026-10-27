@@ -436,7 +436,7 @@
     "menu": {
       "label": "Exportieren",
       "table": "CSV-Export",
-      "ai": "Für KI kopieren (folgt)",
+      "ai": "Für KI kopieren",
       "print": "Liste drucken (folgt)"
     },
     "title": "CSV-Export",
@@ -513,6 +513,20 @@
       "priceDate": "Preis-Datum"
     },
     "info": "Hinweise zum Export",
-    "textLanguage": "Texte: {language}"
+    "textLanguage": "Texte: {language}",
+    "ai": {
+      "title": "Für KI kopieren",
+      "onlyActive": "Nur aktive Karten",
+      "withText": "Kartentext mitnehmen",
+      "intro": "Einleitung für die KI voranstellen",
+      "wish": "Dein Wunsch für das Deck (optional)",
+      "wishPlaceholder": "z. B. ein Turnierdeck für das Standard-Format",
+      "preview": "Vorschau",
+      "size": "{characters} Zeichen, etwa {tokens} Token",
+      "copy": "Kopieren",
+      "copied": "In die Zwischenablage kopiert",
+      "copyFailed": "Kopieren fehlgeschlagen, lade den Text stattdessen herunter",
+      "loadFailed": "Der Text konnte nicht erstellt werden, bitte erneut versuchen."
+    }
   }
 }

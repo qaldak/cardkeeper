@@ -177,3 +177,72 @@ describe.skipIf(!TEST_DATABASE_URL)('table export', () => {
     expect(fileName).toBe('cardkeeper-export-2026-10-04.csv')
   })
 })
+
+describe.skipIf(!TEST_DATABASE_URL)('text export for an AI', () => {
+  const h = useHarness()
+  const sorted = { sort: 'name' as const, dir: 'asc' as const }
+  const all = { onlyActive: false, withText: true, intro: false }
+
+  async function seed() {
+    const magician = await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' } }, h.anna)
+    // The same card again, in another print and with another owner.
+    await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'SDY-006', rarity: 'Common' } }, h.sven)
+    await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id) }, h.anna)
+    const spell = await h.services.cards.create({ game: 'ygo', externalId: String(ENGLISH_ONLY.id) }, h.anna)
+    await h.services.cards.update(spell.id, { status: 'SOLD', statusPerson: 'Max' }, h.anna)
+    return { magician, spell }
+  }
+
+  it('merges the copies of a card across prints and owners into one line with the quantity', async () => {
+    await seed()
+    const result = await h.services.export.cardsAiText({}, sorted, all)
+    expect(result.total).toBe(4)
+    expect(result.distinct).toBe(2)
+    expect(result.text).toContain('# Yu-Gi-Oh! – 2 distinct cards (4 total)')
+    expect(result.text).toContain(`3x Dark Magician (DE: Dunkler Magier) [${DARK_MAGICIAN.id}] | Normal Monster | DARK Spellcaster | Lv7 | ATK 2500 / DEF 2100`)
+    expect(result.text).toContain('   Text: Description of Dark Magician')
+  })
+
+  it('leaves out the cards that are not active, only if asked', async () => {
+    await seed()
+    const active = await h.services.export.cardsAiText({}, sorted, { ...all, onlyActive: true })
+    expect(active.total).toBe(3)
+    expect(active.text).not.toContain('Obscure Spell')
+    const everything = await h.services.export.cardsAiText({}, sorted, all)
+    expect(everything.text).toContain('1x Obscure Spell')
+  })
+
+  it('follows the filters of the overview, whoever owns the cards', async () => {
+    await seed()
+    expect((await h.services.export.cardsAiText({ owner: h.sven.id }, sorted, all)).total).toBe(1)
+    expect((await h.services.export.cardsAiText({ game: 'pokemon' }, sorted, all)).text).toBe('')
+  })
+
+  it('has no text lines without the option and no introduction unless asked', async () => {
+    await seed()
+    const short = await h.services.export.cardsAiText({}, sorted, { ...all, withText: false })
+    expect(short.text).not.toContain('Text:')
+    expect(short.text).toContain('ATK 2500 / DEF 2100')
+    expect(short.text.startsWith('# Yu-Gi-Oh!')).toBe(true)
+    const withIntro = await h.services.export.cardsAiText({}, sorted, { ...all, intro: true, wish: 'Build a Dark Magician deck' })
+    expect(withIntro.text).toContain('The wish of the player: Build a Dark Magician deck')
+    expect(withIntro.text.startsWith('You are helping')).toBe(true)
+  })
+
+  it('writes a Pokémon card in English with its attacks and the legality, and gives each game its section', async () => {
+    await seed()
+    await h.services.cards.create({ game: 'pokemon', externalId: 'swsh3-136', set: { setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' } }, h.anna)
+    const result = await h.services.export.cardsAiText({}, sorted, all)
+    expect(result.text).toContain('# Pokémon – 1 distinct card (1 total)')
+    expect(result.text).toContain('1x Furret (DE: Wiesenior) [swsh3-136] | Pokémon · Stage1 · Colorless | Evolves from Sentret | HP 110 | Retreat 1 | Weak: Fighting ×2 | Mark D')
+    expect(result.text).toContain('Legal: Expanded')
+    expect(result.text).toContain('   Attack [Colorless×3] Tail Smash 120')
+    expect(result.text).toContain('# Yu-Gi-Oh! – 2 distinct cards (4 total)')
+  })
+
+  it('names the file after the day', async () => {
+    const services = h.servicesAt(() => new Date('2026-10-27T12:00:00Z'))
+    expect((await services.export.cardsAiText({}, sorted, all)).fileName).toBe('cardkeeper-ai-2026-10-27.txt')
+  })
+})
+

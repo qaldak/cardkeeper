@@ -199,24 +199,26 @@ const summaryText = computed(() => {
 
 const { locale, locales } = useI18n()
 const exportOpen = ref(false)
+const aiExportOpen = ref(false)
 const exportItems = computed(() => [[
   { label: t('export.menu.table'), icon: 'i-lucide-table', onSelect: () => { exportOpen.value = true } },
+  { label: t('export.menu.ai'), icon: 'i-lucide-sparkles', onSelect: () => { aiExportOpen.value = true } },
 ], [
-  // The copy for an AI and the printable list come later; the menu shows where they will be.
-  { label: t('export.menu.ai'), icon: 'i-lucide-sparkles', disabled: true },
+  // The printable list comes later; the menu shows where it will be.
   { label: t('export.menu.print'), icon: 'i-lucide-printer', disabled: true },
 ]])
-// The download address: the filters and the sort order of the overview (every page), and the language of the interface.
-const exportHref = computed(() => {
+// The filters and the sort order of the overview (every page) as a query string, for both exports.
+const exportQuery = computed(() => {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(apiQuery.value)) {
     if (value !== undefined && value !== '' && key !== 'page') {
       params.set(key, String(value))
     }
   }
-  params.set('lang', locale.value)
-  return `/api/export/cards?${params.toString()}`
+  return params.toString()
 })
+// The download address of the table: the selection and the language of the interface.
+const exportHref = computed(() => `/api/export/cards?${exportQuery.value}&lang=${locale.value}`)
 const exportSummary = computed(() => {
   const parts = [
     game.value ? (games.value ?? []).find(entry => entry.slug === game.value)?.displayName ?? game.value : t('overview.allGames'),
@@ -402,5 +404,6 @@ function resetFilters() {
       </UButton>
     </nav>
       <ExportDialog v-model:open="exportOpen" :summary="exportSummary" :count="data?.summary.count ?? 0" :href="exportHref" :language="exportLanguage" />
+      <AiExportDialog v-model:open="aiExportOpen" :summary="exportSummary" :query="exportQuery" />
 </div>
 </template>
