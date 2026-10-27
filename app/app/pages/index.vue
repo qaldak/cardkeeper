@@ -273,7 +273,7 @@ function resetFilters() {
           @click="flipDirection"
         />
         <UDropdownMenu :items="exportItems" :content="{ align: 'end' }">
-          <UButton color="primary" icon="i-lucide-download" trailing-icon="i-lucide-chevron-down" data-test="export-menu">
+          <UButton color="neutral" variant="outline" icon="i-lucide-download" trailing-icon="i-lucide-chevron-down" data-test="export-menu">
             {{ t('export.menu.label') }}
           </UButton>
         </UDropdownMenu>
