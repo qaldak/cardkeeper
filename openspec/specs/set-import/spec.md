@@ -1,115 +1,115 @@
-# Set-Import Specification
+# Set Import Specification
 
 ## Purpose
-Alle Karten eines Sets in einem Durchgang hinzufügen (Wizard), für Yu-Gi-Oh! und Pokémon. Nur unklare Karten verlangen eine Entscheidung. Einzelkarten stehen in `kartenerfassung`.
+Adding all cards of a set in one pass (wizard), for Yu-Gi-Oh! and Pokémon. Only unclear cards require a decision. Single cards are in `card-entry`.
 
 ## Requirements
 
-### Requirement: Wizard „Ganzes Set“
-Das System MUSS beim Erfassen den Reiter „Ganzes Set“ anbieten (Yu-Gi-Oh!: neben „Einzelne Karte“; Pokémon: neben „Nach Set und Nummer“ und „Nach Name oder ID“) mit den Schritten Set wählen, Karten prüfen, Hinzufügen.
-Quelle: Chat 2026-10-10 12:56, 19:56; README §Features; Code app/app/components/SetImportWizard.vue | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Wizard "Whole set"
+The system SHALL offer the tab "Whole set" when adding cards (Yu-Gi-Oh!: next to "Single card"; Pokémon: next to "By set and number" and "By name or ID") with the steps choose the set, check the cards, add.
+Source: User instruction 2026-10-10 12:56, 19:56; README §Features; code app/app/components/SetImportWizard.vue | Origin: user requirement
 
-#### Scenario: Set suchen
-- GIVEN die Set-Liste (neueste zuerst)
-- WHEN der Benutzer „Albaz“ eingibt
-- THEN erscheint „Structure Deck: Albaz Strike“ mit Code, Kartenzahl und Datum
+#### Scenario: Searching a set
+- GIVEN the set list (newest first)
+- WHEN the user enters "Albaz"
+- THEN "Structure Deck: Albaz Strike" appears with code, number of cards and date
 
-### Requirement: Yu-Gi-Oh!: Sprache bestimmt den Set-Code
-Das System MUSS beim Yu-Gi-Oh!-Wizard die Sprache der Karten (Deutsch, Englisch, Japanisch) wählen lassen, in der die Set-Codes gespeichert werden (z. B. `SDAZ-DE001`), und die Codes in dieser Sprache in der Tabelle zeigen.
-Quelle: Chat 2026-10-10 12:56; README §Features; Code shared/utils/set-import.ts (importBody) | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Yu-Gi-Oh!: the language determines the set code
+The system SHALL let the user choose in the Yu-Gi-Oh! wizard the language of the cards (German, English, Japanese) in which the set codes are stored (e.g. `SDAZ-DE001`), and show the codes in this language in the table.
+Source: User instruction 2026-10-10 12:56; README §Features; code shared/utils/set-import.ts (importBody) | Origin: user requirement
 
-#### Scenario: Deutsche Codes
-- GIVEN Set SDAZ, Sprache Deutsch
-- WHEN die Karten geprüft werden
-- THEN zeigt die Tabelle `SDAZ-DE001` und speichert diesen Code
+#### Scenario: German codes
+- GIVEN set SDAZ, language German
+- WHEN the cards are checked
+- THEN the table shows `SDAZ-DE001` and stores this code
 
-### Requirement: Edition einmal für das Set, pro Karte änderbar
-Das System MUSS beim Yu-Gi-Oh!-Wizard die Edition (1. Auflage, Limitierte Auflage, keine = Unlimited) einmal für das ganze Set wählen lassen und pro Karte änderbar speichern.
-Quelle: Chat 2026-10-10 12:56 („pro Karte gespeichert“); README §Features | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Edition once for the set, changeable per card
+The system SHALL let the user choose in the Yu-Gi-Oh! wizard the edition (1st Edition, Limited Edition, none = Unlimited) once for the whole set and store it changeable per card.
+Source: User instruction 2026-10-10 12:56 ("stored per card"); README §Features | Origin: user requirement
 
-#### Scenario: Set-Edition
-- GIVEN „1. Auflage“ für das Set
-- WHEN ein Karte auf „Limitierte Auflage“ gesetzt wird
-- THEN bekommt diese Karte die Limitierte Auflage und die anderen die 1. Auflage
+#### Scenario: Set edition
+- GIVEN "1st Edition" for the set
+- WHEN one card is set to "Limited Edition"
+- THEN this card gets the Limited Edition and the others the 1st Edition
 
-### Requirement: Klar oder unklar
-Das System MUSS eine Zeile als klar behandeln, wenn die Karte genau einen Druck im Set hat oder die für das ganze Set gewählte Pokémon-Variante genau einmal vorkommt, und als Konflikt, wenn mehrere Drucke bleiben (Yu-Gi-Oh!: Code in mehreren Seltenheiten oder mehrere Codes).
-Quelle: README §Features; Code shared/utils/set-import.ts; Test set-import.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
+### Requirement: Clear or unclear
+The system SHALL treat a row as clear when the card has exactly one print in the set or the Pokémon variant chosen for the whole set occurs exactly once, and as a conflict when several prints remain (Yu-Gi-Oh!: a code in several rarities or several codes).
+Source: README §Features; code shared/utils/set-import.ts; test set-import.test.ts | Origin: derived
 
-#### Scenario: Einziger Druck
-- GIVEN eine Karte mit einem Druck
-- WHEN das Set geladen wird
-- THEN ist ihr Druck gewählt
+#### Scenario: Only print
+- GIVEN a card with one print
+- WHEN the set is loaded
+- THEN its print is chosen
 
-#### Scenario: Mehrere Seltenheiten
-- GIVEN ein Code in zwei Seltenheiten
-- WHEN das Set geladen wird
-- THEN ist die Karte ein Konflikt, und der Benutzer muss wählen
+#### Scenario: Several rarities
+- GIVEN a code in two rarities
+- WHEN the set is loaded
+- THEN the card is a conflict and the user has to choose
 
-### Requirement: Nur Konflikte standardmässig sichtbar
-Das System MUSS nach der Set-Wahl standardmässig nur die Konflikt-Karten (gelb markiert) zeigen, die Zahl der eindeutigen Karten zusammenfassen, und die vollständige Liste zum Abwählen einzelner Karten aufklappbar machen; eine entschiedene Karte darf nicht aus der Liste verschwinden.
-Quelle: Chat 2026-10-10 13:24; README §Features; Test set-import.test.ts (visibleRows) | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Only conflicts are visible by default
+The system SHALL show only the conflict cards (marked yellow) by default after the set is chosen, summarise the number of unambiguous cards and make the complete list expandable for deselecting single cards; a decided card SHALL NOT disappear from the list.
+Source: User instruction 2026-10-10 13:24; README §Features; test set-import.test.ts (visibleRows) | Origin: user requirement
 
-#### Scenario: Ohne Konflikt
-- GIVEN ein Set ohne Konflikte
-- WHEN es geladen wird
-- THEN steht „Alle Karten sind eindeutig“ und Hinzufügen ist sofort möglich
+#### Scenario: Without conflicts
+- GIVEN a set without conflicts
+- WHEN it is loaded
+- THEN it says "All cards are unambiguous" and adding is possible at once
 
-#### Scenario: Abwählen
-- GIVEN die vollständige Liste ist geöffnet
-- WHEN der Benutzer Karten abwählt
-- THEN werden diese nicht hinzugefügt
+#### Scenario: Deselecting
+- GIVEN the complete list is open
+- WHEN the user deselects cards
+- THEN these are not added
 
-### Requirement: Hinzufügen erst ohne offene Wahl
-Das System MUSS das Hinzufügen erst erlauben, wenn für alle hinzuzufügenden Karten ein Druck feststeht.
-Quelle: README §Features; Code shared/utils/set-import.ts (needsChoice); Test set-import.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
+### Requirement: Adding only without an open choice
+The system SHALL allow adding only when a print is fixed for all cards to be added.
+Source: README §Features; code shared/utils/set-import.ts (needsChoice); test set-import.test.ts | Origin: derived
 
-#### Scenario: Offene Wahl
-- GIVEN eine Konflikt-Karte ist nicht entschieden
-- WHEN der Benutzer hinzufügen will
-- THEN ist „Hinzufügen“ nicht möglich
+#### Scenario: Open choice
+- GIVEN a conflict card is undecided
+- WHEN the user wants to add
+- THEN "Add" is not possible
 
-### Requirement: Hinzufügen mit denselben Prüfungen, drei gleichzeitig
-Das System MUSS die Karten einzeln mit denselben Prüfungen wie eine Einzelkarte hinzufügen, höchstens drei gleichzeitig (Limit der Karten-Datenbank), den Fortschritt anzeigen, fehlgeschlagene Karten auflisten und einen erneuten Versuch erlauben; jede Karte wird einmal hinzugefügt, es gibt keine Menge.
-Quelle: Chat 2026-10-10 12:56, 19:56; README §Features | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Adding with the same checks, three at a time
+The system SHALL add the cards one by one with the same checks as a single card, at most three at a time (limit of the card database), show the progress, list failed cards and allow a new attempt; every card is added once, there is no quantity.
+Source: User instruction 2026-10-10 12:56, 19:56; README §Features | Origin: user requirement
 
-#### Scenario: Fehler
-- GIVEN eine Karte schlägt fehl
-- WHEN alle hinzugefügt wurden
-- THEN steht sie in der Fehlerliste und kann erneut versucht werden
+#### Scenario: Failure
+- GIVEN a card fails
+- WHEN all were added
+- THEN it appears in the error list and can be tried again
 
-### Requirement: Yu-Gi-Oh! und Pokémon senden verschiedene Angaben
-Das System MUSS für Pokémon nur Karten-ID und Variante, für Yu-Gi-Oh! Set-Code, Seltenheit, Edition und gedruckten Code in der Sprache des Sets an `POST /api/cards` senden.
-Quelle: Code shared/utils/set-import.ts (importBody); Test set-import.test.ts | Herkunft: Abgeleitet | MUSS=SHALL
+### Requirement: Yu-Gi-Oh! and Pokémon send different data
+The system SHALL send to `POST /api/cards` only card ID and variant for Pokémon, and set code, rarity, edition and printed code in the language of the set for Yu-Gi-Oh!.
+Source: Code shared/utils/set-import.ts (importBody); test set-import.test.ts | Origin: derived
 
 #### Scenario: Pokémon
-- GIVEN eine klare Pokémon-Zeile
-- WHEN sie hinzugefügt wird
-- THEN enthält der Aufruf `externalId` und die Variante als `edition`
+- GIVEN a clear Pokémon row
+- WHEN it is added
+- THEN the call contains `externalId` and the variant as `edition`
 
-### Requirement: Pokémon: Variante ist das Unklare
-Das System MUSS beim Pokémon-Wizard die Sprache der Set-Liste wählen lassen, die Variante als unklaren Punkt behandeln (eine Variante für das ganze Set wählbar, sie gilt für jede Karte, die sie genau einmal hat) und alle Sprachen einer Karte wie bei einer Einzelkarte speichern.
-Quelle: Chat 2026-10-10 19:56; README §Features | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Pokémon: the variant is the unclear part
+The system SHALL let the user choose the language of the set list in the Pokémon wizard, treat the variant as the unclear point (one variant can be chosen for the whole set and applies to every card that has it exactly once) and store all languages of a card as for a single card.
+Source: User instruction 2026-10-10 19:56; README §Features | Origin: user requirement
 
-#### Scenario: Eine Variante für alle
-- GIVEN Variante „reverse“ für das Set
-- WHEN Karten mit dieser Variante geprüft werden
-- THEN sind sie klar, die übrigen Konflikte
+#### Scenario: One variant for all
+- GIVEN variant "reverse" for the set
+- WHEN cards with this variant are checked
+- THEN they are clear, the others are conflicts
 
-### Requirement: Pokémon: Varianten werden pro Karte geladen
-Das System MUSS beim Öffnen eines Pokémon-Sets die Varianten pro Karte einzeln (höchstens vier gleichzeitig) laden und einige Stunden zwischenspeichern; eine nicht ladbare Karte bleibt weg, ein Limit der Karten-Datenbank wird gemeldet.
-Quelle: README §Features; Code server/tcg/tcgdex/adapter.ts (listCardPrints), server/services/catalog.ts | Herkunft: Abgeleitet | MUSS=SHALL
+### Requirement: Pokémon: variants are loaded per card
+The system SHALL load the variants per card individually (at most four at a time) when a Pokémon set is opened and cache them for a few hours; a card that cannot be loaded is left out, a limit of the card database is reported.
+Source: README §Features; code server/tcg/tcgdex/adapter.ts (listCardPrints), server/services/catalog.ts | Origin: derived
 
-#### Scenario: Grosses Set
-- GIVEN ein Set mit vielen Karten
-- WHEN es geöffnet wird
-- THEN dauert das Laden, danach ist es aus dem Zwischenspeicher
+#### Scenario: Large set
+- GIVEN a set with many cards
+- WHEN it is opened
+- THEN loading takes a while, afterwards it comes from the cache
 
-### Requirement: Schrittanzeige ohne Buttons
-Das System MUSS die Schritte des Wizards als nicht klickbare Fortschrittsanzeige zeigen (nummerierte Kreise, Haken für Erledigtes, aktueller Schritt hervorgehoben), nicht als Schaltflächen.
-Quelle: Chat 2026-10-10 18:42, 19:56 („so okay“); Code app/app/components/SetImportWizard.vue | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Step display without buttons
+The system SHALL show the steps of the wizard as a non-clickable progress display (numbered circles, check marks for finished steps, current step highlighted), not as buttons.
+Source: User instruction 2026-10-10 18:42, 19:56 ("fine like this"); code app/app/components/SetImportWizard.vue | Origin: user requirement
 
-#### Scenario: Anzeige
-- GIVEN der Wizard ist im zweiten Schritt
-- WHEN er angezeigt wird
-- THEN zeigt Schritt 1 einen Haken, Schritt 2 hervorgehoben, Schritt 3 blass, ohne Klickverhalten
+#### Scenario: Display
+- GIVEN the wizard is in the second step
+- WHEN it is shown
+- THEN step 1 shows a check mark, step 2 is highlighted, step 3 is pale, without click behaviour

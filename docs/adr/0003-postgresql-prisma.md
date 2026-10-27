@@ -1,29 +1,29 @@
-# ADR 0003: PostgreSQL 16 mit Prisma als Datenhaltung
+# ADR 0003: PostgreSQL 16 with Prisma for data storage
 
-- **Status:** Akzeptiert
-- **Datum:** 2026-10-03 (Konzept)
-- **Herkunft:** User-Vorgabe (Konzept des Benutzers; vom Benutzer am 2026-10-23 bestätigt).
-- **Specs:** [`datenhaltung`](../../openspec/specs/datenhaltung/spec.md), [`betrieb`](../../openspec/specs/betrieb/spec.md)
+- **Status:** Accepted
+- **Date:** 2026-10-03 (concept)
+- **Origin:** User requirement (concept of the user; confirmed by the user on 2026-10-23).
+- **Specs:** [`data-storage`](../../openspec/specs/data-storage/spec.md), [`operations`](../../openspec/specs/operations/spec.md)
 
-## Kontext
+## Context
 
-Das Konzept fordert JSONB für spielspezifische Attribute, arm64-Unterstützung (Raspberry Pi) und Zeitreihenfähigkeit für die Preishistorie sowie typsichere Zugriffe und einfache Migrationen.
+The concept demands JSONB for game-specific attributes, arm64 support (Raspberry Pi) and time-series capability for the price history, as well as type-safe access and simple migrations.
 
-## Entscheid
+## Decision
 
-PostgreSQL 16 als Datenbank, Prisma als ORM. Die App nutzt eine eigene Datenbankrolle ohne Superuser; Migrationen werden bei jedem Start angewendet.
+PostgreSQL 16 as the database, Prisma as the ORM. The app uses its own database role without superuser rights; migrations are applied on every start.
 
-## Betrachtete Alternativen
+## Considered alternatives
 
-nicht dokumentiert.
+Not documented.
 
-## Konsequenzen
+## Consequences
 
-- Datenmodell und Invarianten: Spec `datenhaltung`.
-- Datenbank ohne veröffentlichten Port, zwei Volumes (`db-data`, `card-images`): Spec `betrieb`.
-- Prisma-Client wird im Image erzeugt; im Laufzeit-Image liegt nur die Prisma-CLI für Migrationen.
+- Data model and invariants: spec `data-storage`.
+- Database without a published port, two volumes (`db-data`, `card-images`): spec `operations`.
+- The Prisma client is generated in the image; the runtime image contains only the Prisma CLI for migrations.
 
-## Quellen
+## Sources
 
 - `docs/KONZEPT.md` §Tech-Stack, §Datenmodell
 - `README.md` §Data model, §Quick start

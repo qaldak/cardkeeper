@@ -306,7 +306,7 @@ app/                      Nuxt web app (UI + API routes), one Docker image
   tests/                  Unit and integration tests
 db/init/                  PostgreSQL first-start script (application role)
 docs/                     Architecture overview, decision records (adr/), UI mockups, original concept (historical)
-openspec/specs/           Requirements per topic (German), the valid state of what the app does
+openspec/specs/           Requirements per topic, the valid state of what the app does
 docker-compose.yml        Production stack
 docker-compose.dev.yml    Development and test overlay
 ```

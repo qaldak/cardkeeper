@@ -1,28 +1,28 @@
-# Arbeitsregeln für Claude Code
+# Working rules for Claude Code
 
-Cardkeeper: selbst gehostete Sammlung für Yu-Gi-Oh!- und Pokémon-Karten. Überblick und Befehle: `README.md`. Architektur: `docs/ARCHITECTURE.md`.
+Cardkeeper: self-hosted collection for Yu-Gi-Oh! and Pokémon cards. Overview and commands: `README.md`. Architecture: `docs/ARCHITECTURE.md`.
 
-## Wo steht was
+## Where things are
 
-- `openspec/specs/<domain>/spec.md`: Anforderungen, letzter gültiger Stand (MUSS/SOLL, GIVEN/WHEN/THEN). Jede Anforderung nennt Quelle und Herkunft (`User-Vorgabe` oder `Abgeleitet`).
-- `docs/adr/`: Architekturentscheide (Status, Datum, Herkunft, Kontext, Entscheid, Alternativen, Konsequenzen, Quellen).
-- `docs/KONZEPT.md`: historisches Ausgangskonzept, nicht mehr gültig.
+- `openspec/specs/<domain>/spec.md`: requirements, last valid state (SHALL, GIVEN/WHEN/THEN). Every requirement names its source and its origin (`user requirement` or `derived`).
+- `docs/adr/`: architecture decision records (status, date, origin, context, decision, considered alternatives, consequences, sources).
+- `docs/KONZEPT.md`: historical initial concept (German), no longer valid.
 
-## Spec und Code bleiben deckungsgleich
+## Keep spec and code in step
 
-- Ändert eine Aufgabe das Verhalten, das eine Spec beschreibt, passt du die betroffene Spec im selben Pull Request an (Requirement und Szenario, Quelle-Zeile mit Datum der Anweisung, Herkunft `User-Vorgabe`). Danach `openspec validate --specs --strict`.
-- Rein optische Änderungen, Textkorrekturen und Fehlerbehebungen ohne Verhaltensänderung brauchen keinen Spec-Eintrag.
-- Ein Architekturentscheid (neue Komponente, neue Abhängigkeit, anderer Ablauf) bekommt einen neuen ADR mit der nächsten Nummer und einen Verweis aus der Spec.
-- Nichts erfinden: Jede neue Aussage in Spec oder ADR braucht eine Quelle (Anweisung des Benutzers, Code, README). Vermutungen als Vermutung kennzeichnen und beim Benutzer nachfragen.
+- If a task changes a behaviour that a spec describes, adjust the affected spec in the same pull request (requirement and scenario, source line with the date of the instruction, origin `user requirement`). Then run `openspec validate --specs --strict`.
+- Purely visual changes, text corrections and fixes without a change of behaviour need no spec entry.
+- An architecture decision (new component, new dependency, changed flow) gets a new ADR with the next number and a link from the spec.
+- Do not invent anything: every new statement in a spec or ADR needs a source (instruction of the user, code, README). Mark assumptions as assumptions and ask the user.
 
-## Grössere neue Anforderungen
+## Larger new requirements
 
-Für eine echte neue Funktion (z. B. ein weiteres Exportformat) den OpenSpec-Ablauf verwenden: `/opsx:propose <name>` → Entwurf mit dem Benutzer durchgehen → `/opsx:apply` → `/opsx:archive`. Für alles Kleine genügt die direkte Änderung samt Spec-Anpassung (siehe oben).
+For a real new function (e.g. a further export format) use the OpenSpec flow: `/opsx:propose <name>` → go through the draft with the user → `/opsx:apply` → `/opsx:archive`. For everything small, change directly and adjust the spec (see above).
 
-## Konventionen
+## Conventions
 
-- Code-Kommentare und README auf Englisch; Specs, ADRs und `docs/` auf Deutsch.
-- Conventional Commits; der Pull-Request-Titel bestimmt die Version (`feat:` Minor, `fix:` Patch). Major nur bei ausdrücklichem Breaking Change.
-- Sprechende Branch-Namen. Rückfragen stellen, bevor Code geändert wird.
-- Texte der Oberfläche in `app/i18n/locales/de.json` und `en.json`.
-- Tests: Unit-Tests für reine Logik, Integrationstests mit `TEST_DATABASE_URL` (nie `DATABASE_URL`); `make test`, `make lint`, `make typecheck`.
+- Code comments, README, specs, ADRs and docs in English (except the historical `docs/KONZEPT.md`).
+- Conventional Commits; the pull request title determines the version on a squash merge (`feat:` minor, `fix:` patch). Major only for an explicit breaking change.
+- Meaningful branch names. Ask before changing code.
+- Interface texts in `app/i18n/locales/de.json` and `en.json`.
+- Tests: unit tests for pure logic, integration tests with `TEST_DATABASE_URL` (never `DATABASE_URL`); `make test`, `make lint`, `make typecheck`.

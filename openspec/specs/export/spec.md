@@ -1,121 +1,121 @@
 # Export Specification
 
 ## Purpose
-Export der Karten als Tabelle zur Weiterverarbeitung (Excel). Der Export folgt der Auswahl der Übersicht. Die Kopie für KI-Prompts und die druckbare Liste sind als eigene Anforderungen geplant und im Menü als deaktivierte Platzhalter sichtbar. Entscheid: [ADR 0013](../../../docs/adr/0013-csv-export-serverseitig.md) (serverseitig).
+Export of the cards as a table for further processing (Excel). The export follows the selection of the overview. The copy for AI prompts and the printable list are planned as separate requirements and are visible in the menu as disabled placeholders. Decision: [ADR 0013](../../../docs/adr/0013-csv-export-server-side.md) (server side).
 
 ## Requirements
 
-### Requirement: Menü „Exportieren“ in der Übersicht
-Das System MUSS in der Übersichtsleiste neben der Sortierung ein Menü „Exportieren“ anbieten; der Eintrag „CSV-Export“ öffnet einen Dialog.
-Quelle: Chat 2026-10-22 11:26, 11:46, 11:53 (Platzierung bestätigt); Code app/app/pages/index.vue | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Menu "Export" in the overview
+The system SHALL offer a menu "Export" (German: "Exportieren") in the toolbar of the overview next to the sort order; the entry "CSV export" opens a dialog.
+Source: User instruction 2026-10-22 11:26, 11:46, 11:53 (placement confirmed); code app/app/pages/index.vue | Origin: user requirement
 
-#### Scenario: Menü
-- GIVEN die Übersicht
-- WHEN „Exportieren“ geöffnet wird
-- THEN erscheint „CSV-Export“ als aktiver Eintrag
+#### Scenario: Menu
+- GIVEN the overview
+- WHEN "Export" is opened
+- THEN "CSV export" appears as an active entry
 
-### Requirement: Geplante Funktionen als Platzhalter
-Das System SOLL im Menü „Für KI kopieren (folgt)“ und „Liste drucken (folgt)“ als nicht wählbare Einträge zeigen; sie sind noch nicht umgesetzt, ihr Inhalt ist bewusst noch nicht festgelegt.
-Quelle: Chat 2026-10-21 19:10, 2026-10-22 11:53; README §Roadmap; Code app/app/pages/index.vue | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Planned functions as placeholders
+The system SHALL show "Copy for AI (coming)" and "Print list (coming)" in the menu as entries that cannot be chosen; they are not implemented yet and their content is deliberately not defined yet.
+Source: User instruction 2026-10-21 19:10, 2026-10-22 11:53; README §Roadmap; code app/app/pages/index.vue | Origin: user requirement
 
-#### Scenario: Platzhalter
-- GIVEN das Menü ist offen
-- WHEN auf „Für KI kopieren (folgt)“ geklickt wird
-- THEN geschieht nichts, der Eintrag ist deaktiviert
+#### Scenario: Placeholder
+- GIVEN the menu is open
+- WHEN "Copy for AI (coming)" is clicked
+- THEN nothing happens, the entry is disabled
 
-### Requirement: Export folgt der Auswahl der Übersicht
-Das System MUSS alle Karten der aktuellen Auswahl (Filter, Suche, Spiel, Sortierung, jede Seite) in der Reihenfolge der Übersicht exportieren, ohne Einschränkung auf Besitzer oder Status.
-Quelle: Chat 2026-10-22 11:53 („Keine Einschränkung auf Status, Benutzer“); Test app/tests/integration/export.test.ts | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: The export follows the selection of the overview
+The system SHALL export all cards of the current selection (filters, search, game, sort order, every page) in the order of the overview, without restriction to owner or status.
+Source: User instruction 2026-10-22 11:53 ("no restriction to status, user"); test app/tests/integration/export.test.ts | Origin: user requirement
 
-#### Scenario: Alle Besitzer
-- GIVEN Karten mehrerer Besitzer, auch eine verkaufte
-- WHEN ohne Filter exportiert wird
-- THEN enthält die Datei alle in der Sortierung der Übersicht
+#### Scenario: All owners
+- GIVEN cards of several owners, including a sold one
+- WHEN exported without a filter
+- THEN the file contains all of them in the sort order of the overview
 
 #### Scenario: Filter
-- GIVEN Besitzerfilter auf Sven
-- WHEN exportiert wird
-- THEN enthält die Datei nur dessen Karten
+- GIVEN an owner filter on Sven
+- WHEN exported
+- THEN the file contains only his cards
 
-### Requirement: Dialog mit der Auswahl
-Das System MUSS im Dialog die Auswahl zur Kontrolle zeigen (Spiel, Besitzer, Status, Sortierung, Suche, „mit weiteren Filtern“, Sprache der Texte, Anzahl Karten), die Hinweise zum Export in einem Info-Popover auf Klick, die Knöpfe rechts mit „Herunterladen“ vor „Abbrechen“, und bei 0 Karten den Download sperren.
-Quelle: Chat 2026-10-23 14:59, 15:05; Code app/app/components/ExportDialog.vue | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Dialog with the selection
+The system SHALL show the selection for checking in the dialog (game, owner, status, sort order, search, "with further filters", language of the texts, number of cards), the notes on the export in an info popover on click, the buttons on the right with "Download" before "Cancel", and disable the download for 0 cards.
+Source: User instruction 2026-10-23 14:59, 15:05; code app/app/components/ExportDialog.vue | Origin: user requirement
 
-#### Scenario: Auswahl
-- GIVEN 4 Karten entsprechen der Auswahl
-- WHEN der Dialog erscheint
-- THEN zeigt er Spiel, Besitzer, Status, Sortierung, Textsprache und „4 Karten“
+#### Scenario: Selection
+- GIVEN 4 cards match the selection
+- WHEN the dialog appears
+- THEN it shows game, owner, status, sort order, text language and "4 cards"
 
-#### Scenario: Keine Karten
-- GIVEN die Auswahl ist leer
-- WHEN der Dialog erscheint
-- THEN ist „Herunterladen“ nicht möglich
+#### Scenario: No cards
+- GIVEN the selection is empty
+- WHEN the dialog appears
+- THEN "Download" is not possible
 
-### Requirement: Download als Datei
-Das System MUSS die Datei über `GET /api/export/cards` (Filter, Sortierung, `lang=de|en`) als Download `cardkeeper-export-YYYY-MM-DD.csv` liefern; die Oberfläche MUSS dabei die Seite nicht verlassen.
-Quelle: Chat 2026-10-22 11:53 („runtergeladen“), 2026-10-23 15:23; Code app/server/api/export/cards.get.ts | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Download as a file
+The system SHALL deliver the file through `GET /api/export/cards` (filters, sort order, `lang=de|en`) as a download `cardkeeper-export-YYYY-MM-DD.csv`; the interface SHALL NOT leave the page in the process.
+Source: User instruction 2026-10-22 11:53 ("downloaded"), 2026-10-23 15:23; code app/server/api/export/cards.get.ts | Origin: user requirement
 
-#### Scenario: Herunterladen
-- GIVEN der Dialog ist offen
-- WHEN „Herunterladen“ geklickt wird
-- THEN speichert der Browser die Datei und die Übersicht bleibt stehen
+#### Scenario: Download
+- GIVEN the dialog is open
+- WHEN "Download" is clicked
+- THEN the browser saves the file and the overview stays in place
 
-### Requirement: CSV-Format
-Das System MUSS die Datei mit Semikolon als Trenner, UTF-8 mit Byte-Order-Mark, Zeilenende CRLF und Anführungszeichen für Zellen mit Semikolon, Anführungszeichen oder Zeilenumbruch (Anführungszeichen verdoppelt) schreiben.
-Quelle: Chat 2026-10-22 11:53 („Semikolon“); Code app/server/lib/csv.ts; Test app/tests/unit/csv.test.ts | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: CSV format
+The system SHALL write the file with a semicolon as the separator, UTF-8 with a byte order mark, line ending CRLF and quotation marks for cells with a semicolon, quotation mark or line break (quotation marks doubled).
+Source: User instruction 2026-10-22 11:53 ("semicolon"); code app/server/lib/csv.ts; test app/tests/unit/csv.test.ts | Origin: user requirement
 
-#### Scenario: Anführungszeichen
-- GIVEN ein Text mit einem Anführungszeichen in der Mitte
-- WHEN er geschrieben wird
-- THEN steht er in Anführungszeichen und das innere Anführungszeichen ist verdoppelt
+#### Scenario: Quotation marks
+- GIVEN a text with a quotation mark in the middle
+- WHEN it is written
+- THEN it is enclosed in quotation marks and the inner quotation mark is doubled
 
-### Requirement: Schutz vor Formeln
-Das System MUSS Text, der mit `=`, `+`, `-`, `@`, Tabulator oder Zeilenumbruch beginnt, mit einem vorangestellten Hochkomma schreiben, damit ihn eine Tabellenkalkulation nicht als Formel ausführt; Zahlen bleiben unverändert.
-Quelle: Code app/server/lib/csv.ts; Tests app/tests/unit/csv.test.ts, export.test.ts (quotes cells and keeps card text…) | Herkunft: Abgeleitet | MUSS=SHALL
+### Requirement: Protection against formulas
+The system SHALL write text that starts with `=`, `+`, `-`, `@`, a tab or a line break with a leading apostrophe, so that a spreadsheet does not run it as a formula; numbers stay unchanged.
+Source: Code app/server/lib/csv.ts; tests app/tests/unit/csv.test.ts, export.test.ts (quotes cells and keeps card text…) | Origin: derived
 
-#### Scenario: Formel
-- GIVEN eine Beschreibung beginnt mit `=1+1`
-- WHEN exportiert wird
-- THEN steht `'=1+1` in der Zelle
+#### Scenario: Formula
+- GIVEN a description starts with `=1+1`
+- WHEN exported
+- THEN `'=1+1` is in the cell
 
-### Requirement: Spalten in der Reihenfolge der Kartenseite
-Das System MUSS alle Daten der Karte ohne Bilder in der Reihenfolge der Kartenseite exportieren (Stammdaten, Yu-Gi-Oh!-Attribute, Pokémon-Attribute, Beschreibung, Status, Besitzer, Zeitstempel, Preis); Spalten des anderen Spiels bleiben leer.
-Quelle: Chat 2026-10-22 11:53 („alle Attribute… Reihenfolge analog Detail“); Code app/server/services/export.ts; Test app/tests/integration/export.test.ts | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Columns in the order of the card page
+The system SHALL export all data of the card without images in the order of the card page (master data, Yu-Gi-Oh! attributes, Pokémon attributes, description, status, owner, timestamps, price); columns of the other game stay empty.
+Source: User instruction 2026-10-22 11:53 ("all attributes… order as in the detail"); code app/server/services/export.ts; test app/tests/integration/export.test.ts | Origin: user requirement
 
-#### Scenario: Yu-Gi-Oh!-Karte
-- GIVEN eine Yu-Gi-Oh!-Karte
-- WHEN exportiert wird
-- THEN stehen ATK, DEF, Level, Kartentyp, Typ, Attribut gefüllt und die Pokémon-Spalten leer
+#### Scenario: Yu-Gi-Oh! card
+- GIVEN a Yu-Gi-Oh! card
+- WHEN exported
+- THEN ATK, DEF, level, card type, type, attribute are filled and the Pokémon columns are empty
 
-#### Scenario: Pokémon-Karte
-- GIVEN eine Pokémon-Karte mit Attacken
-- WHEN exportiert wird
-- THEN stehen alle Attacken in einer Zelle, getrennt durch ` | `
+#### Scenario: Pokémon card
+- GIVEN a Pokémon card with attacks
+- WHEN exported
+- THEN all attacks are in one cell, separated by ` | `
 
-### Requirement: Sprache der Texte
-Das System MUSS Kopfzeile, Statuswerte, Editionen, Pokémon-Werte und Kartentexte in der Sprache der Oberfläche (`de` oder `en`) ausgeben und bei einer Karte ohne Text in dieser Sprache den englischen Text verwenden.
-Quelle: Chat 2026-10-22 11:53 („Fallback ist Englisch“); Test app/tests/integration/export.test.ts, locales.test.ts | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Language of the texts
+The system SHALL output header, status values, editions, Pokémon values and card texts in the language of the interface (`de` or `en`) and use the English text for a card without a text in this language.
+Source: User instruction 2026-10-22 11:53 ("fallback is English"); test app/tests/integration/export.test.ts, locales.test.ts | Origin: user requirement
 
-#### Scenario: Englisch
-- GIVEN die Oberfläche steht auf Englisch
-- WHEN exportiert wird
-- THEN heisst die erste Spalte „Game“ und der Status „Active“
+#### Scenario: English
+- GIVEN the interface is set to English
+- WHEN exported
+- THEN the first column is called "Game" and the status "Active"
 
-#### Scenario: Nur englische Karte
-- GIVEN eine Karte nur mit englischem Text, Oberfläche Deutsch
-- WHEN exportiert wird
-- THEN steht der englische Text
+#### Scenario: English-only card
+- GIVEN a card with English text only, interface German
+- WHEN exported
+- THEN the English text is in the file
 
-### Requirement: Letzter Preis
-Das System MUSS pro Karte nur den letzten Preis der `PRICE_SOURCE` mit Quelle, Betrag (Punkt als Dezimalzeichen), Währung und Zeitstempel (UTC, `YYYY-MM-DD HH:MM`) ausgeben, bei gesetzter `DISPLAY_CURRENCY` zusätzlich die Spalte „Preis in <Währung>“.
-Quelle: Chat 2026-10-22 11:53 („Preis nur der letzte“); Code app/server/services/export.ts; Test app/tests/integration/export.test.ts | Herkunft: User-Vorgabe | MUSS=SHALL
+### Requirement: Latest price
+The system SHALL output per card only the latest price of the `PRICE_SOURCE` with source, amount (period as the decimal separator), currency and timestamp (UTC, `YYYY-MM-DD HH:MM`), and with `DISPLAY_CURRENCY` set additionally the column "Price in <currency>".
+Source: User instruction 2026-10-22 11:53 ("only the latest price"); code app/server/services/export.ts; test app/tests/integration/export.test.ts | Origin: user requirement
 
-#### Scenario: Mehrere Preise
-- GIVEN eine Karte mit zwei Preisen
-- WHEN exportiert wird
-- THEN steht nur der neuere in der Datei
+#### Scenario: Several prices
+- GIVEN a card with two prices
+- WHEN exported
+- THEN only the newer one is in the file
 
 #### Scenario: CHF
-- GIVEN `DISPLAY_CURRENCY=CHF` und ein EUR-Preis 18 bei Kurs 0.9
-- WHEN exportiert wird
-- THEN steht in „Preis in CHF“ der Wert 16.2
+- GIVEN `DISPLAY_CURRENCY=CHF` and a EUR price of 18 at a rate of 0.9
+- WHEN exported
+- THEN "Price in CHF" contains 16.2
