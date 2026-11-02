@@ -1,6 +1,6 @@
 # Optional labels for tools that watch for new versions. Not used by default. To switch them on, add this to your .env:
 #
-#   COMPOSE_FILE=docker-compose.yml:docker-compose.label.yml
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.labels.yml
 #
 # (On Windows the separator is ";".) Nothing in this file has to be edited: the version that is followed is chosen with
 # APP_IMAGE in .env, e.g. ghcr.io/qaldak/cardkeeper:0.24 (patch updates) or :0 (every update of the major version);
@@ -20,11 +20,12 @@ services:
       diun.include_tags: ${DIUN_INCLUDE_TAGS:-^[1-9][0-9]*\.[0-9]+\.[0-9]+$$}
   db:
     labels:
-      # PostgreSQL stays as it is, also with Watchtower in its default mode (all containers).
-      com.centurylinklabs.watchtower.enable: "false"
-      # Diun: reports a new major version. The tag "16-alpine" stays on version 16 and only moves with its patch releases;
-      # version 17 appears as a new tag "17-alpine". Only tags of the form <major>-alpine are considered, so a new major
-      # is reported once when the tag appears. Moving the data to it is a manual step (dump and restore), see README.
+      # Watchtower: updates PostgreSQL within its tag (postgres:16-alpine receives the patch releases of version 16 only).
+      com.centurylinklabs.watchtower.enable: "true"
+      # Diun: reports a new major version only. The tag "16-alpine" stays on version 16; version 17 appears as a new tag
+      # "17-alpine", which the filter below matches. notify_on "new" silences the report of a changed digest of a known
+      # tag (the patch updates that Watchtower applies). Moving the data to a new major is a manual step (dump and restore).
       diun.enable: "true"
       diun.watch_repo: "true"
+      diun.notify_on: new
       diun.include_tags: ^[0-9]+-alpine$$
