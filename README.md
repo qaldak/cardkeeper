@@ -68,7 +68,7 @@ All settings are environment variables in `.env`:
 | `PRICE_REFRESH_BATCH_EVERY` | `1d` | Least time between two tranches (at least `1h`) |
 | `PRICE_REFRESH_DELAY_MS` | `500` | Pause between two requests to a card database (at least `100`) |
 | `CONTAINER_PREFIX` | `cardkeeper` | Prefix of the container names (`cardkeeper_app`, `cardkeeper_db`) |
-| `APP_IMAGE` | `ghcr.io/qaldak/cardkeeper:latest` | Image to run, e.g. to pin a version |
+| `APP_IMAGE` | `ghcr.io/qaldak/cardkeeper:latest` | Image to run, e.g. to pin a version (see [Updates](#updates)) |
 
 Further variables are read by the app but not passed on by `docker-compose.yml`, so they have no effect in `.env`: `IMAGE_DIR`
 (fixed to `/data/card-images` in the image), the base URLs `YGOPRODECK_API_URL`, `TCGDEX_API_URL` and `EXCHANGE_RATE_API_URL`
@@ -121,6 +121,25 @@ Upgrading from a version without logins: add `SESSION_SECRET` and `USERS` to the
 without them). The existing players become users with the initial password and keep their cards; add everybody else to
 `USERS`. The rules for passwords, sessions and the lock after failed logins are in
 [`users-access`](openspec/specs/users-access/spec.md); HTTPS, HSTS and a content security policy are for the reverse proxy.
+
+### Updates
+
+The image is published as `X.Y.Z`, `X.Y`, `X` and `latest`; `X.Y.Z` never changes, the others move with each release. Set the
+tag you want to follow in `APP_IMAGE` (for example `ghcr.io/qaldak/cardkeeper:0.24` for patch updates or `:0` for all updates of
+the major version). For tools that watch for new versions there is an optional file with their labels,
+[`docker-compose.updates.yml`](docker-compose.updates.yml): add this line to your `.env` (it is not versioned, so a `git pull`
+never conflicts) and the file is used next to `docker-compose.yml`; leave it out and nothing changes.
+
+```
+COMPOSE_FILE=docker-compose.yml:docker-compose.updates.yml
+```
+
+- [Watchtower](https://containrrr.dev/watchtower/), started with `--label-enable`, updates the app within the tag.
+  The app applies new database migrations at every start and a migration is not undone by an older image: take a backup first.
+  The database is excluded.
+- [Diun](https://crazymax.dev/diun/), with `watchByDefault` switched off, reports new versions of the image. By default only
+  new major versions (`1.0.0` and up); `DIUN_INCLUDE_TAGS` in `.env` replaces the filter, e.g. `'^[0-9]+\.[0-9]+\.[0-9]+$'`
+  (in single quotes) for every release.
 
 ### Reverse proxy
 
