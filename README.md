@@ -127,11 +127,11 @@ without them). The existing players become users with the initial password and k
 The image is published as `X.Y.Z`, `X.Y`, `X` and `latest`; `X.Y.Z` never changes, the others move with each release. Set the
 tag you want to follow in `APP_IMAGE` (for example `ghcr.io/qaldak/cardkeeper:0.24` for patch updates or `:0` for all updates of
 the major version). For tools that watch for new versions there is an optional file with their labels,
-[`docker-compose.updates.yml`](docker-compose.updates.yml): add this line to your `.env` (it is not versioned, so a `git pull`
+[`docker-compose.label.yml`](docker-compose.label.yml): add this line to your `.env` (it is not versioned, so a `git pull`
 never conflicts) and the file is used next to `docker-compose.yml`; leave it out and nothing changes.
 
 ```
-COMPOSE_FILE=docker-compose.yml:docker-compose.updates.yml
+COMPOSE_FILE=docker-compose.yml:docker-compose.label.yml
 ```
 
 - [Watchtower](https://containrrr.dev/watchtower/), started with `--label-enable`, updates the app within the tag.
@@ -139,7 +139,9 @@ COMPOSE_FILE=docker-compose.yml:docker-compose.updates.yml
   The database is excluded.
 - [Diun](https://crazymax.dev/diun/), with `watchByDefault` switched off, reports new versions of the image. By default only
   new major versions (`1.0.0` and up); `DIUN_INCLUDE_TAGS` in `.env` replaces the filter, e.g. `'^[0-9]+\.[0-9]+\.[0-9]+$'`
-  (in single quotes) for every release.
+  (in single quotes) for every release. For the database it reports a new PostgreSQL major version: `postgres:16-alpine`
+  stays on 16 and only receives its patch releases, version 17 appears as the new tag `17-alpine`. Switching is a manual
+  step (the data of one major version cannot be started by the next one: dump and restore, see [Backup](#backup)).
 
 ### Reverse proxy
 

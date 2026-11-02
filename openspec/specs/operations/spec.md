@@ -137,8 +137,8 @@ Source: Code app/server/lib/config.ts, app/docker-entrypoint.sh, docker-compose.
 - THEN the app does not receive the value
 
 ### Requirement: Optional labels for update tools
-The system SHALL provide the labels for Watchtower and Diun in an optional file `docker-compose.updates.yml` that `COMPOSE_FILE` in `.env` switches on; without it the stack SHALL carry no such labels, and `db` SHALL be excluded from Watchtower.
-Source: User instruction 2026-11-02 (settings through `.env`, no conflicts on `git pull`); docker-compose.updates.yml | Origin: user requirement
+The system SHALL provide the labels for Watchtower and Diun in an optional file `docker-compose.label.yml` that `COMPOSE_FILE` in `.env` switches on; without it the stack SHALL carry no such labels, `db` SHALL be excluded from Watchtower, and Diun SHALL report a new PostgreSQL major version (tags `<major>-alpine`).
+Source: User instruction 2026-11-02 (settings through `.env`, no conflicts on `git pull`; Diun for PostgreSQL majors); docker-compose.label.yml | Origin: user requirement
 
 #### Scenario: Not switched on
 - GIVEN `COMPOSE_FILE` is not set
@@ -146,7 +146,7 @@ Source: User instruction 2026-11-02 (settings through `.env`, no conflicts on `g
 - THEN `app` and `db` carry no labels of these tools
 
 #### Scenario: Switched on
-- GIVEN `COMPOSE_FILE=docker-compose.yml:docker-compose.updates.yml` in `.env` and `APP_IMAGE=ghcr.io/qaldak/cardkeeper:0.24`
+- GIVEN `COMPOSE_FILE=docker-compose.yml:docker-compose.label.yml` in `.env` and `APP_IMAGE=ghcr.io/qaldak/cardkeeper:0.24`
 - WHEN the stack starts
 - THEN `app` runs that tag and carries the labels for both tools, and `db` is excluded from Watchtower
 
@@ -154,3 +154,8 @@ Source: User instruction 2026-11-02 (settings through `.env`, no conflicts on `g
 - GIVEN the labels are switched on and `DIUN_INCLUDE_TAGS` is not set
 - WHEN Diun checks the image
 - THEN it reports only versions from 1.0.0 on
+
+#### Scenario: PostgreSQL major
+- GIVEN the labels are switched on and `db` runs `postgres:16-alpine`
+- WHEN the tag `17-alpine` appears
+- THEN Diun reports it, while `16.x-alpine` patch tags are not considered
