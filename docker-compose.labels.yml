@@ -9,6 +9,7 @@ services:
   app:
     labels:
       # Watchtower, started with --label-enable (WATCHTOWER_LABEL_ENABLE=true): updates this container within its tag.
+      # (containrrr/watchtower has had no release since 2023; the maintained fork nicholas-fedor/watchtower uses the same label.)
       # Note that the app applies new database migrations at every start, take a backup first (see README).
       com.centurylinklabs.watchtower.enable: "true"
       # Diun, with watchByDefault switched off: reports new versions of the image. By default only new major versions
