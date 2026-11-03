@@ -1,0 +1,32 @@
+# Optional labels for tools that watch for new versions. Not used by default. To switch them on, add this to your .env:
+#
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.labels.yml
+#
+# (On Windows the separator is ";".) Nothing in this file has to be edited: the version that is followed is chosen with
+# APP_IMAGE in .env, e.g. ghcr.io/qaldak/cardkeeper:0.24 (patch updates) or :0 (every update of the major version);
+# the tags X.Y and X move with each release, X.Y.Z does not.
+services:
+  app:
+    labels:
+      # Watchtower, started with --label-enable (WATCHTOWER_LABEL_ENABLE=true): updates this container within its tag.
+      # (containrrr/watchtower has had no release since 2023; the maintained fork nicholas-fedor/watchtower uses the same label.)
+      # Note that the app applies new database migrations at every start, take a backup first (see README).
+      com.centurylinklabs.watchtower.enable: "true"
+      # Diun, with watchByDefault switched off: reports new versions of the image. By default only new major versions
+      # (1.0.0 and up); DIUN_INCLUDE_TAGS in .env replaces the filter, e.g. for every release
+      # DIUN_INCLUDE_TAGS='^[0-9]+\.[0-9]+\.[0-9]+$' (in single quotes). Inside this file a "$" is written "$$".
+      diun.enable: "true"
+      diun.watch_repo: "true"
+      diun.sort_tags: semver
+      diun.include_tags: ${DIUN_INCLUDE_TAGS:-^[1-9][0-9]*\.[0-9]+\.[0-9]+$$}
+  db:
+    labels:
+      # Watchtower: updates PostgreSQL within its tag (postgres:16-alpine receives the patch releases of version 16 only).
+      com.centurylinklabs.watchtower.enable: "true"
+      # Diun: reports a new major version only. The tag "16-alpine" stays on version 16; version 17 appears as a new tag
+      # "17-alpine", which the filter below matches. notify_on "new" silences the report of a changed digest of a known
+      # tag (the patch updates that Watchtower applies). Moving the data to a new major is a manual step (dump and restore).
+      diun.enable: "true"
+      diun.watch_repo: "true"
+      diun.notify_on: new
+      diun.include_tags: ^[0-9]+-alpine$$

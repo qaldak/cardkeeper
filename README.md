@@ -68,7 +68,7 @@ All settings are environment variables in `.env`:
 | `PRICE_REFRESH_BATCH_EVERY` | `1d` | Least time between two tranches (at least `1h`) |
 | `PRICE_REFRESH_DELAY_MS` | `500` | Pause between two requests to a card database (at least `100`) |
 | `CONTAINER_PREFIX` | `cardkeeper` | Prefix of the container names (`cardkeeper_app`, `cardkeeper_db`) |
-| `APP_IMAGE` | `ghcr.io/qaldak/cardkeeper:latest` | Image to run, e.g. to pin a version |
+| `APP_IMAGE` | `ghcr.io/qaldak/cardkeeper:latest` | Image to run, e.g. to pin a version (see [Updates](#updates)) |
 
 Further variables are read by the app but not passed on by `docker-compose.yml`, so they have no effect in `.env`: `IMAGE_DIR`
 (fixed to `/data/card-images` in the image), the base URLs `YGOPRODECK_API_URL`, `TCGDEX_API_URL` and `EXCHANGE_RATE_API_URL`
@@ -121,6 +121,23 @@ Upgrading from a version without logins: add `SESSION_SECRET` and `USERS` to the
 without them). The existing players become users with the initial password and keep their cards; add everybody else to
 `USERS`. The rules for passwords, sessions and the lock after failed logins are in
 [`users-access`](openspec/specs/users-access/spec.md); HTTPS, HSTS and a content security policy are for the reverse proxy.
+
+### Updates
+
+The image is published as `X.Y.Z`, `X.Y`, `X` and `latest`; `X.Y.Z` never changes, the others move with each release. Set the
+tag to follow in `APP_IMAGE` (for example `ghcr.io/qaldak/cardkeeper:0.24` for patch updates, `:0` for the whole major version).
+
+Tools that update containers or report new images work with labels. [`docker-compose.labels.yml`](docker-compose.labels.yml)
+has them for [Watchtower](https://containrrr.dev/watchtower/) and [Diun](https://crazymax.dev/diun/) as examples; other tools
+need other labels, which you can put in the same file. It is optional and only used if your `.env` (not versioned, so a
+`git pull` never conflicts) lists it; the comments in the file explain the labels and `DIUN_INCLUDE_TAGS`.
+
+```
+COMPOSE_FILE=docker-compose.yml:docker-compose.labels.yml
+```
+
+Before automatic updates take a [backup](#backup): the app applies new database migrations at every start, and an older
+image does not undo them. A new PostgreSQL major version cannot be started on the old data (dump and restore).
 
 ### Reverse proxy
 

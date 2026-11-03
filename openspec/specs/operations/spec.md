@@ -135,3 +135,36 @@ Source: Code app/server/lib/config.ts, app/docker-entrypoint.sh, docker-compose.
 - GIVEN `TCGDEX_API_URL` is in `.env`
 - WHEN the stack starts
 - THEN the app does not receive the value
+
+### Requirement: Optional labels for update tools
+The system SHALL provide the labels for Watchtower and Diun in an optional file `docker-compose.labels.yml` that `COMPOSE_FILE` in `.env` switches on; without it the stack SHALL carry no such labels.
+Source: User instruction 2026-11-02 (settings through `.env`, no conflicts on `git pull`); docker-compose.labels.yml | Origin: user requirement
+
+#### Scenario: Not switched on
+- GIVEN `COMPOSE_FILE` is not set
+- WHEN the stack starts
+- THEN `app` and `db` carry no labels of these tools
+
+#### Scenario: Switched on
+- GIVEN `COMPOSE_FILE=docker-compose.yml:docker-compose.labels.yml` in `.env` and `APP_IMAGE=ghcr.io/qaldak/cardkeeper:0.24`
+- WHEN the stack starts
+- THEN `app` runs that tag and carries the labels for both tools
+
+#### Scenario: Diun filter
+- GIVEN the labels are switched on and `DIUN_INCLUDE_TAGS` is not set
+- WHEN Diun checks the image
+- THEN it reports only versions from 1.0.0 on
+
+### Requirement: Update labels for the database
+The system SHALL let Watchtower update `db` within its tag and Diun report only a new PostgreSQL major version (tags `<major>-alpine`), not a changed digest of the known tag.
+Source: User instruction 2026-11-02 (Diun for major versions; Watchtower for updates of the same image); docker-compose.labels.yml | Origin: user requirement
+
+#### Scenario: PostgreSQL major
+- GIVEN the labels are switched on and `db` runs `postgres:16-alpine`
+- WHEN the tag `17-alpine` appears
+- THEN Diun reports it, while `16.x-alpine` tags and a new digest of `16-alpine` are not reported
+
+#### Scenario: Patch update
+- GIVEN the labels are switched on
+- WHEN `postgres:16-alpine` receives a patch release
+- THEN Watchtower may update `db`, Diun stays silent
