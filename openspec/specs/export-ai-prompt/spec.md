@@ -114,14 +114,18 @@ Source: User instruction 2026-10-27 (recommendations 3 and 4 accepted); the banl
 - WHEN the text is created
 - THEN the text starts with the first heading and the wish is not used
 
-### Requirement: Preview and copy or download
-The system SHALL show a preview of the beginning of the text that is collapsed until the user opens it, keep the number of cards and the size estimate visible, and offer "Copy" (to the clipboard, also where the browser has no clipboard interface) and "Download" (`cardkeeper-ai-YYYY-MM-DD.txt`) as plain text; both SHALL be disabled when the selection contains no cards.
-Source: User instruction 2026-10-27 (proposal accepted), 2026-11-07 (preview collapsed, "takes too much space"); the CSV dialog for the empty selection | Origin: user requirement
+### Requirement: Collapsed preview
+The system SHALL show a preview of the beginning of the text that is collapsed until the user opens it, and keep the number of cards and the size estimate visible.
+Source: User instruction 2026-10-27 (proposal accepted), 2026-11-07 (preview collapsed, "takes too much space") | Origin: user requirement
 
 #### Scenario: Collapsed
 - GIVEN the dialog opens
 - WHEN it appears
 - THEN the preview is closed, the size is visible, and a click on its heading opens it
+
+### Requirement: Copy or download
+The system SHALL offer "Copy" (to the clipboard, also where the browser has no clipboard interface) and "Download" (`cardkeeper-ai-YYYY-MM-DD.txt`) as plain text; both SHALL be disabled when the selection contains no cards.
+Source: User instruction 2026-10-27 (proposal accepted); the CSV dialog for the empty selection | Origin: user requirement
 
 #### Scenario: Copy
 - GIVEN the dialog shows the text of the selection
