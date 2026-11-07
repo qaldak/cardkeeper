@@ -91,8 +91,9 @@ describe('request schemas', () => {
   it('only allows the printing and the user\'s own data on card updates', () => {
     expect(updateCardSchema.parse({ set: { setCode: ' LOB-DE005 ', edition: '1st Edition' } }).set).toEqual({ setCode: 'LOB-DE005', edition: '1st Edition' })
     expect(updateCardSchema.parse({ status: 'SOLD', ownerId: 3 })).toEqual({ status: 'SOLD', ownerId: 3 })
-    // Texts, attributes, rarity and set name come from the API and cannot be edited.
-    for (const field of [{ name: 'x' }, { description: 'x' }, { attributes: { atk: 1 } }, { gameId: 2 }, { set: { rarity: 'Common' } }, { set: { setName: 'x' } }]) {
+    // The name and other columns cannot be edited. Text, attributes, rarity and set name are accepted by the schema, but
+    // only for a card entered by hand: the service rejects them for a card from the API (`field_not_editable`).
+    for (const field of [{ name: 'x' }, { description: 'x' }, { gameId: 2 }]) {
       expect(() => updateCardSchema.parse(field)).toThrow()
     }
   })

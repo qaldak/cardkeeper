@@ -195,4 +195,38 @@ describe.skipIf(!TEST_DATABASE_URL)('scheduled price reload', () => {
     expect(await h.servicesAt(daysLater(8), noWait()).prices.dueCount()).toBe(0)
     expect(await h.servicesAt(daysLater(11), noWait()).prices.dueCount()).toBe(1)
   })
+
+  describe('cards entered by hand', () => {
+    const addByHand = () => h.services.cards.createManual({
+      game: 'ygo',
+      translation: { language: 'de', name: 'Albaz der Verschleierte' },
+      set: { setCode: 'SDAZ-DE047' },
+      attributes: { type: 'Token' },
+    }, h.anna)
+
+    it('are not due, whatever their age: no request, no run, no failed card', async () => {
+      const card = await addByHand()
+      const service = h.servicesAt(daysLater(30), noWait())
+      expect(await service.prices.dueCount()).toBe(0)
+      expect(await service.prices.runDue()).toBeNull()
+      expect(h.ygo.apiCalls()).toBe(0)
+      expect(await h.db.priceRefreshRun.count()).toBe(0)
+      expect(await h.db.priceHistory.count({ where: { cardId: card.id } })).toBe(0)
+      expect(await checked(card.id)).toBeNull()
+    })
+
+    it('are left out of a run that reloads other cards', async () => {
+      const manual = await addByHand()
+      const card = await add(DARK_MAGICIAN.id)
+      const callsBefore = h.ygo.requestedIds.length
+
+      const summary = await h.servicesAt(daysLater(8), noWait()).prices.runDue()
+
+      expect(summary).toEqual({ status: 'done', due: 1, updated: 1, failed: 0 })
+      expect(h.ygo.requestedIds.slice(callsBefore)).toEqual([[String(DARK_MAGICIAN.id)]])
+      expect(await rowsOf(card.id)).toHaveLength(4)
+      expect(await rowsOf(manual.id)).toHaveLength(0)
+      expect(await checked(manual.id)).toBeNull()
+    })
+  })
 })

@@ -1,7 +1,9 @@
 import { z } from 'zod'
 import { CARD_SORTS } from '../../shared/utils/sorting'
 import { CARD_STATUSES } from '../../shared/utils/status'
+import { normalizeSetCode } from '../../shared/utils/set-code'
 import { PASSWORD_MAX_LENGTH } from '../../shared/utils/users'
+import { YGO_ATTRIBUTES, YGO_CARD_TYPES, YGO_RACES } from '../../shared/utils/ygo-values'
 
 const dateOnly = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD')
 const optionalText = (max: number) => z.string().trim().max(max).nullable().optional()
@@ -70,13 +72,56 @@ export const createCardSchema = z.object({
   purchaseDate: dateOnly.nullable().optional(),
 })
 
+// The attributes of a Yu-Gi-Oh! card that can be entered by hand: card type, type and attribute only with the values of
+// the card database, numbers as whole numbers. `null` (when changing) or leaving a field out means "not present".
+const manualAttributes = z.object({
+  type: z.enum(YGO_CARD_TYPES).nullable().optional(),
+  race: z.enum(YGO_RACES).nullable().optional(),
+  attribute: z.enum(YGO_ATTRIBUTES).nullable().optional(),
+  level: z.number().int().min(0).max(99).nullable().optional(),
+  atk: z.number().int().min(0).max(99999).nullable().optional(),
+  def: z.number().int().min(0).max(99999).nullable().optional(),
+}).strict()
+
+const manualText = {
+  name: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(5000).nullable().optional(),
+}
+
+// A card that the card database does not know, entered by hand. There is no external ID (a request with one is
+// rejected), the status is "active" and the owner is the signed-in user, as for every new card.
+export const createManualCardSchema = z.object({
+  game: z.string().trim().min(1).max(40),
+  translation: z.object({
+    language: z.enum(['de', 'en']).default('de'),
+    ...manualText,
+  }).strict(),
+  set: z.object({
+    // Always stored in capital letters; an unusual format is only warned about in the form.
+    setCode: z.string().trim().min(1).max(40).transform(normalizeSetCode),
+    setName: optionalText(200),
+    rarity: optionalText(80),
+    edition: optionalText(80),
+  }).strict(),
+  attributes: manualAttributes.optional(),
+  purchaseDate: dateOnly.nullable().optional(),
+}).strict()
+
 // Only the printing (set code, edition) and the user's own data can be changed. Names, texts and
-// attributes come from the card API and are updated by refreshing the card.
+// attributes come from the card API and are updated by refreshing the card; a card without a link to the card
+// database (entered by hand) is the exception: its text, set name, rarity and attributes can be changed too.
 export const updateCardSchema = z.object({
   set: z.object({
     setCode: z.string().trim().min(1).max(40).optional(),
     edition: optionalText(80),
+    setName: optionalText(200),
+    rarity: optionalText(80),
   }).strict().optional(),
+  translation: z.object({
+    name: manualText.name.optional(),
+    description: manualText.description,
+  }).strict().optional(),
+  attributes: manualAttributes.optional(),
   // Handing the card over to another user; a card always has an owner, so it cannot be cleared.
   ownerId: z.number().int().positive().optional(),
   purchaseDate: dateOnly.nullable().optional(),
@@ -100,6 +145,7 @@ export const idParamSchema = z.coerce.number().int().positive()
 
 export type ListQuery = z.infer<typeof listQuerySchema>
 export type CreateCardInput = z.infer<typeof createCardSchema>
+export type CreateManualCardInput = z.infer<typeof createManualCardSchema>
 export type UpdateCardInput = z.infer<typeof updateCardSchema>
 export type LoginInput = z.infer<typeof loginSchema>
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>

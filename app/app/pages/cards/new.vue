@@ -39,6 +39,11 @@ const query = ref('')
 const results = ref<LookupCandidateDto[] | null>(null)
 const searching = ref(false)
 const searchError = ref('')
+// Yu-Gi-Oh!: a card that the card database does not know is entered by hand. The form opens from the message "No card
+// found", with what was searched for.
+const searchedQuery = ref('')
+const manualOpen = ref(false)
+const canEnterManually = computed(() => config.value.manualEntry && mode.value === 'name')
 
 const chosen = ref<LookupCandidateDto | null>(null)
 const choosing = ref<string | null>(null)
@@ -57,6 +62,7 @@ watch(gameSlug, (slug) => {
   mode.value = slug === 'pokemon' ? 'set' : 'name'
   results.value = null
   chosen.value = null
+  manualOpen.value = false
   searchError.value = ''
 })
 
@@ -83,6 +89,7 @@ async function search() {
     return
   }
   searching.value = true
+  searchedQuery.value = query.value.trim()
   try {
     results.value = await $fetch<LookupCandidateDto[]>('/api/lookup', {
       query: { game: gameSlug.value, q: query.value.trim() },
@@ -187,7 +194,9 @@ const MAX_RESULTS = 50
       {{ t('add.languageHint') }}
     </p>
 
-    <template v-if="!chosen">
+    <ManualCardForm v-if="manualOpen" :prefill="searchedQuery" @cancel="manualOpen = false" />
+
+    <template v-else-if="!chosen">
       <UFormField v-if="gameItems.length > 1" :label="t('add.game')" class="mb-4 w-44">
         <USelect v-model="gameSlug" :items="gameItems" class="w-full" />
       </UFormField>
@@ -234,9 +243,14 @@ const MAX_RESULTS = 50
       </p>
 
       <template v-if="results && !(hasModes && mode !== 'name')">
-        <p v-if="results.length === 0" class="text-sm text-muted">
-          {{ t('add.noResults') }}
-        </p>
+        <div v-if="results.length === 0" class="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <p class="text-sm text-muted">
+            {{ t('add.noResults') }}
+          </p>
+          <UButton v-if="canEnterManually" color="neutral" variant="outline" size="sm" data-test="manual-open" @click="manualOpen = true">
+            {{ t('manual.button') }}
+          </UButton>
+        </div>
         <template v-else>
           <h2 class="mb-3 text-[15px] font-semibold">
             {{ t('add.results') }} ({{ results.length }})

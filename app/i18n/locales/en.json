@@ -528,5 +528,32 @@
       "copyFailed": "Copying failed, use the download instead",
       "loadFailed": "The text could not be created, please try again."
     }
+  },
+  "manual": {
+    "button": "Enter manually",
+    "title": "Enter a card manually",
+    "intro": "The card database does not have this card? Enter it yourself, for example a token. Only name and set code are required.",
+    "name": "Name",
+    "language": "Language",
+    "languages": {
+      "de": "German",
+      "en": "English"
+    },
+    "setCode": "Set code",
+    "setCodePlaceholder": "e.g. SDAZ-EN047",
+    "setCodeWarning": "\"{code}\" does not look like a set code (for example SDAZ-EN047). You can still save it.",
+    "setName": "Set (optional)",
+    "rarity": "Rarity (optional)",
+    "cardType": "Card type (optional)",
+    "race": "Type (optional)",
+    "attribute": "Attribute (optional)",
+    "level": "Level (optional)",
+    "atk": "ATK (optional)",
+    "def": "DEF (optional)",
+    "description": "Description (optional)",
+    "notSet": "Not set",
+    "numberHint": "Leave empty if the card has no value.",
+    "submit": "Save card",
+    "cancel": "Back to the search"
   }
 }

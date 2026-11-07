@@ -19,7 +19,7 @@ Not documented.
 
 ## Consequences
 
-- Names, texts and attributes are read-only, there are no manual overrides (`manual_overrides` is dropped).
+- Names, texts and attributes of a card from a card database are read-only, there are no manual overrides (`manual_overrides` is dropped). A card entered by hand is the exception, see [ADR 0025](0025-manual-cards.md).
 - The search covers the names of all languages (spec `overview`).
 - An English copy on a German request is not stored as a translation (spec `game-adapters`).
 

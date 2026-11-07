@@ -16,7 +16,8 @@ import { detectImageType, removeCardImageDir, saveImage } from '../lib/image-fil
 import { downloadImage } from '../lib/image-download'
 import { allowedImageUrl } from '../lib/image-url'
 import { fromCents, toCents } from '../lib/money'
-import type { CreateCardInput, UpdateCardInput } from '../lib/schemas'
+import { manualAttributes, textOrNull } from '../lib/manual-card'
+import type { CreateCardInput, CreateManualCardInput, UpdateCardInput } from '../lib/schemas'
 import { normalizeStatusChange } from '../lib/status'
 import { mergeLanguageCards, primaryName, type MergedCard } from '../lib/translations'
 import type { AdapterRegistry } from '../tcg/registry'
@@ -490,6 +491,51 @@ export function createCardService(deps: CardServiceDeps) {
     },
 
     /**
+     * Creates a card that the card database does not know (a token, for instance). It has no external ID, no snapshot
+     * and no price, so nothing asks the card database about it later; its data is what was entered.
+     */
+    async createManual(input: CreateManualCardInput, actor: Actor): Promise<CardDetailDto> {
+      registry.require(input.game)
+      if (!getGameConfig(input.game).manualEntry) {
+        throw badRequest('manual_not_supported', 'This game does not support entering a card by hand')
+      }
+      const game = await ensureGame(input.game)
+      const timestamp = now()
+      const { name, language } = input.translation
+
+      const card = await db.$transaction(async (tx) => {
+        const created = await tx.card.create({
+          data: {
+            gameId: game.id,
+            externalId: null,
+            name,
+            gameSpecificAttributes: manualAttributes(input.attributes) as Json,
+            ownerUserId: actor.id,
+            purchaseDate: input.purchaseDate ? parseDateOnly(input.purchaseDate) : null,
+            lastModifiedBy: actor.name,
+            translations: {
+              create: { language, name, description: textOrNull(input.translation.description), fetchedAt: timestamp },
+            },
+            sets: {
+              create: {
+                setCode: input.set.setCode,
+                setName: textOrNull(input.set.setName),
+                rarity: textOrNull(input.set.rarity),
+                edition: textOrNull(input.set.edition),
+              },
+            },
+            statusHistory: { create: { status: 'ACTIVE', date: utcToday(timestamp), changedBy: actor.name } },
+          },
+        })
+        await tx.auditLog.create({
+          data: { entity: 'card', entityId: created.id, field: 'created', newValue: created.name, changedBy: actor.name },
+        })
+        return created
+      })
+      return get(card.id)
+    },
+
+    /**
      * Changes the printing (set code, edition) and the user's own data (status, assignment,
      * purchase date). Everything that comes from the card API can only be changed by refreshing.
      */
@@ -500,6 +546,7 @@ export function createCardService(deps: CardServiceDeps) {
           game: { select: { slug: true } },
           owner: { select: { name: true } },
           sets: { orderBy: { id: 'asc' }, take: 1 },
+          translations: { orderBy: { id: 'asc' }, take: 1 },
           statusHistory: { orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 1 },
         },
       })
@@ -508,6 +555,15 @@ export function createCardService(deps: CardServiceDeps) {
       }
       assertOwner(card, actor)
       const gameConfig = getGameConfig(card.game.slug)
+
+      // Text, set name, rarity and attributes come from the card database and are updated by refreshing the card. Only a
+      // card entered by hand (no external ID) has nobody else who knows them, so its owner can change them.
+      const manual = card.externalId === null && gameConfig.manualEntry
+      const touchesCardData = patch.translation !== undefined || patch.attributes !== undefined
+        || patch.set?.setName !== undefined || patch.set?.rarity !== undefined
+      if (touchesCardData && !manual) {
+        throw badRequest('field_not_editable', 'The data of a card from the card database cannot be changed')
+      }
 
       const audit: FieldChange[] = []
       const data: Prisma.CardUpdateInput = { lastModifiedBy: actor.name }
@@ -534,6 +590,39 @@ export function createCardService(deps: CardServiceDeps) {
         }
       }
 
+      if (manual && patch.translation) {
+        const existingText = card.translations[0]
+        const language = existingText?.language ?? 'de'
+        const name = patch.translation.name ?? existingText?.name ?? card.name
+        const description = patch.translation.description !== undefined ? textOrNull(patch.translation.description) : existingText?.description ?? null
+        const nameChanged = track('translation.name', existingText?.name ?? card.name, name)
+        const descriptionChanged = track('translation.description', existingText?.description ?? null, description)
+        if (nameChanged) {
+          data.name = name
+        }
+        if (nameChanged || descriptionChanged) {
+          data.translations = existingText
+            ? { update: { where: { id: existingText.id }, data: { name, description } } }
+            : { create: { language, name, description } }
+        }
+      }
+
+      if (manual && patch.attributes) {
+        const attributes: Record<string, unknown> = { ...(card.gameSpecificAttributes as Record<string, unknown>) }
+        let attributesChanged = false
+        for (const [key, value] of Object.entries(patch.attributes)) {
+          const next = value ?? null
+          if (track(`attributes.${key}`, attributes[key] ?? null, next)) {
+            attributesChanged = true
+            attributes[key] = next
+          }
+        }
+        if (attributesChanged) {
+          // A cleared attribute is removed, not stored as null.
+          data.gameSpecificAttributes = Object.fromEntries(Object.entries(attributes).filter(([, value]) => value !== null)) as Json
+        }
+      }
+
       const existingSet = card.sets[0]
       const setPatch = patch.set
       if (setPatch) {
@@ -555,6 +644,12 @@ export function createCardService(deps: CardServiceDeps) {
         if (setPatch.edition !== undefined && track('set.edition', existingSet?.edition ?? null, setPatch.edition)) {
           setData.edition = setPatch.edition
         }
+        if (setPatch.setName !== undefined && track('set.setName', existingSet?.setName ?? null, textOrNull(setPatch.setName))) {
+          setData.setName = textOrNull(setPatch.setName)
+        }
+        if (setPatch.rarity !== undefined && track('set.rarity', existingSet?.rarity ?? null, textOrNull(setPatch.rarity))) {
+          setData.rarity = textOrNull(setPatch.rarity)
+        }
         if (Object.keys(setData).length > 0) {
           if (existingSet) {
             data.sets = { update: { where: { id: existingSet.id }, data: setData } }
@@ -566,7 +661,7 @@ export function createCardService(deps: CardServiceDeps) {
             if (!setCode) {
               throw badRequest('invalid_set', 'A set code is required')
             }
-            data.sets = { create: { setCode, edition: setPatch.edition ?? null } }
+            data.sets = { create: { setCode, edition: setPatch.edition ?? null, setName: textOrNull(setPatch.setName), rarity: textOrNull(setPatch.rarity) } }
           }
         }
       }
