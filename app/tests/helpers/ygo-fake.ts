@@ -74,6 +74,28 @@ export const ENGLISH_ONLY: FakeYgoCard = {
   sets: [{ set_name: 'Obscure Set', set_code: 'OBS-001', set_rarity: 'Rare' }],
 }
 
+/** A token: a card type of the card database, but never in a deck. No level, ATK, DEF or attribute. */
+export const SHEEP_TOKEN: FakeYgoCard = {
+  id: 23635815,
+  name: 'Sheep Token',
+  nameDe: 'Schafs-Token',
+  type: 'Token',
+  race: 'Beast',
+  prices: { cardmarket_price: '0', tcgplayer_price: '0', ebay_price: '0', amazon_price: '0', coolstuffinc_price: '0' },
+  sets: [{ set_name: 'Duelist Pack: Kaiba', set_code: 'DPKB-ENTKN', set_rarity: 'Common' }],
+  raw: { frameType: 'token', atk: undefined, def: undefined, level: undefined, attribute: undefined },
+}
+
+/** A skill card (Speed Duel): goes into the skill slot, never into the deck. */
+export const SKILL_CARD: FakeYgoCard = {
+  id: 300000001,
+  name: 'Skill - Test',
+  type: 'Skill Card',
+  race: 'Yugi',
+  sets: [{ set_name: 'Speed Duel: Test', set_code: 'SDTS-ENS01', set_rarity: 'Common' }],
+  raw: { frameType: 'skill', atk: undefined, def: undefined, level: undefined, attribute: undefined },
+}
+
 export function toRawCard(card: FakeYgoCard, language = 'en') {
   // A card without German text answers with the English text, like the real API might.
   const german = language === 'de' && card.nameDe !== undefined

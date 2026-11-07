@@ -3,6 +3,7 @@ import type { CardDetailDto, CardListResponseDto, CardNeighborsDto, FacetsDto, L
 import { EDITION_KEYS } from '../../shared/utils/editions'
 import { eszettVariants } from '../../shared/utils/eszett'
 import { getGameConfig } from '../../shared/utils/game-config'
+import { deckableByDefault } from '../../shared/utils/ygo-values'
 import { isSetCode, normalizeSetCode, setCodeSpellings } from '../../shared/utils/set-code'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import { assertOwner, type Actor } from '../lib/actor'
@@ -451,6 +452,8 @@ export function createCardService(deps: CardServiceDeps) {
             externalId: merged.externalId,
             name: merged.name,
             gameSpecificAttributes: merged.attributes as Json,
+            // A card is for the deck unless its card type says it cannot be (a token, a skill card); only some games have the flag.
+            deckable: getGameConfig(input.game).deckUse ? deckableByDefault(merged.attributes.type) : true,
             // A user only adds cards for themselves.
             ownerUserId: actor.id,
             purchaseDate: input.purchaseDate ? parseDateOnly(input.purchaseDate) : null,
@@ -511,6 +514,8 @@ export function createCardService(deps: CardServiceDeps) {
             name,
             gameSpecificAttributes: manualAttributes(input.attributes) as Json,
             ownerUserId: actor.id,
+            // Not for the deck unless the owner says so: nothing tells that a card entered by hand can be played.
+            deckable: input.deckable ?? false,
             purchaseDate: input.purchaseDate ? parseDateOnly(input.purchaseDate) : null,
             lastModifiedBy: actor.name,
             translations: {
@@ -564,6 +569,9 @@ export function createCardService(deps: CardServiceDeps) {
       if (touchesCardData && !manual) {
         throw badRequest('field_not_editable', 'The data of a card from the card database cannot be changed')
       }
+      if (patch.deckable !== undefined && !gameConfig.deckUse) {
+        throw badRequest('field_not_editable', 'This game has no deck use')
+      }
 
       const audit: FieldChange[] = []
       const data: Prisma.CardUpdateInput = { lastModifiedBy: actor.name }
@@ -581,6 +589,11 @@ export function createCardService(deps: CardServiceDeps) {
         if (track('owner', card.owner?.name ?? null, newOwner.name)) {
           data.owner = { connect: { id: newOwner.id } }
         }
+      }
+
+      // Whether the card may be used in a deck (the text for an AI leaves out the others).
+      if (patch.deckable !== undefined && track('deckable', card.deckable, patch.deckable)) {
+        data.deckable = patch.deckable
       }
 
       if (patch.purchaseDate !== undefined) {

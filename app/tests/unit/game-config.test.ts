@@ -5,15 +5,15 @@ import { POKEMON_VARIANTS } from '../../shared/types/pokemon'
 
 describe('game configuration', () => {
   it('lets the edition and set code of Yu-Gi-Oh! cards be corrected freely', () => {
-    expect(getGameConfig('ygo')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS, manualEntry: true })
+    expect(getGameConfig('ygo')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS, manualEntry: true, deckUse: true })
   })
 
   it('treats the edition of Pokémon cards as a variant and fixes the set code', () => {
-    expect(getGameConfig('pokemon')).toEqual({ editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [], manualEntry: false })
+    expect(getGameConfig('pokemon')).toEqual({ editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [], manualEntry: false, deckUse: false })
   })
 
   it('falls back to free text for an unknown game', () => {
-    expect(getGameConfig('mtg')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [], manualEntry: false })
+    expect(getGameConfig('mtg')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [], manualEntry: false, deckUse: false })
   })
 
   it('offers the printed editions for Yu-Gi-Oh! only, as stable keys', () => {
@@ -25,6 +25,12 @@ describe('game configuration', () => {
     expect(getGameConfig('ygo').manualEntry).toBe(true)
     expect(getGameConfig('pokemon').manualEntry).toBe(false)
     expect(getGameConfig('mtg').manualEntry).toBe(false)
+  })
+
+  it('has the deck flag for Yu-Gi-Oh! only', () => {
+    expect(getGameConfig('ygo').deckUse).toBe(true)
+    expect(getGameConfig('pokemon').deckUse).toBe(false)
+    expect(getGameConfig('mtg').deckUse).toBe(false)
   })
 
   it('knows the Pokémon variants', () => {

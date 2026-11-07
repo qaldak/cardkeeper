@@ -19,14 +19,16 @@ export interface GameConfig {
   editions: readonly EditionKey[]
   /** Whether a card that the card database does not know can be entered by hand (Yu-Gi-Oh! only for now). */
   manualEntry: boolean
+  /** Whether a card has a "for deck" flag that decides if it is in the text for an AI (Yu-Gi-Oh! only). */
+  deckUse: boolean
 }
 
-const DEFAULT_CONFIG: GameConfig = { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [], manualEntry: false }
+const DEFAULT_CONFIG: GameConfig = { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [], manualEntry: false, deckUse: false }
 
 export const GAME_CONFIG: Record<string, GameConfig> = {
-  ygo: { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS, manualEntry: true },
+  ygo: { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS, manualEntry: true, deckUse: true },
   // Japanese cards exist in their own database with their own ids, so Japanese is a stored language.
-  pokemon: { editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [], manualEntry: false },
+  pokemon: { editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [], manualEntry: false, deckUse: false },
 }
 
 export function getGameConfig(gameSlug: string): GameConfig {

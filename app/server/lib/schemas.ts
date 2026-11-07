@@ -104,6 +104,8 @@ export const createManualCardSchema = z.object({
     edition: optionalText(80),
   }).strict(),
   attributes: manualAttributes.optional(),
+  // Whether the card may be used in a deck; a card entered by hand is not unless its owner says so.
+  deckable: z.boolean().optional(),
   purchaseDate: dateOnly.nullable().optional(),
 }).strict()
 
@@ -122,6 +124,8 @@ export const updateCardSchema = z.object({
     description: manualText.description,
   }).strict().optional(),
   attributes: manualAttributes.optional(),
+  // Whether the card may be used in a deck (Yu-Gi-Oh! only).
+  deckable: z.boolean().optional(),
   // Handing the card over to another user; a card always has an owner, so it cannot be cleared.
   ownerId: z.number().int().positive().optional(),
   purchaseDate: dateOnly.nullable().optional(),

@@ -2,18 +2,18 @@
 
 ## 1. Data model, rule and game setting
 
-- [ ] 1.1 Add `deckable Boolean @default(true)` to `Card` in `app/prisma/schema.prisma` and a migration `app/prisma/migrations/20261107200000_deckable/migration.sql` (add the column, then set false for `ygo` cards with `external_id IS NULL` or card type `Token` or `Skill Card`). Verify with an integration test like `edition-migration.test.ts`: a normal Yu-Gi-Oh! card and a Pokémon card stay true; a manual card, a token and a skill card become false.
-- [ ] 1.2 Add `YGO_NON_DECK_CARD_TYPES` and `deckableByDefault` to `app/shared/utils/ygo-values.ts` and `deckUse: boolean` to `GameConfig` (true for `ygo` only). Verify with unit tests in `ygo-values.test.ts` and `game-config.test.ts`: Token and Skill Card are not deckable by default, every other of the 29 card types is, an absent card type is; only `ygo` has deck use.
+- [x] 1.1 Add `deckable Boolean @default(true)` to `Card` in `app/prisma/schema.prisma` and a migration `app/prisma/migrations/20261107200000_deckable/migration.sql` (add the column, then set false for `ygo` cards with `external_id IS NULL` or card type `Token` or `Skill Card`). Verify with an integration test like `edition-migration.test.ts`: a normal Yu-Gi-Oh! card and a Pokémon card stay true; a manual card, a token and a skill card become false.
+- [x] 1.2 Add `YGO_NON_DECK_CARD_TYPES` and `deckableByDefault` to `app/shared/utils/ygo-values.ts` and `deckUse: boolean` to `GameConfig` (true for `ygo` only). Verify with unit tests in `ygo-values.test.ts` and `game-config.test.ts`: Token and Skill Card are not deckable by default, every other of the 29 card types is, an absent card type is; only `ygo` has deck use.
 
 ## 2. Creating cards
 
-- [ ] 2.1 In `create` (`app/server/services/cards.ts`) store `deckable` from the card type of the card database for a game with deck use, and true otherwise; in `createManual` store the input, and add `deckable: z.boolean().default(false)` to `createManualCardSchema`. Verify with integration tests in `cards.test.ts` and `manual-card.test.ts`: Dark Magician is for the deck; a token from the fake card database is not; a manual card is not by default and is when `deckable: true`; a Pokémon card is.
-- [ ] 2.2 Verify the whole-set import path with a test that adds a set containing a token through `create`. Check that the stored flag follows the card database rule (no code change is expected; fix `create` if it does not).
+- [x] 2.1 In `create` (`app/server/services/cards.ts`) store `deckable` from the card type of the card database for a game with deck use, and true otherwise; in `createManual` store the input, and add `deckable: z.boolean().default(false)` to `createManualCardSchema`. Verify with integration tests in `cards.test.ts` and `manual-card.test.ts`: Dark Magician is for the deck; a token from the fake card database is not; a manual card is not by default and is when `deckable: true`; a Pokémon card is.
+- [x] 2.2 Verify the whole-set import path with a test that adds a set containing a token through `create`. Check that the stored flag follows the card database rule (no code change is expected; fix `create` if it does not).
 
 ## 3. Changing the flag
 
-- [ ] 3.1 Add `deckable` to `CardDetailDto` and `toDetail`, `deckable: z.boolean().optional()` to `updateCardSchema`, and handle it in `update`: owner only, 400 `field_not_editable` for a game without deck use, logged with old and new value, "modified on" set, nothing logged for an unchanged value. Verify with integration tests in `manual-card.test.ts` or `cards.test.ts`: switching off and on is logged; a non-owner gets 403; a Pokémon card is rejected; an unchanged value logs nothing.
-- [ ] 3.2 Verify that `refresh` leaves the flag unchanged: a token from the card database switched on by its owner is still on after "Update from API", and a card switched off is still off. Add the test to `cards.test.ts` (no code change is expected).
+- [x] 3.1 Add `deckable` to `CardDetailDto` and `toDetail`, `deckable: z.boolean().optional()` to `updateCardSchema`, and handle it in `update`: owner only, 400 `field_not_editable` for a game without deck use, logged with old and new value, "modified on" set, nothing logged for an unchanged value. Verify with integration tests in `manual-card.test.ts` or `cards.test.ts`: switching off and on is logged; a non-owner gets 403; a Pokémon card is rejected; an unchanged value logs nothing.
+- [x] 3.2 Verify that `refresh` leaves the flag unchanged: a token from the card database switched on by its owner is still on after "Update from API", and a card switched off is still off. Add the test to `cards.test.ts` (no code change is expected).
 
 ## 4. Text for the AI (server)
 

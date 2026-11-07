@@ -67,6 +67,13 @@ describe.skipIf(!TEST_DATABASE_URL)('cards entered by hand', () => {
       expect(card.sets).toMatchObject([{ setCode: 'SDAZ-EN047', setName: null, rarity: null, edition: 'FIRST_EDITION' }])
     })
 
+    it('is not for the deck unless the owner says so', async () => {
+      const deckable = async (cardId: number) => (await h.db.card.findUniqueOrThrow({ where: { id: cardId } })).deckable
+      expect(await deckable((await h.services.cards.createManual(albaz(), h.anna)).id)).toBe(false)
+      expect(await deckable((await h.services.cards.createManual(albaz({ deckable: false }), h.anna)).id)).toBe(false)
+      expect(await deckable((await h.services.cards.createManual(albaz({ deckable: true }), h.anna)).id)).toBe(true)
+    })
+
     it('registers the game on first use', async () => {
       expect(await h.db.game.count()).toBe(0)
       await h.services.cards.createManual(albaz(), h.anna)

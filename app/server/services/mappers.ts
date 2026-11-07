@@ -72,6 +72,7 @@ export function toDetail(card: DetailCard, priceSource: string, convert: Convert
     statusPerson: showStatusInfo ? latestStatus.personText : null,
     owner: card.owner,
     purchaseDate: card.purchaseDate ? formatDateOnly(card.purchaseDate) : null,
+    deckable: card.deckable,
     sets: card.sets.map(set => ({
       id: set.id,
       setCode: set.setCode,

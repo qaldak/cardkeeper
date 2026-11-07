@@ -13,7 +13,7 @@ A card has no field for deck use. [ADR 0005](../../../docs/adr/0005-game-attribu
 - A migration that is correct for the data that exists on the day it runs, including cards entered by hand since 0.26.0.
 
 **Non-Goals:**
-- A filter, column or marker for the flag in the overview.
+- A filter, column or marker for the flag in the overview (the filter display has no room for it; a later story with a redesign).
 - Pokémon (the flag exists on the row but has no meaning and no interface there).
 - Bulk changing of the flag (a card at a time, on its page).
 - Rules by format or banlist (the introduction of the text still asks the AI to check the banlist).
@@ -58,4 +58,4 @@ One Prisma migration (`app/prisma/migrations/<timestamp>_deckable/migration.sql`
 
 ## Open Questions
 
-- Whether the overview should offer a filter for "for the deck" (the proposal leaves it out; one more story if the flag is used a lot).
+- A filter for "for the deck" in the overview is deliberately a later story: it needs a redesign of the filter display, which has no room for another filter today (User instruction 2026-11-07).

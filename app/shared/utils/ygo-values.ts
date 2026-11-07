@@ -82,3 +82,14 @@ export const YGO_ATTRIBUTES = ['DARK', 'DIVINE', 'EARTH', 'FIRE', 'LIGHT', 'WATE
 export type YgoCardType = (typeof YGO_CARD_TYPES)[number]
 export type YgoRace = (typeof YGO_RACES)[number]
 export type YgoAttribute = (typeof YGO_ATTRIBUTES)[number]
+
+/**
+ * The card types that cannot be in a deck: a token is created in a duel, a skill card goes into the skill slot of Speed
+ * Duel. The card database has no field for deck use; these two card types (the frame types `token` and `skill`, checked
+ * against its data on 2026-11-07) are the only signal, and no other card type shares those frame types.
+ */
+export const YGO_NON_DECK_CARD_TYPES: readonly string[] = ['Token', 'Skill Card']
+
+/** Whether a card of this card type (as the card database writes it) is for the deck unless its owner says otherwise. */
+export const deckableByDefault = (cardType: unknown): boolean =>
+  !(typeof cardType === 'string' && YGO_NON_DECK_CARD_TYPES.includes(cardType))
