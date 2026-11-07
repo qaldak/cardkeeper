@@ -103,3 +103,17 @@ Source: User instruction 2026-10-04 09:59; 2026-10-06 08:00; 2026-10-21 14:37 | 
 - GIVEN a new change
 - WHEN a branch is created
 - THEN it has a meaningful name
+
+### Requirement: Branch names with the type spelled out
+The development SHALL name a branch `<type>/<short-name>` with the type spelled out (`feature/`, `fix/`, `build/`, `chore/`, `test/`, `docs/`, `refactor/`, `perf/`, `style/`, `ci/`) and SHALL NOT abbreviate it (no `feat/`); the type is the one of the change.
+Source: User instruction 2026-11-07 (`feature/` instead of `feat/`; fix/, build/, chore/, test/ and further types as examples); README §Releases (commit types) | Origin: user requirement
+
+#### Scenario: New function
+- GIVEN a new function "manual card entry"
+- WHEN its branch is created
+- THEN it is called `feature/manual-card-entry`
+
+#### Scenario: Other types
+- GIVEN a bug fix, a build change or a documentation change
+- WHEN the branch is created
+- THEN it starts with `fix/`, `build/` or `docs/`
