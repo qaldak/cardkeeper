@@ -1,3 +1,11 @@
+## [0.26.0](https://github.com/qaldak/cardkeeper/compare/v0.25.1...v0.26.0) (2026-11-07)
+
+### Features
+
+* change a manually entered card on the card page ([a89fcb0](https://github.com/qaldak/cardkeeper/commit/a89fcb01bdb3ba2bcc2303ca2f8d5ca83bbc3fde))
+* enter Yu-Gi-Oh! cards by hand (server, entry form, ADR 0025) ([f691614](https://github.com/qaldak/cardkeeper/commit/f6916143a44490ad635e9b9b09e16ea9a5416d28))
+* mark the fields that a rejected save complains about ([cdd3d62](https://github.com/qaldak/cardkeeper/commit/cdd3d62158641d0dfe7674d087c02a728c991f95))
+
 ## [0.25.1](https://github.com/qaldak/cardkeeper/compare/v0.25.0...v0.25.1) (2026-11-02)
 
 ### Maintenance
