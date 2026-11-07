@@ -58,6 +58,10 @@ model Card {
   // The user who owns the card and is the only one who may change it. Null only for cards that predate the logins.
   ownerUserId            Int?       @map("owner_user_id")
   status                 CardStatus @default(ACTIVE)
+  // Whether the card may be used in a deck (Yu-Gi-Oh! only; tokens and skill cards cannot, nor can cards entered by hand
+  // until their owner says so). The owner's data like the status: "Update from API" does not change it. It decides
+  // whether the card is in the text for an AI; other games ignore it.
+  deckable               Boolean    @default(true)
   purchaseDate           DateTime?  @map("purchase_date") @db.Date
   createdAt              DateTime   @default(now()) @map("created_at")
   lastFetchedAt          DateTime?  @map("last_fetched_at")

@@ -23,6 +23,14 @@ describe('input for a manually entered card', () => {
     expect(parsed.translation.language).toBe('en')
   })
 
+  it('accepts the switch for the deck as a boolean only', () => {
+    expect(createManualCardSchema.parse({ ...valid, deckable: true }).deckable).toBe(true)
+    expect(createManualCardSchema.parse(valid).deckable).toBeUndefined()
+    expect(() => createManualCardSchema.parse({ ...valid, deckable: 'yes' })).toThrow()
+    expect(updateCardSchema.parse({ deckable: false })).toEqual({ deckable: false })
+    expect(() => updateCardSchema.parse({ deckable: null })).toThrow()
+  })
+
   it('accepts empty numbers and an empty description', () => {
     expect(() => createManualCardSchema.parse({ ...valid, translation: { name: 'X', description: null }, attributes: { level: null, atk: null, def: null } })).not.toThrow()
   })

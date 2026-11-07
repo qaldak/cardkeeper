@@ -38,6 +38,8 @@ const flag = (fallback: boolean) => z.enum(['true', 'false']).optional().transfo
 
 export const aiExportQuerySchema = listQuerySchema.extend({
   onlyActive: flag(true),
+  // Leave out the Yu-Gi-Oh! cards that are not marked for the deck (tokens, skill cards, cards entered by hand).
+  deckOnly: flag(true),
   withText: flag(true),
   intro: flag(true),
   wish: z.string().trim().max(500).optional(),
@@ -104,6 +106,8 @@ export const createManualCardSchema = z.object({
     edition: optionalText(80),
   }).strict(),
   attributes: manualAttributes.optional(),
+  // Whether the card may be used in a deck; a card entered by hand is not unless its owner says so.
+  deckable: z.boolean().optional(),
   purchaseDate: dateOnly.nullable().optional(),
 }).strict()
 
@@ -122,6 +126,8 @@ export const updateCardSchema = z.object({
     description: manualText.description,
   }).strict().optional(),
   attributes: manualAttributes.optional(),
+  // Whether the card may be used in a deck (Yu-Gi-Oh! only).
+  deckable: z.boolean().optional(),
   // Handing the card over to another user; a card always has an owner, so it cannot be cleared.
   ownerId: z.number().int().positive().optional(),
   purchaseDate: dateOnly.nullable().optional(),

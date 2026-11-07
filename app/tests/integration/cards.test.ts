@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { HttpError } from '../../server/lib/errors'
-import { BLUE_EYES, DARK_MAGICIAN, ENGLISH_ONLY, LINK_MONSTER } from '../helpers/ygo-fake'
+import { BLUE_EYES, DARK_MAGICIAN, ENGLISH_ONLY, LINK_MONSTER, SHEEP_TOKEN, SKILL_CARD } from '../helpers/ygo-fake'
 import { TEST_DATABASE_URL, useHarness } from './helpers'
 
 describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
@@ -691,6 +691,82 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       const card = await addDarkMagician()
       h.ygo.cards.delete(DARK_MAGICIAN.id)
       await expect(h.services.cards.refresh(card.id, h.anna)).rejects.toMatchObject({ status: 404, code: 'upstream_card_not_found' })
+    })
+  })
+
+  describe('deck use of a new card', () => {
+    const deckable = async (cardId: number) => (await h.db.card.findUniqueOrThrow({ where: { id: cardId } })).deckable
+
+    it('is for the deck for a Yu-Gi-Oh! card of the card database', async () => {
+      expect(await deckable((await addDarkMagician()).id)).toBe(true)
+      const spell = await h.services.cards.create({ game: 'ygo', externalId: String(ENGLISH_ONLY.id), set: { setCode: 'OBS-001', rarity: 'Rare' } }, h.anna)
+      expect(await deckable(spell.id)).toBe(true)
+    })
+
+    it('is not for the deck for a token or a skill card of the card database', async () => {
+      h.ygo.cards.set(SHEEP_TOKEN.id, SHEEP_TOKEN)
+      h.ygo.cards.set(SKILL_CARD.id, SKILL_CARD)
+      const token = await h.services.cards.create({ game: 'ygo', externalId: String(SHEEP_TOKEN.id) }, h.anna)
+      const skill = await h.services.cards.create({ game: 'ygo', externalId: String(SKILL_CARD.id) }, h.anna)
+      expect(token.attributes).toMatchObject({ type: 'Token' })
+      expect(await deckable(token.id)).toBe(false)
+      expect(await deckable(skill.id)).toBe(false)
+    })
+
+    it('follows the rule of the card database when a set is added card by card (the wizard calls the same function)', async () => {
+      h.ygo.cards.set(SHEEP_TOKEN.id, SHEEP_TOKEN)
+      const added = []
+      for (const [id, code] of [[DARK_MAGICIAN.id, 'LOB-005'], [SHEEP_TOKEN.id, 'DPKB-ENTKN']] as const) {
+        const rarity = id === DARK_MAGICIAN.id ? 'Ultra Rare' : 'Common'
+        added.push(await h.services.cards.create({ game: 'ygo', externalId: String(id), set: { setCode: code, rarity } }, h.anna))
+      }
+      expect(await Promise.all(added.map(card => deckable(card.id)))).toEqual([true, false])
+    })
+
+    it('can be changed by the owner and is logged', async () => {
+      const card = await addDarkMagician()
+      expect(card.deckable).toBe(true)
+      const off = await h.services.cards.update(card.id, { deckable: false }, h.anna)
+      expect(off).toMatchObject({ deckable: false })
+      expect(off.userModifiedAt).not.toBeNull()
+      expect((await h.services.cards.update(card.id, { deckable: true }, h.anna)).deckable).toBe(true)
+      const log = await h.db.auditLog.findMany({ where: { entityId: card.id, field: 'deckable' }, orderBy: { id: 'asc' } })
+      expect(log.map(entry => [entry.oldValue, entry.newValue])).toEqual([['true', 'false'], ['false', 'true']])
+    })
+
+    it('logs nothing for an unchanged value', async () => {
+      const card = await addDarkMagician()
+      const same = await h.services.cards.update(card.id, { deckable: true }, h.anna)
+      expect(same.userModifiedAt).toBeNull()
+      expect(await h.db.auditLog.count({ where: { entityId: card.id, field: 'deckable' } })).toBe(0)
+    })
+
+    it('can only be changed by the owner', async () => {
+      const card = await addDarkMagician()
+      await expect(h.services.cards.update(card.id, { deckable: false }, h.sven)).rejects.toMatchObject({ status: 403, code: 'not_card_owner' })
+      expect((await h.services.cards.get(card.id)).deckable).toBe(true)
+    })
+
+    it('can be switched on for a token of the card database, and stays when the card is updated', async () => {
+      h.ygo.cards.set(SHEEP_TOKEN.id, SHEEP_TOKEN)
+      const token = await h.services.cards.create({ game: 'ygo', externalId: String(SHEEP_TOKEN.id) }, h.anna)
+      await h.services.cards.update(token.id, { deckable: true }, h.anna)
+      expect((await h.services.cards.refresh(token.id, h.anna)).deckable).toBe(true)
+
+      const card = await addDarkMagician()
+      await h.services.cards.update(card.id, { deckable: false }, h.anna)
+      expect((await h.services.cards.refresh(card.id, h.anna)).deckable).toBe(false)
+    })
+
+    it('has no switch for another game: the change is refused', async () => {
+      const card = await h.services.cards.create({ game: 'pokemon', externalId: 'swsh3-136', set: { setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' } }, h.anna)
+      await expect(h.services.cards.update(card.id, { deckable: false }, h.anna)).rejects.toMatchObject({ status: 400, code: 'field_not_editable' })
+      expect((await h.services.cards.get(card.id)).deckable).toBe(true)
+    })
+
+    it('is for the deck for a Pokémon card (the flag has no meaning there)', async () => {
+      const card = await h.services.cards.create({ game: 'pokemon', externalId: 'swsh3-136', set: { setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' } }, h.anna)
+      expect(await deckable(card.id)).toBe(true)
     })
   })
 

@@ -130,6 +130,8 @@ export interface CardDetailDto {
   /** The only user who may change the card; null for cards that predate the logins (nobody may change them). */
   owner: UserRefDto | null
   purchaseDate: string | null
+  /** Whether the card may be used in a deck (Yu-Gi-Oh! only; other games ignore it). Decides if it is in the text for an AI. */
+  deckable: boolean
   sets: CardSetDto[]
   images: CardImageDto[]
   priceHistory: PricePointDto[]

@@ -79,8 +79,8 @@ Source: Code app/server/lib/csv.ts; tests app/tests/unit/csv.test.ts, export.tes
 - THEN `'=1+1` is in the cell
 
 ### Requirement: Columns in the order of the card page
-The system SHALL export all data of the card without images in the order of the card page (master data, Yu-Gi-Oh! attributes, Pokémon attributes, description, status, owner, timestamps, price); columns of the other game stay empty.
-Source: User instruction 2026-10-22 11:53 ("all attributes… order as in the detail"); code app/server/services/export.ts; test app/tests/integration/export.test.ts | Origin: user requirement
+The system SHALL export all data of the card without images in the order of the card page (master data, Yu-Gi-Oh! attributes, Pokémon attributes, description, deck use, status, owner, timestamps, price); columns of the other game stay empty.
+Source: User instruction 2026-10-22 11:53 ("all attributes… order as in the detail"), 2026-11-07 (deck use); code app/server/services/export.ts; test app/tests/integration/export.test.ts | Origin: user requirement
 
 #### Scenario: Yu-Gi-Oh! card
 - GIVEN a Yu-Gi-Oh! card
@@ -91,6 +91,11 @@ Source: User instruction 2026-10-22 11:53 ("all attributes… order as in the de
 - GIVEN a Pokémon card with attacks
 - WHEN exported
 - THEN all attacks are in one cell, separated by ` | `
+
+#### Scenario: Deck use
+- GIVEN a Yu-Gi-Oh! card that is not for the deck and a Pokémon card
+- WHEN exported
+- THEN the column "For deck" says "No" for the first card and is empty for the Pokémon card
 
 ### Requirement: Language of the texts
 The system SHALL output header, status values, editions, Pokémon values and card texts in the language of the interface (`de` or `en`) and use the English text for a card without a text in this language.

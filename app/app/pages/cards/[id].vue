@@ -89,6 +89,8 @@ interface FormState {
   level: string
   atk: string
   def: string
+  // Whether the card may be used in a deck (Yu-Gi-Oh! only, see `GameConfig.deckUse`).
+  deckable: boolean
 }
 
 const textOf = (value: unknown) => (value === null || value === undefined ? '' : String(value))
@@ -107,6 +109,7 @@ function toForm(source: CardDetailDto): FormState {
     level: textOf(source.attributes.level),
     atk: textOf(source.attributes.atk),
     def: textOf(source.attributes.def),
+    deckable: source.deckable,
     setCode: set?.setCode ?? '',
     edition: set?.edition ?? '',
     status: source.status,
@@ -135,6 +138,7 @@ const ISSUE_PATHS: Record<keyof FormState, string> = {
   level: 'attributes.level',
   atk: 'attributes.atk',
   def: 'attributes.def',
+  deckable: 'deckable',
   status: 'status',
   statusDate: 'statusDate',
   statusPerson: 'statusPerson',
@@ -260,6 +264,10 @@ function buildPatch(current: CardDetailDto): Record<string, unknown> {
         patch.set = { ...(patch.set as Record<string, string | null> | undefined), [key]: nullIfBlank(form[key]) }
       }
     }
+  }
+
+  if (gameConfig.value.deckUse && form.deckable !== original.deckable) {
+    patch.deckable = form.deckable
   }
 
   if (form.status !== original.status) {
@@ -785,6 +793,16 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
         <UFormField :label="t('card.fields.description')" :error="issues.errorOf('translation.description')">
           <UTextarea v-if="canEditData" v-model="form.description" autoresize :rows="3" :maxrows="6" maxlength="5000" class="w-full" data-test="card-description" />
           <UTextarea v-else :model-value="translation?.description ?? ''" readonly autoresize :rows="3" :maxrows="6" class="w-full" :ui="readonlyUi" />
+        </UFormField>
+
+        <UFormField v-if="gameConfig.deckUse" :error="issues.errorOf('deckable')">
+          <USwitch
+            v-model="form.deckable"
+            :disabled="!canEdit"
+            :label="t('card.fields.deckable')"
+            :description="t('card.fields.deckableHint')"
+            data-test="card-deckable"
+          />
         </UFormField>
 
         <section>
