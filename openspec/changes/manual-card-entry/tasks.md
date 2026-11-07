@@ -2,7 +2,7 @@
 
 ## 1. Values of the card database and the game setting
 
-- [ ] 1.1 Check the seven attributes against the data of the API in a session that can reach `db.ygoprodeck.com` (environment "cardkeeper"): fetch `cardinfo.php` once and list the distinct `attribute` values. Verify that the list in design.md (DARK, DIVINE, EARTH, FIRE, LIGHT, WATER, WIND) is confirmed or corrected before 1.2.
+- [x] 1.1 Check the seven attributes against the data of the API in a session that can reach `db.ygoprodeck.com` (environment "cardkeeper"): fetch `cardinfo.php` once and list the distinct `attribute` values. Verify that the list in design.md (DARK, DIVINE, EARTH, FIRE, LIGHT, WATER, WIND) is confirmed or corrected before 1.2.
 - [x] 1.2 Create `app/shared/utils/ygo-values.ts` with `YGO_CARD_TYPES` (29), `YGO_RACES` (33, without `Token`) and `YGO_ATTRIBUTES`, and a unit test `app/tests/unit/ygo-values.test.ts`. Verify that the test passes: 29 card types including `Token`, no race `Token`, "Creator God" and "Illusion" present, no duplicates.
 - [x] 1.3 Add `manualEntry: boolean` to `GameConfig` in `app/shared/utils/game-config.ts` (true for `ygo`, false for `pokemon` and the default). Verify with a unit test next to the existing game-config tests that only `ygo` allows manual entry.
 
@@ -21,7 +21,7 @@
 ## 4. API calls skip manual cards
 
 - [x] 4.1 Add integration tests in `app/tests/integration/price-refresh.test.ts`: a due manual card is not selected and no request is sent for it, the run records no failed card, and a mixed run updates only the API card. Verify that they pass (no production change is expected; fix `dueCards` if a test fails).
-- [ ] 4.2 Verify with a test that `refresh` of a manual card still answers 400 `no_external_id` and that the card page offers no "Update from API" for it (existing behaviour; extend the test in `cards.test.ts` only if it is not covered).
+- [x] 4.2 Verify with a test that `refresh` of a manual card still answers 400 `no_external_id` and that the card page offers no "Update from API" for it (existing behaviour; extend the test in `cards.test.ts` only if it is not covered).
 
 ## 5. Entry form (interface)
 
@@ -32,13 +32,13 @@
 
 ## 6. Card page of a manual card (interface)
 
-- [ ] 6.1 In `app/app/pages/cards/[id].vue` show inputs instead of read-only fields for name, description, set name, rarity, card type, type, attribute, level, ATK and DEF when the card has no external ID and the user may edit it; keep an already stored foreign value selectable; extend `toForm` and `buildPatch` to send only changed fields. Verify in the browser: correct a typo and save (toast, new name in the header and the overview); empty ATK and save (field stays empty); another user sees the fields read-only; a card from the database still shows read-only fields.
-- [ ] 6.2 Verify the whole flow once more in the browser with the unsaved-changes dialog (leaving the page with a changed manual field asks, as for the other fields) and with the language switch (a manual card has one language).
+- [x] 6.1 In `app/app/pages/cards/[id].vue` show inputs instead of read-only fields for name, description, set name, rarity, card type, type, attribute, level, ATK and DEF when the card has no external ID and the user may edit it; keep an already stored foreign value selectable; extend `toForm` and `buildPatch` to send only changed fields. Verify in the browser: correct a typo and save (toast, new name in the header and the overview); empty ATK and save (field stays empty); another user sees the fields read-only; a card from the database still shows read-only fields.
+- [x] 6.2 Verify the whole flow once more in the browser with the unsaved-changes dialog (leaving the page with a changed manual field asks, as for the other fields) and with the language switch (a manual card has one language).
 
 ## 7. Final checks
 
-- [ ] 7.1 Run `make lint`, `make typecheck` and `make test`. Verify that all pass.
-- [ ] 7.2 Run `openspec validate manual-card-entry --strict`. Verify that it passes.
+- [x] 7.1 Run `make lint`, `make typecheck` and `make test`. Verify that all pass.
+- [x] 7.2 Run `openspec validate manual-card-entry --strict`. Verify that it passes.
 
 ## Workflow follow-up
 

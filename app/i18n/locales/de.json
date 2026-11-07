@@ -171,7 +171,8 @@
       "unsavedTitle": "Änderungen speichern?",
       "unsavedText": "Diese Karte hat Änderungen, die noch nicht gespeichert sind. Soll vor dem Wechsel gespeichert werden?",
       "discard": "Verwerfen"
-    }
+    },
+    "basicsHintManual": "Manuell erfasst: der Besitzer kann alle Daten ändern. Set-Code und Edition gelten für alle Sprachen."
   },
   "add": {
     "title": "Karte hinzufügen",

@@ -171,7 +171,8 @@
       "unsavedTitle": "Save changes?",
       "unsavedText": "This card has changes that are not saved yet. Save them before switching?",
       "discard": "Discard"
-    }
+    },
+    "basicsHintManual": "Entered by hand: its owner can change all its data. Set code and edition apply to all languages."
   },
   "add": {
     "title": "Add card",
