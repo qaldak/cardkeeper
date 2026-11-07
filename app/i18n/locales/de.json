@@ -113,8 +113,8 @@
       "cardId": "Karten-ID",
       "owner": "Besitzer",
       "ownerHint": "Karte an einen anderen Benutzer übergeben: danach kann nur noch dieser sie ändern.",
-      "deckable": "Für Deck",
-      "deckableHint": "Karten, die nicht für das Deck sind, fehlen im Text für die KI. Tokens und Skill-Karten können nicht im Deck sein."
+      "deckable": "Für Deck verwenden",
+      "deckableHint": "Tokens und Skill-Karten können nicht im Deck sein."
     },
     "attributes": {
       "atk": "ATK",
@@ -564,7 +564,7 @@
     "submit": "Karte speichern",
     "cancel": "Zurück zur Suche",
     "purchaseDate": "Kaufdatum",
-    "deckable": "Für Deck",
-    "deckableHint": "Tokens und Skill-Karten können nicht im Deck sein. Einschalten für eine echte Karte, die die Kartendatenbank nicht kennt."
+    "deckable": "Für Deck verwenden",
+    "deckableHint": "Tokens und Skill-Karten können nicht im Deck sein."
   }
 }

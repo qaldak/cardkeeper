@@ -113,8 +113,8 @@
       "cardId": "Card ID",
       "owner": "Owner",
       "ownerHint": "Handing the card over to another user: afterwards only that user can change it.",
-      "deckable": "For deck",
-      "deckableHint": "Cards that are not for the deck are left out of the text for an AI. Tokens and skill cards cannot be in a deck."
+      "deckable": "Use for deck",
+      "deckableHint": "Tokens and skill cards cannot be in a deck."
     },
     "attributes": {
       "atk": "ATK",
@@ -564,7 +564,7 @@
     "submit": "Save card",
     "cancel": "Back to the search",
     "purchaseDate": "Purchase date",
-    "deckable": "For deck",
-    "deckableHint": "Tokens and skill cards cannot be in a deck. Switch it on for a real card that the card database lacks."
+    "deckable": "Use for deck",
+    "deckableHint": "Tokens and skill cards cannot be in a deck."
   }
 }

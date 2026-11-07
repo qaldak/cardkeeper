@@ -22,7 +22,7 @@ Source: User instruction 2026-11-07 (answers 1 to 4); YGOPRODeck API checked 202
 - THEN it is not for the deck
 
 ### Requirement: Manual card: switch for the deck
-The system SHALL offer in the form for a manually entered Yu-Gi-Oh! card, below the description, the switch "For deck", off by default, with a hint that tokens and skill cards cannot be in a deck.
+The system SHALL offer in the form for a manually entered Yu-Gi-Oh! card, below the description, the switch "Use for deck", off by default, with the hint that tokens and skill cards cannot be in a deck.
 Source: User instruction 2026-11-07 (answer 4: switch below the description; manual cards excluded by default); code app/app/components/ManualCardForm.vue | Origin: user requirement
 
 #### Scenario: Default
@@ -32,5 +32,5 @@ Source: User instruction 2026-11-07 (answer 4: switch below the description; man
 
 #### Scenario: Switched on
 - GIVEN a real card that the card database lacks
-- WHEN the user switches "For deck" on and saves
+- WHEN the user switches "Use for deck" on and saves
 - THEN the card is for the deck

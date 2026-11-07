@@ -25,7 +25,7 @@
 
 ## 6. Card page and entry form (interface)
 
-- [x] 6.1 Add the switch "For deck" below the description in `app/app/pages/cards/[id].vue` (Yu-Gi-Oh! only via `deckUse`, disabled for a user who may not change the card), `deckable` in `toForm` and `buildPatch`, and the texts. Verify in the browser: switching off and saving shows the new state after a reload; another user sees it disabled; a Pokémon card has no switch (check with a test card inserted by SQL).
+- [x] 6.1 Add the switch "Use for deck" below the description in `app/app/pages/cards/[id].vue` (Yu-Gi-Oh! only via `deckUse`, disabled for a user who may not change the card), `deckable` in `toForm` and `buildPatch`, and the texts. Verify in the browser: switching off and saving shows the new state after a reload; another user sees it disabled; a Pokémon card has no switch (check with a test card inserted by SQL).
 - [x] 6.2 Add the same switch below the description in `ManualCardForm.vue`, off by default, with the hint that tokens and skill cards cannot be in a deck, and send `deckable`. Verify in the browser: a token entered by hand stays not for the deck; with the switch on, the card page shows it on.
 
 ## 7. CSV export

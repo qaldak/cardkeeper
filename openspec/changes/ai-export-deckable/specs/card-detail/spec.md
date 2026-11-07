@@ -29,7 +29,7 @@ Source: User instruction 2026-10-04 19:40 (6), 2026-11-07 (deck use stays); READ
 ## ADDED Requirements
 
 ### Requirement: Deck use of a Yu-Gi-Oh! card
-The system SHALL show on the card page of a Yu-Gi-Oh! card below the description a switch "For deck" that the owner can change, write every change with old and new value into the change log, and reject the change for a card of another game with 400 `field_not_editable`.
+The system SHALL show on the card page of a Yu-Gi-Oh! card below the description a switch "Use for deck" that the owner can change, write every change with old and new value into the change log, and reject the change for a card of another game with 400 `field_not_editable`.
 Source: User instruction 2026-11-07 (answers 4 and 8: switch below the description; Yu-Gi-Oh! only); code app/app/pages/cards/[id].vue | Origin: user requirement
 
 #### Scenario: Switching
