@@ -112,7 +112,9 @@
       "variant": "Variante",
       "cardId": "Karten-ID",
       "owner": "Besitzer",
-      "ownerHint": "Karte an einen anderen Benutzer übergeben: danach kann nur noch dieser sie ändern."
+      "ownerHint": "Karte an einen anderen Benutzer übergeben: danach kann nur noch dieser sie ändern.",
+      "deckable": "Für Deck",
+      "deckableHint": "Karten, die nicht für das Deck sind, fehlen im Text für die KI. Tokens und Skill-Karten können nicht im Deck sein."
     },
     "attributes": {
       "atk": "ATK",
@@ -500,6 +502,7 @@
       "weaknesses": "Schwäche",
       "resistances": "Resistenz",
       "description": "Beschreibung",
+      "deckable": "Für Deck",
       "status": "Status",
       "statusDate": "Status-Datum",
       "statusPerson": "Status-Person",
@@ -520,6 +523,7 @@
     "ai": {
       "title": "Für KI kopieren",
       "onlyActive": "Nur aktive Karten",
+      "deckOnly": "Nur Karten für das Deck",
       "withText": "Kartentext mitnehmen",
       "intro": "Einleitung für die KI voranstellen",
       "wish": "Dein Wunsch für das Deck (optional)",
@@ -529,7 +533,8 @@
       "copy": "Kopieren",
       "copied": "In die Zwischenablage kopiert",
       "copyFailed": "Kopieren fehlgeschlagen, lade den Text stattdessen herunter",
-      "loadFailed": "Der Text konnte nicht erstellt werden, bitte erneut versuchen."
+      "loadFailed": "Der Text konnte nicht erstellt werden, bitte erneut versuchen.",
+      "excluded": "keine Karte ausgelassen | {n} Karte ausgelassen, weil sie nicht für das Deck ist | {n} Karten ausgelassen, weil sie nicht für das Deck sind"
     }
   },
   "manual": {
@@ -558,6 +563,8 @@
     "numberHint": "Leer lassen, wenn die Karte keinen Wert hat.",
     "submit": "Karte speichern",
     "cancel": "Zurück zur Suche",
-    "purchaseDate": "Kaufdatum"
+    "purchaseDate": "Kaufdatum",
+    "deckable": "Für Deck",
+    "deckableHint": "Tokens und Skill-Karten können nicht im Deck sein. Einschalten für eine echte Karte, die die Kartendatenbank nicht kennt."
   }
 }

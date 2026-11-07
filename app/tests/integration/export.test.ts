@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BLUE_EYES, DARK_MAGICIAN, ENGLISH_ONLY } from '../helpers/ygo-fake'
+import { BLUE_EYES, DARK_MAGICIAN, ENGLISH_ONLY, SHEEP_TOKEN } from '../helpers/ygo-fake'
 import { TEST_DATABASE_URL, useHarness } from './helpers'
 
 /** Reads a CSV document of the export: the byte order mark and the quotes are handled, a cell can hold line breaks. */
@@ -172,6 +172,22 @@ describe.skipIf(!TEST_DATABASE_URL)('table export', () => {
     expect(table.cell(table.rows[0]!, 'Beschreibung')).toBe('\'=1+1; "quoted"\nsecond line')
   })
 
+  it('writes whether a card is for the deck right after the description, and nothing for another game', async () => {
+    const { magician } = await seed()
+    await h.services.cards.update(magician.id, { deckable: false }, h.anna)
+    await h.services.cards.create({ game: 'pokemon', externalId: 'swsh3-136', set: { setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' } }, h.anna)
+
+    const de = await asTable({}, 'de')
+    expect(de.header.indexOf('Für Deck')).toBe(de.header.indexOf('Beschreibung') + 1)
+    const byName = (table: typeof de, column: string) => Object.fromEntries(table.rows.map(row => [table.cell(row, 'Name'), table.cell(row, column)]))
+    expect(byName(de, 'Für Deck')).toEqual({ 'Dunkler Magier': 'Nein', 'Blauäugiger weißer Drache': 'Ja', 'Obscure Spell': 'Ja', 'Wiesenior': '' })
+
+    const en = await asTable({}, 'en')
+    expect(en.header).toContain('For deck')
+    expect(byName(en, 'For deck')['Dark Magician']).toBe('No')
+    expect(byName(en, 'For deck')['Blue-Eyes White Dragon']).toBe('Yes')
+  })
+
   it('names the file after the day', async () => {
     const { fileName } = await h.services.export.cardsCsv({}, sorted, 'de')
     expect(fileName).toBe('cardkeeper-export-2026-10-04.csv')
@@ -181,7 +197,7 @@ describe.skipIf(!TEST_DATABASE_URL)('table export', () => {
 describe.skipIf(!TEST_DATABASE_URL)('text export for an AI', () => {
   const h = useHarness()
   const sorted = { sort: 'name' as const, dir: 'asc' as const }
-  const all = { onlyActive: false, withText: true, intro: false }
+  const all = { onlyActive: false, deckOnly: false, withText: true, intro: false }
 
   async function seed() {
     const magician = await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' } }, h.anna)
@@ -238,6 +254,77 @@ describe.skipIf(!TEST_DATABASE_URL)('text export for an AI', () => {
     expect(result.text).toContain('Legal: Expanded')
     expect(result.text).toContain('   Attack [Colorless×3] Tail Smash 120')
     expect(result.text).toContain('# Yu-Gi-Oh! – 2 distinct cards (4 total)')
+  })
+
+  describe('only cards for the deck', () => {
+    const forDeck = { ...all, deckOnly: true }
+    const manual = (name: string, deckable?: boolean) => h.services.cards.createManual({
+      game: 'ygo',
+      translation: { language: 'en', name },
+      set: { setCode: 'SDAZ-EN047' },
+      attributes: { type: 'Token' },
+      ...(deckable === undefined ? {} : { deckable }),
+    }, h.anna)
+
+    it('leaves out a card entered by hand and says how many it left out, and writes it without the option', async () => {
+      await seed()
+      await manual('Albaz Token')
+      const left = await h.services.export.cardsAiText({}, sorted, forDeck)
+      expect(left.text).not.toContain('Albaz Token')
+      expect(left.total).toBe(4)
+      expect(left.excluded).toBe(1)
+      const everything = await h.services.export.cardsAiText({}, sorted, all)
+      expect(everything.text).toContain('1x Albaz Token')
+      expect(everything.total).toBe(5)
+      expect(everything.excluded).toBe(0)
+    })
+
+    it('takes in a card entered by hand that its owner marked for the deck', async () => {
+      await manual('Neue Karte', true)
+      const result = await h.services.export.cardsAiText({}, sorted, forDeck)
+      expect(result.text).toContain('1x Neue Karte')
+      expect(result.excluded).toBe(0)
+    })
+
+    it('leaves out a token of the card database', async () => {
+      h.ygo.cards.set(SHEEP_TOKEN.id, SHEEP_TOKEN)
+      await h.services.cards.create({ game: 'ygo', externalId: String(SHEEP_TOKEN.id) }, h.anna)
+      await h.services.cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id) }, h.anna)
+      const result = await h.services.export.cardsAiText({}, sorted, forDeck)
+      expect(result.text).not.toContain('Sheep Token')
+      expect(result.text).toContain('1x Dark Magician')
+      expect(result.excluded).toBe(1)
+    })
+
+    it('counts the quantity of the cards that remain', async () => {
+      const { magician } = await seed()
+      await h.services.cards.update(magician.id, { deckable: false }, h.anna)
+      const result = await h.services.export.cardsAiText({}, sorted, forDeck)
+      expect(result.text).toContain('2x Dark Magician')
+      expect(result.excluded).toBe(1)
+    })
+
+    it('never leaves out a Pokémon card', async () => {
+      await h.services.cards.create({ game: 'pokemon', externalId: 'swsh3-136', set: { setCode: 'swsh3-136', rarity: 'Uncommon', edition: 'reverse' } }, h.anna)
+      // The flag of a Pokémon card has no meaning, whatever the row says.
+      await h.db.card.updateMany({ where: { game: { slug: 'pokemon' } }, data: { deckable: false } })
+      const result = await h.services.export.cardsAiText({}, sorted, forDeck)
+      expect(result.text).toContain('1x Furret')
+      expect(result.excluded).toBe(0)
+    })
+
+    it('does not count a card that the option "only active cards" already removed', async () => {
+      const sold = await manual('Verkauft')
+      await h.services.cards.update(sold.id, { status: 'SOLD', statusPerson: 'Max' }, h.anna)
+      expect((await h.services.export.cardsAiText({}, sorted, { ...forDeck, onlyActive: true })).excluded).toBe(0)
+      expect((await h.services.export.cardsAiText({}, sorted, forDeck)).excluded).toBe(1)
+    })
+
+    it('is empty when every card is left out', async () => {
+      await manual('Albaz Token')
+      const result = await h.services.export.cardsAiText({}, sorted, forDeck)
+      expect(result).toMatchObject({ text: '', total: 0, distinct: 0, excluded: 1 })
+    })
   })
 
   it('names the file after the day', async () => {

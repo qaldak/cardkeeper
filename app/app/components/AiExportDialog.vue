@@ -6,6 +6,8 @@ interface AiResult {
   fileName: string
   total: number
   distinct: number
+  /** Cards that only the option "only cards for the deck" left out. */
+  excluded: number
 }
 
 const props = defineProps<{
@@ -19,6 +21,7 @@ const { t } = useI18n()
 const toast = useToast()
 
 const onlyActive = ref(true)
+const deckOnly = ref(true)
 const withText = ref(true)
 const intro = ref(true)
 const wish = ref('')
@@ -38,6 +41,7 @@ async function load() {
   failed.value = false
   const params = new URLSearchParams(props.query)
   params.set('onlyActive', String(onlyActive.value))
+  params.set('deckOnly', String(deckOnly.value))
   params.set('withText', String(withText.value))
   params.set('intro', String(intro.value))
   if (intro.value && wish.value.trim()) {
@@ -63,7 +67,7 @@ async function load() {
 }
 
 let timer: ReturnType<typeof setTimeout> | undefined
-watch([open, onlyActive, withText, intro, wish], () => {
+watch([open, onlyActive, deckOnly, withText, intro, wish], () => {
   clearTimeout(timer)
   if (open.value) {
     // The wish is typed; the other options wait a moment as well, which does no harm.
@@ -72,6 +76,8 @@ watch([open, onlyActive, withText, intro, wish], () => {
 }, { immediate: true })
 onBeforeUnmount(() => clearTimeout(timer))
 
+// The preview takes much room, so it is closed until the user wants to see it; the size stays visible.
+const previewOpen = ref(false)
 const PREVIEW_CHARS = 1500
 const preview = computed(() => {
   const text = result.value?.text ?? ''
@@ -155,6 +161,7 @@ function download() {
 
         <div class="flex flex-col gap-2">
           <UCheckbox v-model="onlyActive" :label="t('export.ai.onlyActive')" data-test="ai-only-active" />
+          <UCheckbox v-model="deckOnly" :label="t('export.ai.deckOnly')" data-test="ai-deck-only" />
           <UCheckbox v-model="withText" :label="t('export.ai.withText')" data-test="ai-with-text" />
           <UCheckbox v-model="intro" :label="t('export.ai.intro')" data-test="ai-intro" />
         </div>
@@ -163,15 +170,31 @@ function download() {
           <UTextarea v-model="wish" :rows="2" :maxlength="WISH_MAX" :placeholder="t('export.ai.wishPlaceholder')" class="w-full" data-test="ai-wish" />
         </UFormField>
 
+        <p v-if="result && result.excluded > 0" class="text-xs text-muted" data-test="ai-excluded">
+          {{ t('export.ai.excluded', { n: result.excluded }, result.excluded) }}
+        </p>
+
         <UAlert v-if="failed" color="error" variant="subtle" :title="t('export.ai.loadFailed')" data-test="ai-failed" />
         <UAlert v-else-if="empty" color="warning" variant="subtle" :title="t('export.empty')" data-test="ai-empty" />
-        <div v-else>
-          <p class="mb-1 flex justify-between text-xs font-semibold uppercase tracking-wide text-muted">
-            <span>{{ t('export.ai.preview') }}</span>
-            <span v-if="result" class="font-normal normal-case" data-test="ai-size">{{ t('export.ai.size', { characters, tokens }) }}</span>
-          </p>
-          <pre class="max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-default bg-elevated p-3 text-xs" data-test="ai-preview">{{ loading && !result ? t('common.loading') : preview }}</pre>
-        </div>
+        <UCollapsible v-else v-model:open="previewOpen" data-test="ai-preview-box">
+          <template #default="{ open: shown }">
+            <button
+              type="button"
+              class="flex w-full items-center justify-between gap-2 rounded-md py-1 text-left text-xs font-semibold uppercase tracking-wide text-muted hover:text-default"
+              :aria-expanded="shown"
+              data-test="ai-preview-toggle"
+            >
+              <span class="flex items-center gap-1">
+                <UIcon :name="shown ? 'i-lucide-chevron-down' : 'i-lucide-chevron-right'" class="size-4" />
+                {{ t('export.ai.preview') }}
+              </span>
+              <span v-if="result" class="font-normal normal-case" data-test="ai-size">{{ t('export.ai.size', { characters, tokens }) }}</span>
+            </button>
+          </template>
+          <template #content>
+            <pre class="mt-1 max-h-64 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-default bg-elevated p-3 text-xs" data-test="ai-preview">{{ loading && !result ? t('common.loading') : preview }}</pre>
+          </template>
+        </UCollapsible>
       </div>
     </template>
     <template #footer>

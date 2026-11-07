@@ -20,7 +20,8 @@ Everything runs in containers: there is nothing to install on the host except Do
   status (active, sold, traded, gifted, lost) with date and counterpart, owner, and price history
 - Login with ownership: everybody sees all cards, only the owner changes a card and can hand it over
 - Prices per marketplace in its currency, an optional display currency (e.g. CHF), and a scheduled reload in small tranches
-- CSV export of the current selection for Excel, and a compact text of it for an AI prompt (for example to build a deck)
+- CSV export of the current selection for Excel, and a compact text of it for an AI prompt (for example to build a deck;
+  tokens, skill cards and cards entered by hand are left out unless marked "for deck")
 - Light and dark appearance, interface in German and English
 - Card images are downloaded once and stored on a volume, never hotlinked
 - Semantic releases, multi-arch (amd64 + arm64) Docker images, automated dependency updates

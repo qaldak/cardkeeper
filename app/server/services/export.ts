@@ -1,6 +1,7 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client'
 import type { PokemonAttributes, PokemonDetails } from '../../shared/types/pokemon'
 import { editionLabel } from '../../shared/utils/editions'
+import { getGameConfig } from '../../shared/utils/game-config'
 import { sortByLanguagePreference } from '../../shared/utils/languages'
 import type { CardSort, SortDirection } from '../../shared/utils/sorting'
 import type { CardFilters } from '../lib/card-filters'
@@ -58,7 +59,7 @@ export const COLUMN_KEYS = [
   // Pokémon
   'pokemonCategory', 'hp', 'pokemonTypes', 'stage', 'trainerType', 'energyType', 'retreat', 'evolveFrom', 'number', 'illustrator',
   'regulationMark', 'dexId', 'pokemonLevel', 'suffix', 'legalStandard', 'legalExpanded', 'effect', 'abilities', 'attacks', 'weaknesses', 'resistances',
-  'description',
+  'description', 'deckable',
   'status', 'statusDate', 'statusPerson', 'owner', 'purchaseDate',
   'lastModifiedAt', 'lastModifiedBy', 'lastFetchedAt', 'pricesCheckedAt',
   'priceSource', 'price', 'currency', 'priceIn', 'priceDate',
@@ -145,6 +146,8 @@ function rowOf(card: ExportCard, locale: ExportLocale, i18n: Translator, convert
     resistances: typeValues(details.resistances),
 
     description: translation?.description ?? '',
+    // Only a game with deck use has the flag (Yu-Gi-Oh!); for the others the column stays empty.
+    deckable: getGameConfig(card.game.slug).deckUse ? yesNo(card.deckable) : '',
 
     status: t(`status.${card.status}`),
     statusDate: hasStatusInfo ? formatDateOnly(latestStatus.date) : '',
@@ -209,13 +212,14 @@ export function createExportService({ db, config, rates, orderedIds, now = () =>
 
     /**
      * The text of a selection for an AI prompt: the cards of the selection in the order of the overview (the active ones
-     * only, if asked), merged to one line per distinct card with the quantity; see `buildAiText`.
+     * only, if asked, and without the cards that are not for the deck, if asked), merged to one line per distinct card with
+     * the quantity; see `buildAiText`. `excluded` is the number of cards that only the deck option left out.
      */
     async cardsAiText(
       filters: CardFilters,
       order: { sort: CardSort, dir?: SortDirection },
-      options: { onlyActive: boolean, withText: boolean, intro: boolean, wish?: string },
-    ): Promise<{ text: string, fileName: string, total: number, distinct: number }> {
+      options: { onlyActive: boolean, deckOnly: boolean, withText: boolean, intro: boolean, wish?: string },
+    ): Promise<{ text: string, fileName: string, total: number, distinct: number, excluded: number }> {
       const ids = await orderedIds(filters, order)
       const loaded = new Map<number, Prisma.CardGetPayload<{ include: typeof aiInclude }>>()
       for (let start = 0; start < ids.length; start += CHUNK) {
@@ -225,9 +229,16 @@ export function createExportService({ db, config, rates, orderedIds, now = () =>
         }
       }
 
+      let excluded = 0
       const cards = ids.flatMap((id): AiCard[] => {
         const card = loaded.get(id)
         if (!card || (options.onlyActive && card.status !== 'ACTIVE')) {
+          return []
+        }
+        // Only a game with deck use has the flag; the other games are always in the text. Left out before the cards are
+        // merged, so that the quantities count the cards that remain.
+        if (options.deckOnly && !card.deckable && getGameConfig(card.game.slug).deckUse) {
+          excluded += 1
           return []
         }
         // English, else whatever the card has; the German name is added next to it where it differs.
@@ -248,7 +259,7 @@ export function createExportService({ db, config, rates, orderedIds, now = () =>
 
       const { text, total, distinct } = buildAiText(cards, options)
       const day = now().toISOString().slice(0, 10)
-      return { text, fileName: `cardkeeper-ai-${day}.txt`, total, distinct }
+      return { text, fileName: `cardkeeper-ai-${day}.txt`, total, distinct, excluded }
     },
   }
 }

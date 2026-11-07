@@ -17,25 +17,25 @@
 
 ## 4. Text for the AI (server)
 
-- [ ] 4.1 Add `deckOnly` (default true) to `aiExportQuerySchema` and `GET /api/export/ai`, and handle it in `cardsAiText`: skip Yu-Gi-Oh! cards that are not for the deck before merging, never skip other games, and return `excluded` (the cards that only this option removed, after the status option). Verify with integration tests in `export.test.ts`: a token is missing with the option and present without; the quantity of three copies with one not for the deck is "2x"; a Pokémon card stays; `excluded` is 1 and does not count a sold card that the status option already removed; an unknown value of `deckOnly` is rejected with 400.
+- [x] 4.1 Add `deckOnly` (default true) to `aiExportQuerySchema` and `GET /api/export/ai`, and handle it in `cardsAiText`: skip Yu-Gi-Oh! cards that are not for the deck before merging, never skip other games, and return `excluded` (the cards that only this option removed, after the status option). Verify with integration tests in `export.test.ts`: a token is missing with the option and present without; the quantity of three copies with one not for the deck is "2x"; a Pokémon card stays; `excluded` is 1 and does not count a sold card that the status option already removed; an unknown value of `deckOnly` is rejected with 400.
 
 ## 5. Dialog (interface)
 
-- [ ] 5.1 In `AiExportDialog.vue` add the option "Only cards for the deck" (checked by default, sent as `deckOnly`) and the notice "N cards left out because they are not for the deck" when `excluded` is above 0, and make the preview a `UCollapsible` that is closed by default with the heading, the size estimate and a chevron in its trigger row. Add the texts to `de.json` and `en.json`. Verify in the browser (`make dev` or the dev server) in light and dark mode: the four options checked, the notice for a selection with a manual card, the preview closed and opening on a click, "Copy" working with the preview closed, the empty state when every card is left out.
+- [x] 5.1 In `AiExportDialog.vue` add the option "Only cards for the deck" (checked by default, sent as `deckOnly`) and the notice "N cards left out because they are not for the deck" when `excluded` is above 0, and make the preview a `UCollapsible` that is closed by default with the heading, the size estimate and a chevron in its trigger row. Add the texts to `de.json` and `en.json`. Verify in the browser (`make dev` or the dev server) in light and dark mode: the four options checked, the notice for a selection with a manual card, the preview closed and opening on a click, "Copy" working with the preview closed, the empty state when every card is left out.
 
 ## 6. Card page and entry form (interface)
 
-- [ ] 6.1 Add the switch "For deck" below the description in `app/app/pages/cards/[id].vue` (Yu-Gi-Oh! only via `deckUse`, disabled for a user who may not change the card), `deckable` in `toForm` and `buildPatch`, and the texts. Verify in the browser: switching off and saving shows the new state after a reload; another user sees it disabled; a Pokémon card has no switch (check with a test card inserted by SQL).
-- [ ] 6.2 Add the same switch below the description in `ManualCardForm.vue`, off by default, with the hint that tokens and skill cards cannot be in a deck, and send `deckable`. Verify in the browser: a token entered by hand stays not for the deck; with the switch on, the card page shows it on.
+- [x] 6.1 Add the switch "For deck" below the description in `app/app/pages/cards/[id].vue` (Yu-Gi-Oh! only via `deckUse`, disabled for a user who may not change the card), `deckable` in `toForm` and `buildPatch`, and the texts. Verify in the browser: switching off and saving shows the new state after a reload; another user sees it disabled; a Pokémon card has no switch (check with a test card inserted by SQL).
+- [x] 6.2 Add the same switch below the description in `ManualCardForm.vue`, off by default, with the hint that tokens and skill cards cannot be in a deck, and send `deckable`. Verify in the browser: a token entered by hand stays not for the deck; with the switch on, the card page shows it on.
 
 ## 7. CSV export
 
-- [ ] 7.1 Add the column `deckable` after `description` to `COLUMN_KEYS` and the rows of `app/server/services/export.ts` (yes and no, empty for a game without deck use) and its header in both locale files. Verify with the tests in `export.test.ts` (a Yu-Gi-Oh! card not for the deck says "no", a Pokémon card is empty, the English and German headers) and `locales.test.ts`.
+- [x] 7.1 Add the column `deckable` after `description` to `COLUMN_KEYS` and the rows of `app/server/services/export.ts` (yes and no, empty for a game without deck use) and its header in both locale files. Verify with the tests in `export.test.ts` (a Yu-Gi-Oh! card not for the deck says "no", a Pokémon card is empty, the English and German headers) and `locales.test.ts`.
 
 ## 8. Documentation and final checks
 
-- [ ] 8.1 Write ADR 0026 `docs/adr/0026-deck-use-flag.md` (column instead of JSON attribute, the card type rule, the migration rule), add a note to ADR 0005, mention the flag in the README feature list and in `openspec/config.yaml` (principles), and update the count of ADRs there. Verify by reading the files.
-- [ ] 8.2 Run `make lint`, `make typecheck` and `make test`, then `openspec validate ai-export-deckable --strict`. Verify that all pass.
+- [x] 8.1 Write ADR 0026 `docs/adr/0026-deck-use-flag.md` (column instead of JSON attribute, the card type rule, the migration rule), add a note to ADR 0005, mention the flag in the README feature list and in `openspec/config.yaml` (principles), and update the count of ADRs there. Verify by reading the files.
+- [x] 8.2 Run `make lint`, `make typecheck` and `make test`, then `openspec validate ai-export-deckable --strict`. Verify that all pass.
 
 ## Workflow follow-up
 

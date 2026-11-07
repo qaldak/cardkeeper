@@ -38,6 +38,8 @@ const flag = (fallback: boolean) => z.enum(['true', 'false']).optional().transfo
 
 export const aiExportQuerySchema = listQuerySchema.extend({
   onlyActive: flag(true),
+  // Leave out the Yu-Gi-Oh! cards that are not marked for the deck (tokens, skill cards, cards entered by hand).
+  deckOnly: flag(true),
   withText: flag(true),
   intro: flag(true),
   wish: z.string().trim().max(500).optional(),

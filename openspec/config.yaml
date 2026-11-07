@@ -11,7 +11,7 @@ context: |
 
   Principles (README, docs/adr/):
   - A new game needs no schema change: game-specific values are stored as JSONB (ADR 0004, 0005).
-  - Names, texts and attributes of cards from a card database are read-only; only set code and edition or variant are editable (README §Data model). A card entered by hand (no external ID) can be changed in all fields except the external ID (ADR 0025).
+  - Names, texts and attributes of cards from a card database are read-only; only set code and edition or variant are editable (README §Data model). A card entered by hand (no external ID) can be changed in all fields except the external ID (ADR 0025). Data of the user that must survive the refresh (status, owner, the flag for the deck use) is stored in columns, not in the attributes (ADR 0026).
   - Only the owner changes a card; all signed-in users see all cards (ADR 0008).
   - Prices stay in the currency of their marketplace; conversion happens only on display (ADR 0012).
   - Configuration through environment variables in `.env`, not through the interface (user instruction 2026-10-10, see spec `operations`).
@@ -27,7 +27,7 @@ context: |
   Documentation of the decisions and their origin:
   - Overview (C4: context, containers, building blocks, flows): docs/ARCHITECTURE.md
   - Working rules for Claude Code (keep spec and code in step): CLAUDE.md
-  - Architecture decisions: docs/adr/ (ADR 0001–0025)
+  - Architecture decisions: docs/adr/ (ADR 0001–0026)
   - Requirements: openspec/specs/<domain>/spec.md; every requirement names source and origin
 
 rules:

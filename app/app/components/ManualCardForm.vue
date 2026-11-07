@@ -29,6 +29,8 @@ const level = ref('')
 const atk = ref('')
 const def = ref('')
 const description = ref('')
+// A card entered by hand is not for the deck unless the user says so: nothing tells that it can be played.
+const deckable = ref(false)
 const purchaseDate = ref('')
 const submitting = ref(false)
 
@@ -99,6 +101,7 @@ async function submit() {
           atk: numberOrNull(atk.value),
           def: numberOrNull(def.value),
         },
+        deckable: deckable.value,
         purchaseDate: purchaseDate.value || null,
       },
     })
@@ -217,6 +220,13 @@ async function submit() {
     <UFormField :label="t('manual.description')" :error="issues.errorOf('translation.description')">
       <UTextarea v-model="description" autoresize :rows="3" :maxrows="8" maxlength="5000" class="w-full" data-test="manual-description" />
     </UFormField>
+
+    <USwitch
+      v-model="deckable"
+      :label="t('manual.deckable')"
+      :description="t('manual.deckableHint')"
+      data-test="manual-deckable"
+    />
 
     <p class="text-sm text-muted" data-test="owner-note">
       {{ t('add.ownerNote', { name: me?.name ?? '' }) }}
