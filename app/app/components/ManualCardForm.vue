@@ -32,6 +32,27 @@ const description = ref('')
 const purchaseDate = ref('')
 const submitting = ref(false)
 
+// A save that the server rejects marks the fields that are wrong (see `useFormIssues`); a field is unmarked when changed.
+const issues = useFormIssues()
+const issueSources: Record<string, Ref<string | null>> = {
+  'translation.name': name,
+  'translation.description': description,
+  'set.setCode': setCode,
+  'set.setName': setName,
+  'set.rarity': rarity,
+  'set.edition': edition,
+  'attributes.type': cardType,
+  'attributes.race': race,
+  'attributes.attribute': attribute,
+  'attributes.level': level,
+  'attributes.atk': atk,
+  'attributes.def': def,
+  'purchaseDate': purchaseDate,
+}
+for (const [path, source] of Object.entries(issueSources)) {
+  watch(source, () => issues.clear(path))
+}
+
 // What was searched for is what the user is most likely to enter: a set code fills the set code, any other text the name.
 const searched = props.prefill.trim()
 if (isSetCode(searched)) {
@@ -85,6 +106,7 @@ async function submit() {
     await navigateTo(`/cards/${card.id}`)
   }
   catch (error) {
+    issues.fromError(error, path => issueSources[path]?.value ?? '')
     toast.add({ title: apiError(error), color: 'error' })
   }
   finally {
@@ -105,7 +127,7 @@ async function submit() {
     </div>
 
     <div class="flex flex-wrap items-start gap-3">
-      <UFormField :label="t('manual.name')" required class="min-w-56 flex-1">
+      <UFormField :label="t('manual.name')" required class="min-w-56 flex-1" :error="issues.errorOf('translation.name')">
         <UInput v-model="name" required maxlength="200" class="w-full" data-test="manual-name" />
       </UFormField>
       <UFormField :label="t('manual.language')" class="w-40">
@@ -113,7 +135,7 @@ async function submit() {
       </UFormField>
     </div>
 
-    <UFormField :label="t('manual.setCode')" required>
+    <UFormField :label="t('manual.setCode')" required :error="issues.errorOf('set.setCode')">
       <UInput
         :model-value="setCode"
         required
@@ -129,20 +151,20 @@ async function submit() {
     </UFormField>
 
     <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-      <UFormField :label="t('manual.setName')">
+      <UFormField :label="t('manual.setName')" :error="issues.errorOf('set.setName')">
         <UInput v-model="setName" maxlength="200" class="w-full" data-test="manual-set-name" />
       </UFormField>
-      <UFormField :label="t('manual.rarity')">
+      <UFormField :label="t('manual.rarity')" :error="issues.errorOf('set.rarity')">
         <UInput v-model="rarity" maxlength="80" class="w-full" data-test="manual-rarity" />
       </UFormField>
     </div>
 
-    <UFormField :label="t('add.edition.label')" :description="t('add.edition.hint')">
+    <UFormField :label="t('add.edition.label')" :description="t('add.edition.hint')" :error="issues.errorOf('set.edition')">
       <EditionChips v-model="edition" :choices="YGO_EDITIONS" />
     </UFormField>
 
     <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-3">
-      <UFormField :label="t('manual.cardType')">
+      <UFormField :label="t('manual.cardType')" :error="issues.errorOf('attributes.type')">
         <USelectMenu
           :model-value="cardType ?? undefined"
           :items="cardTypeItems"
@@ -153,7 +175,7 @@ async function submit() {
           @update:model-value="(value?: string | null) => (cardType = value ?? null)"
         />
       </UFormField>
-      <UFormField :label="t('manual.race')">
+      <UFormField :label="t('manual.race')" :error="issues.errorOf('attributes.race')">
         <USelectMenu
           :model-value="race ?? undefined"
           :items="raceItems"
@@ -164,7 +186,7 @@ async function submit() {
           @update:model-value="(value?: string | null) => (race = value ?? null)"
         />
       </UFormField>
-      <UFormField :label="t('manual.attribute')">
+      <UFormField :label="t('manual.attribute')" :error="issues.errorOf('attributes.attribute')">
         <USelectMenu
           :model-value="attribute ?? undefined"
           :items="attributeItems"
@@ -178,13 +200,13 @@ async function submit() {
     </div>
 
     <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-3">
-      <UFormField :label="t('manual.level')">
+      <UFormField :label="t('manual.level')" :error="issues.errorOf('attributes.level')">
         <UInput v-model="level" type="number" min="0" max="99" step="1" class="w-full" data-test="manual-level" />
       </UFormField>
-      <UFormField :label="t('manual.atk')">
+      <UFormField :label="t('manual.atk')" :error="issues.errorOf('attributes.atk')">
         <UInput v-model="atk" type="number" min="0" max="99999" step="1" class="w-full" data-test="manual-atk" />
       </UFormField>
-      <UFormField :label="t('manual.def')">
+      <UFormField :label="t('manual.def')" :error="issues.errorOf('attributes.def')">
         <UInput v-model="def" type="number" min="0" max="99999" step="1" class="w-full" data-test="manual-def" />
       </UFormField>
     </div>
@@ -192,14 +214,14 @@ async function submit() {
       {{ t('manual.numberHint') }}
     </p>
 
-    <UFormField :label="t('manual.description')">
+    <UFormField :label="t('manual.description')" :error="issues.errorOf('translation.description')">
       <UTextarea v-model="description" autoresize :rows="3" :maxrows="8" maxlength="5000" class="w-full" data-test="manual-description" />
     </UFormField>
 
     <p class="text-sm text-muted" data-test="owner-note">
       {{ t('add.ownerNote', { name: me?.name ?? '' }) }}
     </p>
-    <UFormField :label="t('manual.purchaseDate')">
+    <UFormField :label="t('manual.purchaseDate')" :error="issues.errorOf('purchaseDate')">
       <UInput v-model="purchaseDate" type="date" class="w-full" data-test="manual-purchase-date" />
     </UFormField>
 

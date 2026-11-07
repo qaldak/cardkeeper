@@ -324,7 +324,9 @@
     "password_too_long": "Das neue Passwort ist zu lang.",
     "password_initial": "Das neue Passwort darf nicht das Initialpasswort sein.",
     "password_unchanged": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
-    "user_not_found": "Der Benutzer wurde nicht gefunden."
+    "user_not_found": "Der Benutzer wurde nicht gefunden.",
+    "fieldRequired": "Pflichtfeld",
+    "fieldInvalid": "Ungültiger Wert"
   },
   "variant": {
     "normal": "Normal",

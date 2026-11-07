@@ -324,7 +324,9 @@
     "password_too_long": "The new password is too long.",
     "password_initial": "The new password must not be the initial password.",
     "password_unchanged": "The new password must differ from the current one.",
-    "user_not_found": "The user was not found."
+    "user_not_found": "The user was not found.",
+    "fieldRequired": "Required",
+    "fieldInvalid": "Invalid value"
   },
   "variant": {
     "normal": "Normal",
