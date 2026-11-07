@@ -200,6 +200,10 @@ Only minor and patch releases are created during normal development. A new major
 | `feat!: …`, `fix!: …`, any type with `!`, or a `BREAKING CHANGE:` footer | **major** |
 | `build: …`, `ci: …`, `docs: …`, `style: …`, `test: …` | none |
 
+Branches are named `<type>/<short-name>` with the type spelled out (`feature/`, `fix/`, `build/`, `chore/`, `test/`, `docs/`,
+`refactor/`, `perf/`, `style/`, `ci/`), for example `feature/manual-card-entry`; the abbreviation `feat/` is not used. The
+branch type matches the type of the pull request title (`feature/` goes with `feat:`, the other types are the same word).
+
 To start at `0.1.0` instead of semantic-release's default `1.0.0`, the release workflow tags the first commit as `v0.0.0`
 once (only if the repository has no version tag yet).
 

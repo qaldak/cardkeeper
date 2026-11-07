@@ -23,6 +23,6 @@ For a real new function (e.g. a further export format) use the OpenSpec flow: `/
 
 - Code comments, README, specs, ADRs and docs in English (except the historical `docs/KONZEPT.md`).
 - Conventional Commits; the pull request title determines the version on a squash merge (`feat:` minor, `fix:` patch). Major only for an explicit breaking change.
-- Meaningful branch names. Ask before changing code.
+- Meaningful branch names `<type>/<short-name>` with the type spelled out: `feature/`, `fix/`, `build/`, `chore/`, `test/`, `docs/`, `refactor/`, `perf/`, `style/`, `ci/`; never the abbreviation `feat/` (example: `feature/manual-card-entry`). Ask before changing code.
 - Interface texts in `app/i18n/locales/de.json` and `en.json`.
 - Tests: unit tests for pure logic, integration tests with `TEST_DATABASE_URL` (never `DATABASE_URL`); `make test`, `make lint`, `make typecheck`.

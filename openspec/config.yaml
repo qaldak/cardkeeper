@@ -21,7 +21,7 @@ context: |
   Conventions:
   - Code comments, README, specs and ADRs in English (ADR 0024); the historical initial concept `docs/KONZEPT.md` stays German.
   - Conventional Commits; on a squash merge the pull request title determines the version; major version only for an explicit breaking change (ADR 0015).
-  - Meaningful branch names; ask before executing (spec `development-release`).
+  - Meaningful branch names `<type>/<short-name>` with the type spelled out (`feature/`, `fix/`, `build/`, `chore/`, `test/`, ...; never `feat/`); ask before executing (spec `development-release`).
   - Tests: unit tests for pure logic, integration tests against a real PostgreSQL through `TEST_DATABASE_URL` (README §Tests).
 
   Documentation of the decisions and their origin:
