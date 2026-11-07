@@ -199,7 +199,7 @@ async function submit() {
     <p class="text-sm text-muted" data-test="owner-note">
       {{ t('add.ownerNote', { name: me?.name ?? '' }) }}
     </p>
-    <UFormField :label="t('add.purchaseDate')">
+    <UFormField :label="t('manual.purchaseDate')">
       <UInput v-model="purchaseDate" type="date" class="w-full" data-test="manual-purchase-date" />
     </UFormField>
 
