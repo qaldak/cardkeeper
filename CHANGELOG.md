@@ -1,3 +1,10 @@
+## [0.27.0](https://github.com/qaldak/cardkeeper/compare/v0.26.0...v0.27.0) (2026-11-07)
+
+### Features
+
+* leave tokens, skill cards and manual cards out of the text for an AI ([ecedf4d](https://github.com/qaldak/cardkeeper/commit/ecedf4d0078bfc9b6b224a6899e09d02fbebfb19))
+* store whether a card is for the deck (column, migration, defaults, change) ([1e3b704](https://github.com/qaldak/cardkeeper/commit/1e3b704cff85fb821c99bbab57efa850a374ff72))
+
 ## [0.26.0](https://github.com/qaldak/cardkeeper/compare/v0.25.1...v0.26.0) (2026-11-07)
 
 ### Features
