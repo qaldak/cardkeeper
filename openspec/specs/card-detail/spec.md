@@ -1,7 +1,7 @@
 # Card Detail Specification
 
 ## Purpose
-The detail page of a card: texts in several languages, the few editable fields (all data for a card entered by hand), updating from the card database, deleting and display of changes. Status is in `card-status`, images in `images`, price history in `prices`, paging in `card-paging`. Decisions: [ADR 0006](../../../docs/adr/0006-texts-per-language.md) (texts per language), [ADR 0011](../../../docs/adr/0011-editions-as-keys.md) (editions), [ADR 0025](../../../docs/adr/0025-manual-cards.md) (cards entered by hand).
+The detail page of a card: texts in several languages, the few editable fields (all data for a card entered by hand), the switch for deck use, updating from the card database, deleting and display of changes. Status is in `card-status`, images in `images`, price history in `prices`, paging in `card-paging`. Decisions: [ADR 0006](../../../docs/adr/0006-texts-per-language.md) (texts per language), [ADR 0011](../../../docs/adr/0011-editions-as-keys.md) (editions), [ADR 0025](../../../docs/adr/0025-manual-cards.md) (cards entered by hand), [ADR 0026](../../../docs/adr/0026-deck-use-flag.md) (deck use).
 
 ## Requirements
 
@@ -108,13 +108,18 @@ Source: User instruction 2026-10-04 19:40 (4); README (7f3d955) §Features; code
 - THEN "modified on" is missing
 
 ### Requirement: Updating from the card database
-The system SHALL reload texts, attributes and prices in all stored languages on "Update from API" and leave set code, edition, status, owner, purchase date and images unchanged.
-Source: User instruction 2026-10-04 19:40 (6); README (7f3d955) §Features; test cards.test.ts (refresh) | Origin: user requirement
+The system SHALL reload texts, attributes and prices in all stored languages on "Update from API" and leave set code, edition, deck use, status, owner, purchase date and images unchanged.
+Source: User instruction 2026-10-04 19:40 (6), 2026-11-07 (deck use stays); README (7f3d955) §Features; test cards.test.ts (refresh) | Origin: user requirement
 
 #### Scenario: Data changed
 - GIVEN the database has a new text
 - WHEN the card is updated
 - THEN it shows the new text and the user data remain
+
+#### Scenario: Deck use stays
+- GIVEN a card from the card database that the owner switched to "not for the deck"
+- WHEN it is updated
+- THEN it is still not for the deck
 
 #### Scenario: New language
 - GIVEN a language becomes available
@@ -217,3 +222,22 @@ Source: User instruction 2026-11-07 ("changes are written to the change log"); c
 - GIVEN unchanged values
 - WHEN the card is saved
 - THEN nothing is logged
+
+### Requirement: Deck use of a Yu-Gi-Oh! card
+The system SHALL show on the card page of a Yu-Gi-Oh! card below the description a switch "Use for deck" that the owner can change, write every change with old and new value into the change log, and reject the change for a card of another game with 400 `field_not_editable`.
+Source: User instruction 2026-11-07 (answers 4 and 8: switch below the description; Yu-Gi-Oh! only); code app/app/pages/cards/[id].vue | Origin: user requirement
+
+#### Scenario: Switching
+- GIVEN a Yu-Gi-Oh! card that is for the deck
+- WHEN its owner switches it off and saves
+- THEN the card is not for the deck and the change log contains `deckable` with both values
+
+#### Scenario: Not the owner
+- GIVEN a card of another user
+- WHEN its page is opened
+- THEN the switch shows the value and cannot be changed
+
+#### Scenario: Pokémon
+- GIVEN a Pokémon card
+- WHEN its page is opened
+- THEN there is no switch, and a change call with `deckable` is rejected with `field_not_editable`

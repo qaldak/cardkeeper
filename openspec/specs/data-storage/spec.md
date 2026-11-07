@@ -1,7 +1,7 @@
 # Data Storage Specification
 
 ## Purpose
-Data model invariants of the collection: read-only card data, translations, raw-data snapshots, audit log and edition keys including the startup check. Decisions: [ADR 0003](../../../docs/adr/0003-postgresql-prisma.md), [ADR 0005](../../../docs/adr/0005-game-attributes-as-jsonb.md), [ADR 0006](../../../docs/adr/0006-texts-per-language.md), [ADR 0010](../../../docs/adr/0010-status-as-enum.md), [ADR 0011](../../../docs/adr/0011-editions-as-keys.md).
+Data model invariants of the collection: read-only card data, the flag for deck use, translations, raw-data snapshots, audit log and edition keys including the startup check. Decisions: [ADR 0003](../../../docs/adr/0003-postgresql-prisma.md), [ADR 0005](../../../docs/adr/0005-game-attributes-as-jsonb.md), [ADR 0006](../../../docs/adr/0006-texts-per-language.md), [ADR 0010](../../../docs/adr/0010-status-as-enum.md), [ADR 0011](../../../docs/adr/0011-editions-as-keys.md), [ADR 0025](../../../docs/adr/0025-manual-cards.md), [ADR 0026](../../../docs/adr/0026-deck-use-flag.md).
 
 ## Requirements
 
@@ -113,3 +113,17 @@ Source: User instruction 2026-11-07 (existing display is enough); code app/prism
 - GIVEN a card without external ID
 - WHEN the card page header and the CSV export are shown
 - THEN both say "entered manually"
+
+### Requirement: Deck use is stored per card
+The system SHALL store per card whether it is for the deck (`cards.deckable`, never empty, true by default) as the user's own data that "Update from API" does not change, and the migration SHALL set it to false for Yu-Gi-Oh! cards without external ID or of card type `Token` or `Skill Card`, and to true for all other cards.
+Source: User instruction 2026-11-07 (flag `deckable`, migration of existing cards); YGOPRODeck API checked 2026-11-07 (card types Token, Skill Card) | Origin: user requirement
+
+#### Scenario: Migration
+- GIVEN existing cards: a normal Yu-Gi-Oh! card, a Yu-Gi-Oh! card without external ID, a Yu-Gi-Oh! token from the card database, and a Pokémon card
+- WHEN the migration has run
+- THEN only the first and the Pokémon card are for the deck
+
+#### Scenario: New card of another game
+- GIVEN a Pokémon card is added
+- WHEN it is stored
+- THEN it is for the deck and the flag has no effect
