@@ -171,7 +171,8 @@
       "unsavedTitle": "Änderungen speichern?",
       "unsavedText": "Diese Karte hat Änderungen, die noch nicht gespeichert sind. Soll vor dem Wechsel gespeichert werden?",
       "discard": "Verwerfen"
-    }
+    },
+    "basicsHintManual": "Manuell erfasst: der Besitzer kann alle Daten ändern. Set-Code und Edition gelten für alle Sprachen."
   },
   "add": {
     "title": "Karte hinzufügen",
@@ -323,7 +324,9 @@
     "password_too_long": "Das neue Passwort ist zu lang.",
     "password_initial": "Das neue Passwort darf nicht das Initialpasswort sein.",
     "password_unchanged": "Das neue Passwort muss sich vom aktuellen unterscheiden.",
-    "user_not_found": "Der Benutzer wurde nicht gefunden."
+    "user_not_found": "Der Benutzer wurde nicht gefunden.",
+    "fieldRequired": "Pflichtfeld",
+    "fieldInvalid": "Ungültiger Wert"
   },
   "variant": {
     "normal": "Normal",
@@ -528,5 +531,33 @@
       "copyFailed": "Kopieren fehlgeschlagen, lade den Text stattdessen herunter",
       "loadFailed": "Der Text konnte nicht erstellt werden, bitte erneut versuchen."
     }
+  },
+  "manual": {
+    "button": "Manuell erfassen",
+    "title": "Karte manuell erfassen",
+    "intro": "Die Kartendatenbank kennt diese Karte nicht? Erfasse sie selbst, zum Beispiel einen Spielstein. Nur Name und Set-Code sind zwingend.",
+    "name": "Name",
+    "language": "Sprache",
+    "languages": {
+      "de": "Deutsch",
+      "en": "Englisch"
+    },
+    "setCode": "Set-Code",
+    "setCodePlaceholder": "z. B. SDAZ-DE047",
+    "setCodeWarning": "„{code}“ sieht nicht wie ein Set-Code aus (zum Beispiel SDAZ-DE047). Du kannst ihn trotzdem speichern.",
+    "setName": "Set",
+    "rarity": "Seltenheit",
+    "cardType": "Kartentyp",
+    "race": "Typ",
+    "attribute": "Attribut",
+    "level": "Level",
+    "atk": "ATK",
+    "def": "DEF",
+    "description": "Beschreibung",
+    "notSet": "Nicht gesetzt",
+    "numberHint": "Leer lassen, wenn die Karte keinen Wert hat.",
+    "submit": "Karte speichern",
+    "cancel": "Zurück zur Suche",
+    "purchaseDate": "Kaufdatum"
   }
 }

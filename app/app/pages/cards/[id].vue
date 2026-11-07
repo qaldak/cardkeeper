@@ -7,6 +7,7 @@ import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fie
 import { preferredLanguage } from '#shared/utils/languages'
 import { hasCardNavigation, navApiQuery, overviewQueryOf } from '#shared/utils/overview-query'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
+import { YGO_ATTRIBUTES, YGO_CARD_TYPES, YGO_RACES } from '#shared/utils/ygo-values'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -77,11 +78,35 @@ interface FormState {
   statusPerson: string
   owner: string
   purchaseDate: string
+  // The data of a card entered by hand (see `canEditData`); a card from the card database leaves them untouched.
+  name: string
+  description: string
+  setName: string
+  rarity: string
+  cardType: string
+  race: string
+  attribute: string
+  level: string
+  atk: string
+  def: string
 }
+
+const textOf = (value: unknown) => (value === null || value === undefined ? '' : String(value))
 
 function toForm(source: CardDetailDto): FormState {
   const set = source.sets[0]
+  const text = source.translations[0]
   return {
+    name: text?.name ?? source.name,
+    description: text?.description ?? '',
+    setName: set?.setName ?? '',
+    rarity: set?.rarity ?? '',
+    cardType: textOf(source.attributes.type),
+    race: textOf(source.attributes.race),
+    attribute: textOf(source.attributes.attribute),
+    level: textOf(source.attributes.level),
+    atk: textOf(source.attributes.atk),
+    def: textOf(source.attributes.def),
     setCode: set?.setCode ?? '',
     edition: set?.edition ?? '',
     status: source.status,
@@ -93,11 +118,54 @@ function toForm(source: CardDetailDto): FormState {
 }
 
 const form = reactive<FormState>(toForm(card.value))
+
+// A save that the server rejects marks the fields that are wrong (see `useFormIssues`). The path is the one the API
+// reports; a field is unmarked when it is changed.
+const issues = useFormIssues()
+const ISSUE_PATHS: Record<keyof FormState, string> = {
+  name: 'translation.name',
+  description: 'translation.description',
+  setName: 'set.setName',
+  rarity: 'set.rarity',
+  setCode: 'set.setCode',
+  edition: 'set.edition',
+  cardType: 'attributes.type',
+  race: 'attributes.race',
+  attribute: 'attributes.attribute',
+  level: 'attributes.level',
+  atk: 'attributes.atk',
+  def: 'attributes.def',
+  status: 'status',
+  statusDate: 'statusDate',
+  statusPerson: 'statusPerson',
+  owner: 'ownerId',
+  purchaseDate: 'purchaseDate',
+}
+const issueValue = (path: string) => {
+  const key = (Object.keys(ISSUE_PATHS) as (keyof FormState)[]).find(field => ISSUE_PATHS[field] === path)
+  return key ? String(form[key] ?? '') : undefined
+}
+for (const key of Object.keys(ISSUE_PATHS) as (keyof FormState)[]) {
+  watch(() => form[key], () => issues.clear(ISSUE_PATHS[key]))
+}
 const saving = ref(false)
 
 const attributeFields = computed(() => getAttributeFields(card.value!.game.slug))
 const gameConfig = computed(() => getGameConfig(card.value!.game.slug))
 const isPokemon = computed(() => card.value!.game.slug === 'pokemon')
+// A card without a link to the card database was entered by hand: its owner can change all its data, nobody else can.
+const isManual = computed(() => card.value!.externalId === null && gameConfig.value.manualEntry)
+const canEditData = computed(() => isManual.value && canEdit.value)
+
+// Card type, type and attribute are chosen among the values of the card database. A stored value that is none of them
+// stays in the list, so that it is shown and not lost by saving.
+const withCurrent = (values: readonly string[], current: string): string[] => (current && !values.includes(current) ? [...values, current] : [...values])
+const cardTypeItems = computed(() => withCurrent(YGO_CARD_TYPES, form.cardType))
+const raceItems = computed(() => withCurrent(YGO_RACES, form.race))
+const attributeItems = computed(() => withCurrent(YGO_ATTRIBUTES, form.attribute))
+const setNumber = (key: 'level' | 'atk' | 'def', value: string | number | null | undefined) => {
+  form[key] = value === null || value === undefined ? '' : String(value)
+}
 
 // Language dependent data of the selected language (Pokémon: attacks, localized types, ...).
 const details = computed(() => (translation.value?.details ?? null) as PokemonDetails | null)
@@ -162,6 +230,38 @@ function buildPatch(current: CardDetailDto): Record<string, unknown> {
     patch.set = set
   }
 
+  if (canEditData.value) {
+    const translation: Record<string, string | null> = {}
+    if (form.name !== original.name) {
+      translation.name = form.name.trim()
+    }
+    if (form.description !== original.description) {
+      translation.description = nullIfBlank(form.description)
+    }
+    if (Object.keys(translation).length > 0) {
+      patch.translation = translation
+    }
+    const attributes: Record<string, string | number | null> = {}
+    for (const key of ['cardType', 'race', 'attribute'] as const) {
+      if (form[key] !== original[key]) {
+        attributes[{ cardType: 'type', race: 'race', attribute: 'attribute' }[key]] = nullIfBlank(form[key])
+      }
+    }
+    for (const key of ['level', 'atk', 'def'] as const) {
+      if (form[key] !== original[key]) {
+        attributes[key] = form[key].trim() === '' ? null : Number(form[key])
+      }
+    }
+    if (Object.keys(attributes).length > 0) {
+      patch.attributes = attributes
+    }
+    for (const key of ['setName', 'rarity'] as const) {
+      if (form[key] !== original[key]) {
+        patch.set = { ...(patch.set as Record<string, string | null> | undefined), [key]: nullIfBlank(form[key]) }
+      }
+    }
+  }
+
   if (form.status !== original.status) {
     patch.status = form.status
     patch.statusDate = showDate.value ? (form.statusDate || today()) : null
@@ -192,6 +292,7 @@ async function save(): Promise<boolean> {
     const updated = await $fetch<CardDetailDto>(`/api/cards/${id}`, { method: 'PATCH', body: patch })
     card.value = updated
     Object.assign(form, toForm(updated))
+    issues.reset()
     toast.add({ title: t('common.saved'), color: 'success' })
     if (paging) {
       await refreshNeighbors() // the change can move the card (or take it out of the list)
@@ -199,6 +300,7 @@ async function save(): Promise<boolean> {
     return true
   }
   catch (e) {
+    issues.fromError(e, issueValue)
     toast.add({ title: apiError(e), color: 'error' })
     return false
   }
@@ -551,14 +653,15 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             {{ t('card.sections.basics') }}
           </h2>
           <p class="mb-3 text-xs text-dimmed">
-            {{ isPokemon ? t('card.basicsHintVariant') : t('card.basicsHint') }}
+            {{ isManual ? t('card.basicsHintManual') : isPokemon ? t('card.basicsHintVariant') : t('card.basicsHint') }}
           </p>
           <div class="flex flex-col gap-3.5">
-            <UFormField :label="t('card.fields.name')">
-              <UInput :model-value="shownName" readonly class="w-full" :ui="readonlyUi" />
+            <UFormField :label="t('card.fields.name')" :error="issues.errorOf('translation.name')">
+              <UInput v-if="canEditData" v-model="form.name" required maxlength="200" class="w-full" data-test="card-name" />
+              <UInput v-else :model-value="shownName" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
             <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-              <UFormField :label="isPokemon ? t('card.fields.cardId') : t('card.fields.setCode')">
+              <UFormField :label="isPokemon ? t('card.fields.cardId') : t('card.fields.setCode')" :error="issues.errorOf('set.setCode')">
                 <UInput
                   v-model="form.setCode"
                   maxlength="40"
@@ -569,7 +672,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
                   @input="upperCaseSetCode"
                 />
               </UFormField>
-              <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')">
+              <UFormField :label="isPokemon ? t('card.fields.variant') : t('card.fields.edition')" :error="issues.errorOf('set.edition')">
                 <USelect v-if="gameConfig.editionKind === 'variant'" v-model="form.edition" :items="variantItems" :disabled="!canEdit" class="w-full" />
                 <!-- A preset is shown translated but stored as its key; a typed text (create item) is stored as typed. -->
                 <USelectMenu
@@ -587,11 +690,13 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
                 <UInput v-else-if="canEdit" v-model="form.edition" maxlength="80" class="w-full" />
                 <UInput v-else :model-value="editionText(form.edition)" readonly :ui="readonlyUi" class="w-full" />
               </UFormField>
-              <UFormField :label="t('card.fields.setName')">
-                <UInput :model-value="setNameShown" readonly class="w-full" :ui="readonlyUi" />
+              <UFormField :label="t('card.fields.setName')" :error="issues.errorOf('set.setName')">
+                <UInput v-if="canEditData" v-model="form.setName" maxlength="200" class="w-full" data-test="card-set-name" />
+                <UInput v-else :model-value="setNameShown" readonly class="w-full" :ui="readonlyUi" />
               </UFormField>
-              <UFormField :label="t('card.fields.rarity')">
-                <UInput :model-value="rarityShown" readonly class="w-full" :ui="readonlyUi" />
+              <UFormField :label="t('card.fields.rarity')" :error="issues.errorOf('set.rarity')">
+                <UInput v-if="canEditData" v-model="form.rarity" maxlength="80" class="w-full" data-test="card-rarity" />
+                <UInput v-else :model-value="rarityShown" readonly class="w-full" :ui="readonlyUi" />
               </UFormField>
             </div>
             <UFormField v-if="card.externalId && !isPokemon" :label="t('card.fields.externalId')">
@@ -605,6 +710,56 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             {{ t('card.sections.attributes', { game: card.game.displayName }) }}
           </h2>
           <PokemonInfo :attributes="card.attributes" :details="translation?.details ?? null" />
+        </section>
+
+        <section v-else-if="canEditData">
+          <h2 class="mb-3 text-[15px] font-semibold">
+            {{ t('card.sections.attributes', { game: card.game.displayName }) }}
+          </h2>
+          <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+            <UFormField :label="t('card.attributes.atk')" :error="issues.errorOf('attributes.atk')">
+              <UInput :model-value="form.atk" type="number" min="0" max="99999" step="1" class="w-full" data-test="card-atk" @update:model-value="(value: string | number | null | undefined) => setNumber('atk', value)" />
+            </UFormField>
+            <UFormField :label="t('card.attributes.def')" :error="issues.errorOf('attributes.def')">
+              <UInput :model-value="form.def" type="number" min="0" max="99999" step="1" class="w-full" data-test="card-def" @update:model-value="(value: string | number | null | undefined) => setNumber('def', value)" />
+            </UFormField>
+            <UFormField :label="t('card.attributes.level')" :error="issues.errorOf('attributes.level')">
+              <UInput :model-value="form.level" type="number" min="0" max="99" step="1" class="w-full" data-test="card-level" @update:model-value="(value: string | number | null | undefined) => setNumber('level', value)" />
+            </UFormField>
+            <UFormField :label="t('card.attributes.type')" :error="issues.errorOf('attributes.type')">
+              <USelectMenu
+                :model-value="form.cardType || undefined"
+                :items="cardTypeItems"
+                :placeholder="t('manual.notSet')"
+                clear
+                class="w-full"
+                data-test="card-card-type"
+                @update:model-value="(value?: string | null) => (form.cardType = value ?? '')"
+              />
+            </UFormField>
+            <UFormField :label="t('card.attributes.race')" :error="issues.errorOf('attributes.race')">
+              <USelectMenu
+                :model-value="form.race || undefined"
+                :items="raceItems"
+                :placeholder="t('manual.notSet')"
+                clear
+                class="w-full"
+                data-test="card-race"
+                @update:model-value="(value?: string | null) => (form.race = value ?? '')"
+              />
+            </UFormField>
+            <UFormField :label="t('card.attributes.attribute')" :error="issues.errorOf('attributes.attribute')">
+              <USelectMenu
+                :model-value="form.attribute || undefined"
+                :items="attributeItems"
+                :placeholder="t('manual.notSet')"
+                clear
+                class="w-full"
+                data-test="card-attribute"
+                @update:model-value="(value?: string | null) => (form.attribute = value ?? '')"
+              />
+            </UFormField>
+          </div>
         </section>
 
         <section v-else-if="attributeFields.length">
@@ -627,8 +782,9 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
           </div>
         </section>
 
-        <UFormField :label="t('card.fields.description')">
-          <UTextarea :model-value="translation?.description ?? ''" readonly autoresize :rows="3" :maxrows="6" class="w-full" :ui="readonlyUi" />
+        <UFormField :label="t('card.fields.description')" :error="issues.errorOf('translation.description')">
+          <UTextarea v-if="canEditData" v-model="form.description" autoresize :rows="3" :maxrows="6" maxlength="5000" class="w-full" data-test="card-description" />
+          <UTextarea v-else :model-value="translation?.description ?? ''" readonly autoresize :rows="3" :maxrows="6" class="w-full" :ui="readonlyUi" />
         </UFormField>
 
         <section>
@@ -639,17 +795,17 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
             <UFormField :label="t('card.fields.status')">
               <USelect v-model="form.status" :items="statusItems" :disabled="!canEdit" class="w-full" />
             </UFormField>
-            <UFormField v-if="showDate" :label="t('card.fields.statusDate')">
+            <UFormField v-if="showDate" :label="t('card.fields.statusDate')" :error="issues.errorOf('statusDate')">
               <UInput v-model="form.statusDate" type="date" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
             </UFormField>
-            <UFormField v-if="showPerson" :label="t('card.fields.statusPerson')">
+            <UFormField v-if="showPerson" :label="t('card.fields.statusPerson')" :error="issues.errorOf('statusPerson')">
               <UInput v-model="form.statusPerson" :placeholder="t('card.fields.statusPersonPlaceholder')" maxlength="120" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
             </UFormField>
             <UFormField :label="t('card.fields.owner')" :description="canEdit ? t('card.fields.ownerHint') : undefined">
               <USelect v-if="canEdit" v-model="form.owner" :items="ownerItems" class="w-full" />
               <UInput v-else :model-value="card.owner?.name ?? ''" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
-            <UFormField :label="t('card.fields.purchaseDate')">
+            <UFormField :label="t('card.fields.purchaseDate')" :error="issues.errorOf('purchaseDate')">
               <UInput v-model="form.purchaseDate" type="date" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
             </UFormField>
           </div>

@@ -5,20 +5,26 @@ import { POKEMON_VARIANTS } from '../../shared/types/pokemon'
 
 describe('game configuration', () => {
   it('lets the edition and set code of Yu-Gi-Oh! cards be corrected freely', () => {
-    expect(getGameConfig('ygo')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS })
+    expect(getGameConfig('ygo')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS, manualEntry: true })
   })
 
   it('treats the edition of Pokémon cards as a variant and fixes the set code', () => {
-    expect(getGameConfig('pokemon')).toEqual({ editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [] })
+    expect(getGameConfig('pokemon')).toEqual({ editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [], manualEntry: false })
   })
 
   it('falls back to free text for an unknown game', () => {
-    expect(getGameConfig('mtg')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [] })
+    expect(getGameConfig('mtg')).toEqual({ editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [], manualEntry: false })
   })
 
   it('offers the printed editions for Yu-Gi-Oh! only, as stable keys', () => {
     expect(YGO_EDITIONS).toEqual(['FIRST_EDITION', 'LIMITED_EDITION'])
     expect(getGameConfig('pokemon').editions).toEqual([])
+  })
+
+  it('allows manual entry for Yu-Gi-Oh! only', () => {
+    expect(getGameConfig('ygo').manualEntry).toBe(true)
+    expect(getGameConfig('pokemon').manualEntry).toBe(false)
+    expect(getGameConfig('mtg').manualEntry).toBe(false)
   })
 
   it('knows the Pokémon variants', () => {

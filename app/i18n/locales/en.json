@@ -171,7 +171,8 @@
       "unsavedTitle": "Save changes?",
       "unsavedText": "This card has changes that are not saved yet. Save them before switching?",
       "discard": "Discard"
-    }
+    },
+    "basicsHintManual": "Entered by hand: its owner can change all its data. Set code and edition apply to all languages."
   },
   "add": {
     "title": "Add card",
@@ -323,7 +324,9 @@
     "password_too_long": "The new password is too long.",
     "password_initial": "The new password must not be the initial password.",
     "password_unchanged": "The new password must differ from the current one.",
-    "user_not_found": "The user was not found."
+    "user_not_found": "The user was not found.",
+    "fieldRequired": "Required",
+    "fieldInvalid": "Invalid value"
   },
   "variant": {
     "normal": "Normal",
@@ -528,5 +531,33 @@
       "copyFailed": "Copying failed, use the download instead",
       "loadFailed": "The text could not be created, please try again."
     }
+  },
+  "manual": {
+    "button": "Enter manually",
+    "title": "Enter a card manually",
+    "intro": "The card database does not have this card? Enter it yourself, for example a token. Only name and set code are required.",
+    "name": "Name",
+    "language": "Language",
+    "languages": {
+      "de": "German",
+      "en": "English"
+    },
+    "setCode": "Set code",
+    "setCodePlaceholder": "e.g. SDAZ-EN047",
+    "setCodeWarning": "\"{code}\" does not look like a set code (for example SDAZ-EN047). You can still save it.",
+    "setName": "Set",
+    "rarity": "Rarity",
+    "cardType": "Card type",
+    "race": "Type",
+    "attribute": "Attribute",
+    "level": "Level",
+    "atk": "ATK",
+    "def": "DEF",
+    "description": "Description",
+    "notSet": "Not set",
+    "numberHint": "Leave empty if the card has no value.",
+    "submit": "Save card",
+    "cancel": "Back to the search",
+    "purchaseDate": "Purchase date"
   }
 }

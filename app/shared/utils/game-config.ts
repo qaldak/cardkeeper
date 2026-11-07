@@ -17,14 +17,16 @@ export interface GameConfig {
   languages: readonly string[]
   /** Editions offered as a quick choice next to the free text (only for `editionKind: 'text'`). */
   editions: readonly EditionKey[]
+  /** Whether a card that the card database does not know can be entered by hand (Yu-Gi-Oh! only for now). */
+  manualEntry: boolean
 }
 
-const DEFAULT_CONFIG: GameConfig = { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [] }
+const DEFAULT_CONFIG: GameConfig = { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: [], manualEntry: false }
 
 export const GAME_CONFIG: Record<string, GameConfig> = {
-  ygo: { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS },
+  ygo: { editionKind: 'text', setCodeEditable: true, printingRequired: false, languages: ['de', 'en'], editions: YGO_EDITIONS, manualEntry: true },
   // Japanese cards exist in their own database with their own ids, so Japanese is a stored language.
-  pokemon: { editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [] },
+  pokemon: { editionKind: 'variant', setCodeEditable: false, printingRequired: true, languages: ['de', 'en', 'ja'], editions: [], manualEntry: false },
 }
 
 export function getGameConfig(gameSlug: string): GameConfig {

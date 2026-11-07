@@ -12,6 +12,8 @@ Everything runs in containers: there is nothing to install on the host except Do
 
 - Yu-Gi-Oh! and Pokémon in one collection, each game with its own filters and sort orders
 - Add cards by name, card id or (Yu-Gi-Oh!) set code, or by set and number (Pokémon); a whole set at once with a wizard
+- A Yu-Gi-Oh! card that the card database does not know (a token, for instance) can be entered by hand after a search that
+  found nothing; its data can be changed afterwards, and it is never asked at the card database
 - Overview with filters, search across all languages, sorting, total value of the active cards, and paging through the
   cards in the order of the overview
 - Card page with German and English texts (Pokémon also Japanese), corrected set code and edition, images with zoom,
