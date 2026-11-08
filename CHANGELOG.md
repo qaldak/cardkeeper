@@ -1,3 +1,9 @@
+## [0.27.1](https://github.com/qaldak/cardkeeper/compare/v0.27.0...v0.27.1) (2026-11-08)
+
+### Bug Fixes
+
+* signing out resets the session and the page ([553f968](https://github.com/qaldak/cardkeeper/commit/553f968743ad4ed1160b50a3a8ca9b45d7208f76))
+
 ## [0.27.0](https://github.com/qaldak/cardkeeper/compare/v0.26.0...v0.27.0) (2026-11-07)
 
 ### Features
