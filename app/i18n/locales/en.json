@@ -8,7 +8,8 @@
     "language": "Language",
     "users": "Users",
     "account": "Change password",
-    "logout": "Log out"
+    "logout": "Log out",
+    "logoutFailed": "Signing out did not work. Please try again."
   },
   "common": {
     "save": "Save",

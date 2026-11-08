@@ -6,8 +6,8 @@ Sign-in, user management through the configuration, password rules, sessions and
 ## Requirements
 
 ### Requirement: Everything is behind the login
-The system SHALL reject every request under `/api/` without a valid login with 401 `unauthenticated`, except `/api/health`, `/api/auth/login` and `/api/_nuxt_icon/`.
-Source: User instruction 2026-10-07 14:46; README (7f3d955) §Users; code server/middleware/auth.ts | Origin: user requirement
+The system SHALL reject every request under `/api/` without a valid login with 401 `unauthenticated`, except `/api/health`, `/api/auth/login`, `/api/auth/logout` and `/api/_nuxt_icon/`.
+Source: User instruction 2026-10-07 14:46, 2026-11-08 (sign-out also without a session); README (7f3d955) §Users; code server/middleware/auth.ts | Origin: user requirement
 
 #### Scenario: API without login
 - GIVEN no login cookie
@@ -179,6 +179,39 @@ Source: README (7f3d955) §Users; code server/lib/session.ts | Origin: derived
 - GIVEN a login over https behind a proxy with `X-Forwarded-Proto`
 - WHEN the answer is sent
 - THEN the cookie `cardkeeper-session` carries the flags httpOnly, SameSite=Lax and secure
+
+### Requirement: Signing out works without a valid session
+The system SHALL accept the sign-out call also without a valid session and end the session cookie, and when the call fails the interface SHALL say so and reset nothing.
+Source: User instruction 2026-11-08 (bug: signing out did nothing visible); code server/lib/public-paths.ts, app/app/composables/useAuth.ts | Origin: user requirement
+
+#### Scenario: Session already ended
+- GIVEN the session ended in another browser (password change) and the page is still open
+- WHEN "Log out" is clicked
+- THEN the sign-in page appears
+
+#### Scenario: Call fails
+- GIVEN the server cannot be reached
+- WHEN "Log out" is clicked
+- THEN an error is shown and the page stays as it is
+
+### Requirement: Signing out resets the browser
+The system SHALL on sign-out drop the state and the loaded data of the user in the browser and load the sign-in page afresh, and lead other tabs of the same browser to the sign-in page when they are shown again.
+Source: User instruction 2026-11-08 ("reset the session, nothing may be done without a user"); code app/app/plugins/auth-watch.client.ts | Origin: user requirement
+
+#### Scenario: Nothing of the page is left
+- GIVEN a signed-in user on a card page
+- WHEN "Log out" is clicked
+- THEN the sign-in page is loaded afresh and "Back" leads to the sign-in page, not to the card
+
+#### Scenario: Another user in the same tab
+- GIVEN Anna signed out and Sven signs in in the same tab
+- WHEN the overview appears
+- THEN it shows only data of Sven
+
+#### Scenario: Another tab
+- GIVEN a second tab still shows a page of the signed-out user
+- WHEN the second tab is shown again
+- THEN it leads to the sign-in page with the page as the target
 
 ### Requirement: A password change ends other sessions
 The system SHALL let a session apply only to the password state in which it was created; after a change or reset the changing browser SHALL stay signed in and other browsers SHALL be signed out.

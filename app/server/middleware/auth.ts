@@ -1,15 +1,13 @@
 import { forbidden, unauthorized } from '../lib/errors'
+import { isPublicPath } from '../lib/public-paths'
 
-// Everything below /api needs a login, except the health check (Docker) and the login itself. A user who still has to
-// choose a password may only reach the password change (and log out or look who they are).
-const PUBLIC = new Set(['/api/health', '/api/auth/login'])
-// The icon data the pages load (the same for everybody, nothing of the collection).
-const PUBLIC_PREFIXES = ['/api/_nuxt_icon/']
+// Everything below /api needs a login, except the few public paths (see `isPublicPath`). A user who still has to choose a
+// password may only reach the password change (and log out or look who they are).
 const WHILE_PASSWORD_CHANGE_REQUIRED = new Set(['/api/auth/me', '/api/auth/password', '/api/auth/logout'])
 
 export default defineEventHandler(async (event) => {
   const path = getRequestURL(event).pathname
-  if (!path.startsWith('/api/') || PUBLIC.has(path) || PUBLIC_PREFIXES.some(prefix => path.startsWith(prefix))) {
+  if (isPublicPath(path)) {
     return
   }
   try {
