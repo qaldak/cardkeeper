@@ -2,13 +2,16 @@
 const { t, locale, locales, setLocale } = useI18n()
 const config = useRuntimeConfig()
 const auth = useAuth()
+const toast = useToast()
 
 // While the initial password is still set, nothing but the password change is available.
 const restricted = computed(() => auth.user.value?.mustChangePassword === true)
 
+// Signing out resets everything of the user in the browser and loads the sign-in page afresh (see `useAuth`).
 async function logout() {
-  await auth.logout()
-  await navigateTo('/login')
+  if (!(await auth.logout())) {
+    toast.add({ title: t('nav.logoutFailed'), color: 'error' })
+  }
 }
 
 const navItems = computed(() => [

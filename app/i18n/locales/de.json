@@ -8,7 +8,8 @@
     "language": "Sprache",
     "users": "Benutzer",
     "account": "Passwort ändern",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "logoutFailed": "Abmelden hat nicht geklappt. Bitte versuche es erneut."
   },
   "common": {
     "save": "Speichern",
