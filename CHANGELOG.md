@@ -1,3 +1,9 @@
+## [0.27.3](https://github.com/qaldak/cardkeeper/compare/v0.27.2...v0.27.3) (2026-11-09)
+
+### Maintenance
+
+* npm: Bump nuxt from 4.6.3 to 4.6.4 in /app ([e00f909](https://github.com/qaldak/cardkeeper/commit/e00f9098dc12a0a88243689e8ce2665ea318aba8))
+
 ## [0.27.2](https://github.com/qaldak/cardkeeper/compare/v0.27.1...v0.27.2) (2026-11-09)
 
 ### Maintenance
