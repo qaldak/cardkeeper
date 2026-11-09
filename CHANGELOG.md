@@ -1,3 +1,9 @@
+## [0.27.4](https://github.com/qaldak/cardkeeper/compare/v0.27.3...v0.27.4) (2026-11-09)
+
+### Maintenance
+
+* npm: Bump tailwindcss from 4.3.3 to 4.3.5 in /app ([3f4aa28](https://github.com/qaldak/cardkeeper/commit/3f4aa28812e59aa6953e876c9f83485f898da6a5))
+
 ## [0.27.3](https://github.com/qaldak/cardkeeper/compare/v0.27.2...v0.27.3) (2026-11-09)
 
 ### Maintenance
