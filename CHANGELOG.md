@@ -1,3 +1,9 @@
+## [0.27.2](https://github.com/qaldak/cardkeeper/compare/v0.27.1...v0.27.2) (2026-11-09)
+
+### Maintenance
+
+* npm: Bump @iconify-json/lucide from 1.2.149 to 1.2.151 in /app ([82360dd](https://github.com/qaldak/cardkeeper/commit/82360dd58878d55421c37db28e1735d8e85258bc))
+
 ## [0.27.1](https://github.com/qaldak/cardkeeper/compare/v0.27.0...v0.27.1) (2026-11-08)
 
 ### Bug Fixes
