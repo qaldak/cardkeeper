@@ -151,13 +151,25 @@ pass `X-Forwarded-Proto $scheme` so that the login cookie is marked `secure` for
 
 ### Backup
 
+The commands run on the host, not in a container: your shell writes the dump (`>`), and the card images are packed through a
+mounted host folder (`-v`). Both files end up in the folder `backup/` next to `docker-compose.yml` (ignored by git), never
+in a Docker volume, so they survive the loss of a volume. The dump holds all data, including the password hashes: keep the
+folder private (`umask 077`), and copy it to another device too, because a failing disk of the host takes the copies with it.
+
 ```bash
+umask 077
+mkdir -p backup
 # database
-docker compose exec -T db pg_dump -U postgres -d cardkeeper > cardkeeper-$(date +%F).sql
+docker compose exec -T db pg_dump -U postgres -d cardkeeper | gzip > backup/cardkeeper-$(date +%F).sql.gz
 # card images
-docker run --rm -v cardkeeper_card-images:/data -v "$PWD":/backup alpine \
+docker run --rm -v cardkeeper_card-images:/data -v "$PWD/backup":/backup alpine \
   tar czf /backup/card-images-$(date +%F).tgz -C /data .
 ```
+
+`docker compose exec` finds the service `db` whatever `CONTAINER_PREFIX` is; with plain Docker use the container name:
+`docker exec -i cardkeeper_db pg_dump -U postgres -d cardkeeper` (`-T` exists only in `docker compose exec`, and `-U` is
+written in capitals). Run the dump from a script with `set -o pipefail` (or look at the file size), so that a failed dump is
+noticed and not saved as an empty file.
 
 ## Development
 
