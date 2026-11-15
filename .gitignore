@@ -70,6 +70,9 @@ web_modules/
 .env.*
 !.env.example
 
+# backups made by hand (README §Backup): a database dump holds all data, including the password hashes
+/backup/
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
