@@ -1,4 +1,4 @@
-import { latestPurchaseDate } from '../../shared/utils/purchase-date'
+import { EARLIEST_PURCHASE_DATE, latestPurchaseDate } from '../../shared/utils/purchase-date'
 import { badRequest } from './errors'
 
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
@@ -26,9 +26,18 @@ export function utcToday(now: Date = new Date()): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
 }
 
-/** A purchase date (`YYYY-MM-DD`) cannot lie in the future: refused with 400 `purchase_date_in_future` (see `latestPurchaseDate`). */
+/**
+ * A purchase date (`YYYY-MM-DD`) cannot lie in the future (400 `purchase_date_in_future`, see `latestPurchaseDate`) and cannot be
+ * earlier than `EARLIEST_PURCHASE_DATE` (400 `purchase_date_too_early`, e.g. the year 0026 of a mistyped "18.12.26").
+ */
 export function assertPurchaseDate(value: string | null | undefined, now: Date = new Date()): void {
-  if (value && value > latestPurchaseDate(now)) {
+  if (!value) {
+    return
+  }
+  if (value > latestPurchaseDate(now)) {
     throw badRequest('purchase_date_in_future', `The purchase date ${value} lies in the future`)
+  }
+  if (value < EARLIEST_PURCHASE_DATE) {
+    throw badRequest('purchase_date_too_early', `The purchase date ${value} is before ${EARLIEST_PURCHASE_DATE}`)
   }
 }

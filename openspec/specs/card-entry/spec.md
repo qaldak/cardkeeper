@@ -1,7 +1,7 @@
 # Card Entry Specification
 
 ## Purpose
-Adding single new cards: game choice, search in the card database (name, ID, set code, for Pokémon set and number), choice of print, edition or variant, and creating the card; for Yu-Gi-Oh! also entering a card by hand that the card database does not know. Adding a whole set is in `set-import`; data and errors of the card databases are in `game-adapters`. Decisions: [ADR 0023](../../../docs/adr/0023-card-data-sources-ygoprodeck-tcgdex.md) (data sources), [ADR 0020](../../../docs/adr/0020-remembered-state-in-cookies.md) (remembered state in cookies), [ADR 0025](../../../docs/adr/0025-manual-cards.md) (cards entered by hand).
+Adding single new cards: game choice, search in the card database (name, ID, set code, for Pokémon set and number), choice of print, edition or variant, and creating the card; for Yu-Gi-Oh! also entering a card by hand that the card database does not know. Adding a whole set is in `set-import`; data and errors of the card databases are in `game-adapters`. Decisions: [ADR 0023](../../../docs/adr/0023-card-data-sources-ygoprodeck-tcgdex.md) (data sources), [ADR 0020](../../../docs/adr/0020-remembered-state-in-cookies.md) (remembered state in cookies), [ADR 0025](../../../docs/adr/0025-manual-cards.md) (cards entered by hand), [ADR 0027](../../../docs/adr/0027-purchase-date-field.md) (purchase date field).
 
 ## Requirements
 
@@ -256,6 +256,34 @@ Source: User instruction 2026-11-18 (nobody buys in the future); code server/lib
 - GIVEN it is 00:30 in Zurich and still the day before in UTC
 - WHEN the user enters today's date
 - THEN it is accepted
+
+### Requirement: Purchase date not before 1990
+The system SHALL refuse a purchase date before 1990-01-01, e.g. the year 0026 of a mistyped "18.12.26": the field marks it, the browser does not send the form, and the server refuses it with 400 `purchase_date_too_early`.
+Source: User instruction 2026-11-18 (18.12.0026 must not be saved); the limit 1990-01-01 (before the first Pokémon and Yu-Gi-Oh! cards) is an assumption, to be confirmed | Origin: user requirement
+
+#### Scenario: A year typed with two digits
+- GIVEN the purchase date field in the form
+- WHEN "180126" is typed
+- THEN the year is 26 (it is not completed to 2026), the field is marked and the form is not sent
+
+#### Scenario: Earlier date to the server
+- GIVEN a call that ignores the field
+- WHEN the purchase date is before 1990-01-01
+- THEN the server answers 400 `purchase_date_too_early` and creates nothing
+
+### Requirement: Purchase date field shows when it is empty
+The system SHALL show the purchase date as a field with day, month and year segments, a placeholder ("tt.mm.jjjj", "dd/mm/yyyy") and no preset date, a calendar and a button to remove the date; the field of a user who cannot edit it is grey.
+Source: User instruction 2026-11-18 (the empty field showed today's date and looked read-only; variant A: segments, "18.01.2026" and "18012026" are enough); code app/app/components/PurchaseDateInput.vue; ADR 0027 | Origin: user requirement
+
+#### Scenario: No date
+- GIVEN a card without a purchase date
+- WHEN the field is shown for editing
+- THEN it shows the placeholder, not today's date, and differs from a grey field that cannot be edited
+
+#### Scenario: Typing a date
+- GIVEN the purchase date field
+- WHEN "18.01.2026" or "18012026" is typed
+- THEN the date is 18 January 2026
 
 ### Requirement: Create a card
 The system SHALL store card, translations, print, prices, raw answers (snapshots), status history (active) and log entry `created` in one transaction when creating, make the creator the owner and take over an optional purchase date.

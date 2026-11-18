@@ -1,5 +1,12 @@
-// A card cannot be bought in the future. The date field of the browser is limited to today, and the server refuses a later
-// date as well (`assertPurchaseDate` in `server/lib/dates.ts`).
+// A card cannot be bought in the future, and a date typed with a short year ("18.12.26" read as the year 26) is not a purchase
+// date either. The date field is limited to the range below, and the server refuses a date outside of it as well
+// (`assertPurchaseDate` in `server/lib/dates.ts`).
+
+/**
+ * The earliest purchase date: before the first Pokémon (1996) and Yu-Gi-Oh! (1999) cards. A year typed with two or three digits
+ * ("26" is year 26, not 2026) lies before it and is refused instead of stored.
+ */
+export const EARLIEST_PURCHASE_DATE = '1990-01-01'
 
 /** Today's date on this device as `YYYY-MM-DD`: the `max` of a date field. */
 export function todayOnDevice(now: Date = new Date()): string {

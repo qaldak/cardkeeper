@@ -5,7 +5,6 @@ import { isEditionKey } from '#shared/utils/editions'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatAttributeValue, getAttributeFields } from '#shared/utils/game-fields'
 import { preferredLanguage } from '#shared/utils/languages'
-import { todayOnDevice } from '#shared/utils/purchase-date'
 import { hasCardNavigation, navApiQuery, overviewQueryOf } from '#shared/utils/overview-query'
 import { CARD_STATUSES, statusNeedsDate, statusNeedsPerson, type CardStatusValue } from '#shared/utils/status'
 import { YGO_ATTRIBUTES, YGO_CARD_TYPES, YGO_RACES } from '#shared/utils/ygo-values'
@@ -825,7 +824,7 @@ const readonlyUi = { base: 'bg-elevated text-muted' }
               <UInput v-else :model-value="card.owner?.name ?? ''" readonly class="w-full" :ui="readonlyUi" />
             </UFormField>
             <UFormField :label="t('card.fields.purchaseDate')" :error="issues.errorOf('purchaseDate')">
-              <UInput v-model="form.purchaseDate" type="date" :max="todayOnDevice()" :readonly="!canEdit" :ui="canEdit ? undefined : readonlyUi" class="w-full" />
+              <PurchaseDateInput v-model="form.purchaseDate" :readonly="!canEdit" />
             </UFormField>
           </div>
         </section>

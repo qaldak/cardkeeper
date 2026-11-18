@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { assertPurchaseDate } from '../../server/lib/dates'
-import { latestPurchaseDate, todayOnDevice } from '../../shared/utils/purchase-date'
+import { EARLIEST_PURCHASE_DATE, latestPurchaseDate, todayOnDevice } from '../../shared/utils/purchase-date'
 
 describe('purchase date in the browser', () => {
   it('is today on the device, whatever the time zone', () => {
@@ -29,7 +29,7 @@ describe('assertPurchaseDate', () => {
   const now = new Date('2026-11-18T12:00:00Z')
 
   it('accepts no date, a past date and today', () => {
-    for (const value of [undefined, null, '', '2020-01-01', '2026-11-17', '2026-11-18']) {
+    for (const value of [undefined, null, '', '1990-01-01', '2020-01-01', '2026-11-17', '2026-11-18']) {
       expect(() => assertPurchaseDate(value, now), String(value)).not.toThrow()
     }
   })
@@ -37,6 +37,13 @@ describe('assertPurchaseDate', () => {
   it('refuses a date after the latest accepted date, with its own code', () => {
     for (const value of ['2026-11-20', '2026-12-01', '2027-01-01']) {
       expect(() => assertPurchaseDate(value, now), value).toThrowError(expect.objectContaining({ status: 400, code: 'purchase_date_in_future' }))
+    }
+  })
+
+  it('refuses a date before the earliest date, with its own code (a year typed with two or three digits)', () => {
+    expect(EARLIEST_PURCHASE_DATE).toBe('1990-01-01')
+    for (const value of ['0026-12-18', '0126-12-18', '1899-01-01', '1989-12-31']) {
+      expect(() => assertPurchaseDate(value, now), value).toThrowError(expect.objectContaining({ status: 400, code: 'purchase_date_too_early' }))
     }
   })
 })

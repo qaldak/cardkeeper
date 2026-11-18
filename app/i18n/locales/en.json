@@ -299,6 +299,7 @@
     "unknown": "Something went wrong. Please try again.",
     "validation_error": "The input is invalid.",
     "purchase_date_in_future": "The purchase date cannot be in the future.",
+    "purchase_date_too_early": "The purchase date cannot be before 1990.",
     "card_not_found": "The card was not found.",
     "image_not_found": "The image was not found.",
     "upstream_card_not_found": "The card was not found in the card database.",
@@ -428,6 +429,10 @@
     "submit": "Save password",
     "mismatch": "The two new passwords are not the same.",
     "changed": "Password changed"
+  },
+  "purchaseDate": {
+    "clear": "Remove date",
+    "openCalendar": "Open calendar"
   },
   "theme": {
     "label": "Appearance",

@@ -4,7 +4,7 @@
  * otherwise "Invalid value") and unmarked as soon as it is changed.
  */
 // Errors that have a code of their own and belong to one field: the field is marked with the text of the error.
-const FIELD_OF_CODE: Record<string, string> = { purchase_date_in_future: 'purchaseDate' }
+const FIELD_OF_CODE: Record<string, string> = { purchase_date_in_future: 'purchaseDate', purchase_date_too_early: 'purchaseDate' }
 
 export function useFormIssues() {
   const { t } = useI18n()

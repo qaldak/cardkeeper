@@ -809,6 +809,16 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
       expect((await at().cards.update(card.id, { purchaseDate: null }, h.anna)).purchaseDate).toBeNull()
     })
 
+    it('refuses a date before 1990 (a year typed with two digits), on adding and on changing, and keeps the old date', async () => {
+      await expect(at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), purchaseDate: '0026-12-18' }, h.anna))
+        .rejects.toMatchObject({ status: 400, code: 'purchase_date_too_early' })
+      expect(await h.db.card.count()).toBe(0)
+      const card = await at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), purchaseDate: '2026-07-15' }, h.anna)
+      await expect(at().cards.update(card.id, { purchaseDate: '0126-12-18' }, h.anna)).rejects.toMatchObject({ status: 400, code: 'purchase_date_too_early' })
+      expect(await purchaseDate(card.id)).toBe('2026-07-15')
+      expect((await at().cards.update(card.id, { purchaseDate: '1990-01-01' }, h.anna)).purchaseDate).toBe('1990-01-01')
+    })
+
     it('leaves a date from before the rule alone while other things are changed', async () => {
       const card = await at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id) }, h.anna)
       await h.db.card.update({ where: { id: card.id }, data: { purchaseDate: new Date('2027-03-01T00:00:00Z') } })

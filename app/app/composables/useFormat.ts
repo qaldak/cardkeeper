@@ -18,5 +18,5 @@ export function useFormat() {
   const dateTime = (value: string) =>
     new Intl.DateTimeFormat(tag.value, dateParts).format(new Date(value))
 
-  return { money, moneyWithOriginal, dateTime }
+  return { money, moneyWithOriginal, dateTime, tag }
 }
