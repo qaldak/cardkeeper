@@ -1,3 +1,9 @@
+## [0.27.5](https://github.com/qaldak/cardkeeper/compare/v0.27.4...v0.27.5) (2026-11-18)
+
+### Maintenance
+
+* npm: Bump vue from 3.5.44 to 3.5.45 in /app ([5a67211](https://github.com/qaldak/cardkeeper/commit/5a672115a37f57454f48f81774f56218253989b8))
+
 ## [0.27.4](https://github.com/qaldak/cardkeeper/compare/v0.27.3...v0.27.4) (2026-11-09)
 
 ### Maintenance
