@@ -1,3 +1,9 @@
+## [0.27.8](https://github.com/qaldak/cardkeeper/compare/v0.27.7...v0.27.8) (2026-11-18)
+
+### Bug Fixes
+
+* purchase date as a field with a visible placeholder and a lower limit ([f976ba0](https://github.com/qaldak/cardkeeper/commit/f976ba06a0215cc4d7ed60350d8edbe719195fae))
+
 ## [0.27.7](https://github.com/qaldak/cardkeeper/compare/v0.27.6...v0.27.7) (2026-11-18)
 
 ### Bug Fixes
