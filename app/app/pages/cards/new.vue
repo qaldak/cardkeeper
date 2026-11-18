@@ -5,6 +5,7 @@ import { formatAttributeValue } from '#shared/utils/game-fields'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatPrintedNumber } from '#shared/utils/pokemon-number'
 import { initialGame, LAST_GAME_COOKIE } from '#shared/utils/last-game'
+import { todayOnDevice } from '#shared/utils/purchase-date'
 import { isSetCode, normalizeSetCode, printedCodeFor, printToPreselect } from '#shared/utils/set-code'
 
 const { t } = useI18n()
@@ -328,7 +329,7 @@ const MAX_RESULTS = 50
         {{ t('add.ownerNote', { name: me?.name ?? '' }) }}
       </p>
       <UFormField :label="t('add.purchaseDate')">
-        <UInput v-model="purchaseDate" type="date" class="w-full" />
+        <UInput v-model="purchaseDate" type="date" :max="todayOnDevice()" class="w-full" />
       </UFormField>
 
       <div>

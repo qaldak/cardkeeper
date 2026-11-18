@@ -233,6 +233,30 @@ Source: User instruction 2026-10-09 19:19, 20:41; README (7f3d955) §Features; t
 - WHEN it is searched
 - THEN there is no additional request
 
+### Requirement: Purchase date not in the future
+The system SHALL accept as the purchase date of a new card only a date that is not after today: the date field is limited to today on the device, and the server refuses a later date with 400 `purchase_date_in_future` (the date that it already is at UTC+14 counts as today).
+Source: User instruction 2026-11-18 (nobody buys in the future); code server/lib/dates.ts, shared/utils/purchase-date.ts | Origin: user requirement
+
+#### Scenario: Today and the past
+- GIVEN a new card, from the card database or entered by hand
+- WHEN the purchase date is today or earlier
+- THEN the card is created with it
+
+#### Scenario: Later date in the form
+- GIVEN the form for a new card
+- WHEN a date after today is typed or chosen
+- THEN the browser rejects it and nothing is sent
+
+#### Scenario: Later date to the server
+- GIVEN a call that ignores the field
+- WHEN the purchase date lies after the latest accepted date
+- THEN the server answers 400 `purchase_date_in_future` and creates nothing
+
+#### Scenario: A day that has begun in the east
+- GIVEN it is 00:30 in Zurich and still the day before in UTC
+- WHEN the user enters today's date
+- THEN it is accepted
+
 ### Requirement: Create a card
 The system SHALL store card, translations, print, prices, raw answers (snapshots), status history (active) and log entry `created` in one transaction when creating, make the creator the owner and take over an optional purchase date.
 Source: README (7f3d955) §Features, §Data model; code server/services/cards.ts (create); test cards.test.ts | Origin: derived

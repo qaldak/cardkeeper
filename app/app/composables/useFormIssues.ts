@@ -3,6 +3,9 @@
  * (`data.data.issues`, e.g. `set.setCode`). A field is marked with a short message ("Required" when it is empty,
  * otherwise "Invalid value") and unmarked as soon as it is changed.
  */
+// Errors that have a code of their own and belong to one field: the field is marked with the text of the error.
+const FIELD_OF_CODE: Record<string, string> = { purchase_date_in_future: 'purchaseDate' }
+
 export function useFormIssues() {
   const { t } = useI18n()
   const messages = ref<Record<string, string>>({})
@@ -15,6 +18,10 @@ export function useFormIssues() {
       if (path) {
         next[path] = (valueOf(path) ?? '').trim() === '' ? t('errors.fieldRequired') : t('errors.fieldInvalid')
       }
+    }
+    const code = (error as { data?: { data?: { code?: string } } })?.data?.data?.code
+    if (code && FIELD_OF_CODE[code]) {
+      next[FIELD_OF_CODE[code]] = t(`errors.${code}`)
     }
     messages.value = next
     return Object.keys(next).length > 0

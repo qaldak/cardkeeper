@@ -93,6 +93,20 @@ Source: Code server/services/cards.ts (update); tests cards.test.ts (does nothin
 - WHEN it is saved
 - THEN no log entry is created
 
+### Requirement: Purchase date not in the future when changing it
+The system SHALL apply the rule "purchase date not in the future" (see `card-entry`) also when the date is changed on the card page, and the server SHALL leave a date that was saved earlier and is not changed alone.
+Source: User instruction 2026-11-18 (purchase date at most today); code app/app/pages/cards/[id].vue, server/services/cards.ts | Origin: user requirement
+
+#### Scenario: Changing to a later date
+- GIVEN a card with a purchase date
+- WHEN it is changed to a date after today
+- THEN the browser rejects it, and the server (called directly) answers 400 `purchase_date_in_future` and keeps the old date
+
+#### Scenario: A date from before the rule
+- GIVEN a card whose saved date lies in the future
+- WHEN the card page is saved
+- THEN the browser asks to correct the date first, while a call that does not change the date is accepted by the server
+
 ### Requirement: Note "modified on"
 The system SHALL show "modified on" with the date in the header of the card after the origin ("taken from API" or "entered manually") as soon as a user has changed something; updating from the API does not count.
 Source: User instruction 2026-10-04 19:40 (4); README (7f3d955) §Features; code app/app/pages/cards/[id].vue | Origin: user requirement

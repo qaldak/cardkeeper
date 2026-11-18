@@ -11,7 +11,7 @@ import type { AppConfig } from '../lib/config'
 import { buildCardWhere, type CardFilters } from '../lib/card-filters'
 import { sortRows, type SortRow } from '../lib/card-sort'
 import type { UnknownEdition } from '../lib/editions'
-import { formatDateOnly, parseDateOnly, utcToday } from '../lib/dates'
+import { assertPurchaseDate, formatDateOnly, parseDateOnly, utcToday } from '../lib/dates'
 import { badRequest, notFound } from '../lib/errors'
 import { detectImageType, removeCardImageDir, saveImage } from '../lib/image-files'
 import { downloadImage } from '../lib/image-download'
@@ -411,6 +411,7 @@ export function createCardService(deps: CardServiceDeps) {
     },
 
     async create(input: CreateCardInput, actor: Actor): Promise<CardDetailDto> {
+      assertPurchaseDate(input.purchaseDate, now())
       const adapter = registry.require(input.game)
       const merged = await fetchMerged(adapter, input.externalId)
       if (!merged) {
@@ -498,6 +499,7 @@ export function createCardService(deps: CardServiceDeps) {
      * and no price, so nothing asks the card database about it later; its data is what was entered.
      */
     async createManual(input: CreateManualCardInput, actor: Actor): Promise<CardDetailDto> {
+      assertPurchaseDate(input.purchaseDate, now())
       registry.require(input.game)
       if (!getGameConfig(input.game).manualEntry) {
         throw badRequest('manual_not_supported', 'This game does not support entering a card by hand')
@@ -598,6 +600,10 @@ export function createCardService(deps: CardServiceDeps) {
 
       if (patch.purchaseDate !== undefined) {
         const oldDate = card.purchaseDate ? formatDateOnly(card.purchaseDate) : null
+        // Only a new date is checked: a date that is saved already (from before this rule) is left alone.
+        if (patch.purchaseDate !== oldDate) {
+          assertPurchaseDate(patch.purchaseDate, now())
+        }
         if (track('purchaseDate', oldDate, patch.purchaseDate)) {
           data.purchaseDate = patch.purchaseDate ? parseDateOnly(patch.purchaseDate) : null
         }
