@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { CardDetailDto } from '#shared/types/api'
 import { YGO_EDITIONS } from '#shared/utils/editions'
-import { todayOnDevice } from '#shared/utils/purchase-date'
 import { isSetCode, normalizeSetCode } from '#shared/utils/set-code'
 import { YGO_ATTRIBUTES, YGO_CARD_TYPES, YGO_RACES } from '#shared/utils/ygo-values'
 
@@ -233,7 +232,7 @@ async function submit() {
       {{ t('add.ownerNote', { name: me?.name ?? '' }) }}
     </p>
     <UFormField :label="t('manual.purchaseDate')" :error="issues.errorOf('purchaseDate')">
-      <UInput v-model="purchaseDate" type="date" :max="todayOnDevice()" class="w-full" data-test="manual-purchase-date" />
+      <PurchaseDateInput v-model="purchaseDate" data-test="manual-purchase-date" />
     </UFormField>
 
     <div class="flex flex-wrap gap-3">

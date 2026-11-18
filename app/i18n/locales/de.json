@@ -299,6 +299,7 @@
     "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "validation_error": "Die Eingabe ist ungültig.",
     "purchase_date_in_future": "Das Kaufdatum darf nicht in der Zukunft liegen.",
+    "purchase_date_too_early": "Das Kaufdatum darf nicht vor 1990 liegen.",
     "card_not_found": "Die Karte wurde nicht gefunden.",
     "image_not_found": "Das Bild wurde nicht gefunden.",
     "upstream_card_not_found": "Die Karte wurde in der Kartendatenbank nicht gefunden.",
@@ -428,6 +429,10 @@
     "submit": "Passwort speichern",
     "mismatch": "Die beiden neuen Passwörter stimmen nicht überein.",
     "changed": "Passwort geändert"
+  },
+  "purchaseDate": {
+    "clear": "Datum entfernen",
+    "openCalendar": "Kalender öffnen"
   },
   "theme": {
     "label": "Darstellung",

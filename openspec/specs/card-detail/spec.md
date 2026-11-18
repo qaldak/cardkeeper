@@ -1,7 +1,7 @@
 # Card Detail Specification
 
 ## Purpose
-The detail page of a card: texts in several languages, the few editable fields (all data for a card entered by hand), the switch for deck use, updating from the card database, deleting and display of changes. Status is in `card-status`, images in `images`, price history in `prices`, paging in `card-paging`. Decisions: [ADR 0006](../../../docs/adr/0006-texts-per-language.md) (texts per language), [ADR 0011](../../../docs/adr/0011-editions-as-keys.md) (editions), [ADR 0025](../../../docs/adr/0025-manual-cards.md) (cards entered by hand), [ADR 0026](../../../docs/adr/0026-deck-use-flag.md) (deck use).
+The detail page of a card: texts in several languages, the few editable fields (all data for a card entered by hand), the switch for deck use, updating from the card database, deleting and display of changes. Status is in `card-status`, images in `images`, price history in `prices`, paging in `card-paging`. Decisions: [ADR 0006](../../../docs/adr/0006-texts-per-language.md) (texts per language), [ADR 0011](../../../docs/adr/0011-editions-as-keys.md) (editions), [ADR 0025](../../../docs/adr/0025-manual-cards.md) (cards entered by hand), [ADR 0026](../../../docs/adr/0026-deck-use-flag.md) (deck use), [ADR 0027](../../../docs/adr/0027-purchase-date-field.md) (purchase date field).
 
 ## Requirements
 
@@ -106,6 +106,20 @@ Source: User instruction 2026-11-18 (purchase date at most today); code app/app/
 - GIVEN a card whose saved date lies in the future
 - WHEN the card page is saved
 - THEN the browser asks to correct the date first, while a call that does not change the date is accepted by the server
+
+### Requirement: Purchase date field on the card page
+The system SHALL show the purchase date on the card page in the field of `card-entry` (segments, placeholder, calendar, button to remove) and apply the rule "not before 1990" when the date is changed, while the server leaves a saved date that is not changed alone.
+Source: User instruction 2026-11-18 (variant A; 18.12.0026 must not be saved); code app/app/components/PurchaseDateInput.vue, server/services/cards.ts | Origin: user requirement
+
+#### Scenario: Removing the date
+- GIVEN a card with a purchase date
+- WHEN the owner removes it with the button and saves
+- THEN the card has no purchase date
+
+#### Scenario: Not the owner
+- GIVEN a card of another user
+- WHEN the card page is shown
+- THEN the date is grey, without calendar and without a button to remove it
 
 ### Requirement: Note "modified on"
 The system SHALL show "modified on" with the date in the header of the card after the origin ("taken from API" or "entered manually") as soon as a user has changed something; updating from the API does not count.
