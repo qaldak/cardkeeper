@@ -770,6 +770,55 @@ describe.skipIf(!TEST_DATABASE_URL)('card service', () => {
     })
   })
 
+  describe('purchase date', () => {
+    // Noon UTC on 18 November: the latest accepted date is 19 November (the date it already is at UTC+14).
+    const NOW = () => new Date('2026-11-18T12:00:00Z')
+    const at = () => h.servicesAt(NOW)
+    const purchaseDate = async (cardId: number) => (await h.services.cards.get(cardId)).purchaseDate
+
+    it('accepts today and a past date when a card is added', async () => {
+      const today = await at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' }, purchaseDate: '2026-11-18' }, h.anna)
+      const past = await at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), set: { setCode: 'LOB-005', rarity: 'Ultra Rare' }, purchaseDate: '2025-01-31' }, h.anna)
+      expect([await purchaseDate(today.id), await purchaseDate(past.id)]).toEqual(['2026-11-18', '2025-01-31'])
+    })
+
+    it('accepts the date of the day that has already begun in the east (a user in Switzerland after midnight)', async () => {
+      const card = await at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), purchaseDate: '2026-11-19' }, h.anna)
+      expect(await purchaseDate(card.id)).toBe('2026-11-19')
+    })
+
+    it('refuses a later date when a card is added, and stores nothing', async () => {
+      await expect(at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), purchaseDate: '2026-11-20' }, h.anna))
+        .rejects.toMatchObject({ status: 400, code: 'purchase_date_in_future' })
+      expect(await h.db.card.count()).toBe(0)
+      expect(h.ygo.apiCalls()).toBe(0)
+    })
+
+    it('refuses a later date for a card entered by hand', async () => {
+      const manual = (date: string) => at().cards.createManual({ game: 'ygo', translation: { language: 'de', name: 'Marke' }, set: { setCode: 'X-1' }, purchaseDate: date }, h.anna)
+      await expect(manual('2027-06-01')).rejects.toMatchObject({ status: 400, code: 'purchase_date_in_future' })
+      expect(await h.db.card.count()).toBe(0)
+      expect((await manual('2026-11-18')).purchaseDate).toBe('2026-11-18')
+    })
+
+    it('refuses a later date when it is changed, and keeps the old one', async () => {
+      const card = await at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id), purchaseDate: '2026-07-15' }, h.anna)
+      await expect(at().cards.update(card.id, { purchaseDate: '2026-12-24' }, h.anna)).rejects.toMatchObject({ status: 400, code: 'purchase_date_in_future' })
+      expect(await purchaseDate(card.id)).toBe('2026-07-15')
+      expect((await at().cards.update(card.id, { purchaseDate: '2026-11-18' }, h.anna)).purchaseDate).toBe('2026-11-18')
+      expect((await at().cards.update(card.id, { purchaseDate: null }, h.anna)).purchaseDate).toBeNull()
+    })
+
+    it('leaves a date from before the rule alone while other things are changed', async () => {
+      const card = await at().cards.create({ game: 'ygo', externalId: String(DARK_MAGICIAN.id) }, h.anna)
+      await h.db.card.update({ where: { id: card.id }, data: { purchaseDate: new Date('2027-03-01T00:00:00Z') } })
+      const same = await at().cards.update(card.id, { purchaseDate: '2027-03-01', status: 'SOLD', statusPerson: 'Max' }, h.anna)
+      expect(same).toMatchObject({ purchaseDate: '2027-03-01', status: 'SOLD' })
+      // ... but a different future date is refused
+      await expect(at().cards.update(card.id, { purchaseDate: '2027-04-01' }, h.anna)).rejects.toMatchObject({ code: 'purchase_date_in_future' })
+    })
+  })
+
   describe('remove', () => {
     it('deletes the card with its translations, history and image files', async () => {
       const card = await addDarkMagician()

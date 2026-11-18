@@ -298,6 +298,7 @@
   "errors": {
     "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "validation_error": "Die Eingabe ist ungültig.",
+    "purchase_date_in_future": "Das Kaufdatum darf nicht in der Zukunft liegen.",
     "card_not_found": "Die Karte wurde nicht gefunden.",
     "image_not_found": "Das Bild wurde nicht gefunden.",
     "upstream_card_not_found": "Die Karte wurde in der Kartendatenbank nicht gefunden.",

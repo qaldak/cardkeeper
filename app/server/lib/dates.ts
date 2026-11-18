@@ -1,3 +1,4 @@
+import { latestPurchaseDate } from '../../shared/utils/purchase-date'
 import { badRequest } from './errors'
 
 const DATE_ONLY = /^(\d{4})-(\d{2})-(\d{2})$/
@@ -23,4 +24,11 @@ export function formatDateOnly(date: Date): string {
 /** Today at UTC midnight. */
 export function utcToday(now: Date = new Date()): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+}
+
+/** A purchase date (`YYYY-MM-DD`) cannot lie in the future: refused with 400 `purchase_date_in_future` (see `latestPurchaseDate`). */
+export function assertPurchaseDate(value: string | null | undefined, now: Date = new Date()): void {
+  if (value && value > latestPurchaseDate(now)) {
+    throw badRequest('purchase_date_in_future', `The purchase date ${value} lies in the future`)
+  }
 }

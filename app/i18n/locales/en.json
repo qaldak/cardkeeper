@@ -298,6 +298,7 @@
   "errors": {
     "unknown": "Something went wrong. Please try again.",
     "validation_error": "The input is invalid.",
+    "purchase_date_in_future": "The purchase date cannot be in the future.",
     "card_not_found": "The card was not found.",
     "image_not_found": "The image was not found.",
     "upstream_card_not_found": "The card was not found in the card database.",

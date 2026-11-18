@@ -16,7 +16,7 @@ describe.skipIf(!TEST_DATABASE_URL)('cards entered by hand', () => {
 
   describe('create', () => {
     it('stores the card with its text, print, status and log entry, and nothing from a card database', async () => {
-      const card = await h.services.cards.createManual(albaz({ purchaseDate: '2026-11-07' }), h.anna)
+      const card = await h.services.cards.createManual(albaz({ purchaseDate: '2026-09-07' }), h.anna)
 
       expect(card).toMatchObject({
         game: { slug: 'ygo' },
@@ -24,7 +24,7 @@ describe.skipIf(!TEST_DATABASE_URL)('cards entered by hand', () => {
         name: 'Albaz der Verschleierte',
         status: 'ACTIVE',
         owner: { id: h.anna.id },
-        purchaseDate: '2026-11-07',
+        purchaseDate: '2026-09-07',
         lastModifiedBy: h.anna.name,
         userModifiedAt: null,
         lastFetchedAt: null,
@@ -174,8 +174,8 @@ describe.skipIf(!TEST_DATABASE_URL)('cards entered by hand', () => {
 
     it('still changes status, owner and purchase date of a manual card', async () => {
       const card = await h.services.cards.createManual(albaz(), h.anna)
-      const changed = await h.services.cards.update(card.id, { status: 'SOLD', statusPerson: 'Max', purchaseDate: '2026-11-01' }, h.anna)
-      expect(changed).toMatchObject({ status: 'SOLD', statusPerson: 'Max', purchaseDate: '2026-11-01' })
+      const changed = await h.services.cards.update(card.id, { status: 'SOLD', statusPerson: 'Max', purchaseDate: '2026-09-01' }, h.anna)
+      expect(changed).toMatchObject({ status: 'SOLD', statusPerson: 'Max', purchaseDate: '2026-09-01' })
     })
   })
 
