@@ -1,3 +1,13 @@
+## [0.27.7](https://github.com/qaldak/cardkeeper/compare/v0.27.6...v0.27.7) (2026-11-18)
+
+### Bug Fixes
+
+* the purchase date cannot lie in the future ([70e761f](https://github.com/qaldak/cardkeeper/commit/70e761f6c496af95e586590efa7e931230e23b1d))
+
+### Maintenance
+
+* npm: Bump @iconify-json/lucide from 1.2.151 to 1.2.154 in /app ([31218b8](https://github.com/qaldak/cardkeeper/commit/31218b84b43f86847b6968f594a201f0d12e5136))
+
 ## [0.27.6](https://github.com/qaldak/cardkeeper/compare/v0.27.5...v0.27.6) (2026-11-18)
 
 ### Maintenance
