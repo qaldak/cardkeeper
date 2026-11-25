@@ -1,3 +1,9 @@
+## [0.28.0](https://github.com/qaldak/cardkeeper/compare/v0.27.10...v0.28.0) (2026-11-25)
+
+### Features
+
+* preset the purchase date to today for a new card ([49a7008](https://github.com/qaldak/cardkeeper/commit/49a700865008a736c6a872008c465824c969cc44))
+
 ## [0.27.10](https://github.com/qaldak/cardkeeper/compare/v0.27.9...v0.27.10) (2026-11-23)
 
 ### Maintenance
