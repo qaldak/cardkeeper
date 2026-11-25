@@ -5,6 +5,7 @@ import { formatAttributeValue } from '#shared/utils/game-fields'
 import { getGameConfig } from '#shared/utils/game-config'
 import { formatPrintedNumber } from '#shared/utils/pokemon-number'
 import { initialGame, LAST_GAME_COOKIE } from '#shared/utils/last-game'
+import { todayOnDevice } from '#shared/utils/purchase-date'
 import { isSetCode, normalizeSetCode, printedCodeFor, printToPreselect } from '#shared/utils/set-code'
 
 const { t } = useI18n()
@@ -53,7 +54,12 @@ const typedSetCode = ref<string | null>(null)
 // Yu-Gi-Oh!: the edition printed on the card (a key such as FIRST_EDITION), chosen with one click. None chosen means
 // Unlimited, which is not printed. The card database does not know the edition.
 const edition = ref<string | null>(null)
+// Preset to today, set in the browser: the page is rendered on the server, which does not know the date of the user. The user
+// can change the date or remove it.
 const purchaseDate = ref('')
+onMounted(() => {
+  purchaseDate.value = todayOnDevice()
+})
 const submitting = ref(false)
 
 // A search belongs to one game: switching the game starts over.

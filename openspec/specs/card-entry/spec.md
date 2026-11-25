@@ -272,7 +272,7 @@ Source: User instruction 2026-11-18 (18.12.0026 must not be saved); the limit 19
 - THEN the server answers 400 `purchase_date_too_early` and creates nothing
 
 ### Requirement: Purchase date field shows when it is empty
-The system SHALL show the purchase date as a field with day, month and year segments, a placeholder ("tt.mm.jjjj", "dd/mm/yyyy") and no preset date, a calendar and a button to remove the date; the field of a user who cannot edit it is grey.
+The system SHALL show the purchase date as a field with day, month and year segments, a placeholder ("tt.mm.jjjj", "dd/mm/yyyy", never today's date), a calendar and a button to remove the date; the field of a user who cannot edit it is grey.
 Source: User instruction 2026-11-18 (the empty field showed today's date and looked read-only; variant A: segments, "18.01.2026" and "18012026" are enough); code app/app/components/PurchaseDateInput.vue; ADR 0027 | Origin: user requirement
 
 #### Scenario: No date
@@ -284,6 +284,25 @@ Source: User instruction 2026-11-18 (the empty field showed today's date and loo
 - GIVEN the purchase date field
 - WHEN "18.01.2026" or "18012026" is typed
 - THEN the date is 18 January 2026
+
+### Requirement: Purchase date preset to today for a new card
+The system SHALL preset the purchase date to today on the device in the form for a new card, from the card database or by hand, and let the user change the date or remove it, which stores the card without a purchase date.
+Source: User instruction 2026-11-24 (a new card gets today's date by default; it can be changed or removed); code app/app/pages/cards/new.vue, app/app/components/ManualCardForm.vue | Origin: user requirement
+
+#### Scenario: Adding a card without touching the date
+- GIVEN the form for a new card
+- WHEN it is shown and the card is added
+- THEN the purchase date field shows today's date and the card is created with it
+
+#### Scenario: Removing the date
+- GIVEN the form for a new card with the preset date
+- WHEN the user removes the date and adds the card
+- THEN the card is created without a purchase date
+
+#### Scenario: A card that already exists
+- GIVEN a card without a purchase date
+- WHEN its page is shown
+- THEN the field stays empty and shows the placeholder
 
 ### Requirement: Create a card
 The system SHALL store card, translations, print, prices, raw answers (snapshots), status history (active) and log entry `created` in one transaction when creating, make the creator the owner and take over an optional purchase date.

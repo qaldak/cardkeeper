@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CardDetailDto } from '#shared/types/api'
 import { YGO_EDITIONS } from '#shared/utils/editions'
+import { todayOnDevice } from '#shared/utils/purchase-date'
 import { isSetCode, normalizeSetCode } from '#shared/utils/set-code'
 import { YGO_ATTRIBUTES, YGO_CARD_TYPES, YGO_RACES } from '#shared/utils/ygo-values'
 
@@ -31,7 +32,11 @@ const def = ref('')
 const description = ref('')
 // A card entered by hand is not for the deck unless the user says so: nothing tells that it can be played.
 const deckable = ref(false)
+// Preset to today on the device (set in the browser, see `pages/cards/new.vue`); it can be changed or removed.
 const purchaseDate = ref('')
+onMounted(() => {
+  purchaseDate.value = todayOnDevice()
+})
 const submitting = ref(false)
 
 // A save that the server rejects marks the fields that are wrong (see `useFormIssues`); a field is unmarked when changed.
